@@ -24,6 +24,19 @@ int main(int argc, char * argv[])
     	cin >> login;
 		cout << "Password :" << endl;
     	cin >> password;
+    	cout << "Connexion......." << endl;
+
+    	//On envoie
+
+    	//On attend la réponse
+    	while(1) /* on boucle tant que l'on ne reçoit pas le bon message */
+   		{
+   			
+     		if (UneRequeteR.Compteur != UneRequeteE.Compteur ) 
+        		printf("doublon !!!!!\n") ;
+     		else
+        		break ;
+   }
 
     }while(fail != 0)
 
