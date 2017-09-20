@@ -1,9 +1,10 @@
 //
 // Created by floryan on 20/09/17.
 //
-#include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
+using namespace std;
 
 
 
@@ -11,6 +12,20 @@ int main(int argc, char * argv[])
 {
 	u_long IpSocket;
     u_short PortSocket;
+
+    bool fail = 1;
+    char login[20];
+    char password[20];
+
+    do
+    {
+    	cout << "Application CHECK IN" << endl << "--------------------" << endl;
+    	cout << "Login :" << endl;
+    	cin >> login;
+		cout << "Password :" << endl;
+    	cin >> password;
+
+    }while(fail != 0)
 
 
 }
