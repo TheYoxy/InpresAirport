@@ -1,0 +1,31 @@
+//
+// Created by floryan on 20/09/17.
+//
+
+#ifndef SERVEUR_IPV4_H
+#define SERVEUR_IPV4_H
+
+#include <cstdio>
+#include <iostream>
+#include <ctype.h>
+
+class ipv4 {
+public:
+    ipv4(const char *addr = "127.0.0.1");
+
+    ipv4(unsigned char a1, unsigned char a2, unsigned char a3, unsigned char a4);
+
+    std::string toString();
+
+private:
+    void verification(const char *addr);
+
+    const std::string ExceptionHeader = "Mauvaise adresse ip: ";
+    unsigned char b1;
+    unsigned char b2;
+    unsigned char b3;
+    unsigned char b4;
+};
+
+
+#endif //SERVEUR_IPV4_H
