@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "Socket.h"
 
 Socket::Socket() {
@@ -6,17 +7,6 @@ Socket::Socket() {
     }
 }
 
-/*Socket::Socket(ip &addrip, unsigned short port) : Socket() {
-    try {
-        this->Bind(addrip, port);
-    }
-    catch (Exception e) {
-        std::cerr << e.getMessage() << std::endl;
-        throw e;
-    }
-
-}*/
-
 Socket::~Socket() {
-
+    close(this->descripteur);
 }
