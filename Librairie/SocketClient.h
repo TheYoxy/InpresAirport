@@ -10,12 +10,14 @@
 
 class SocketClient : Socket {
 public:
-    SocketClient(ipv4 &, unsigned short port);
+    SocketClient();
+
+    SocketClient(ipv4 &addr, unsigned short port);
+
+    ~SocketClient();
 
 protected:
-    void Bind(ipv4 &, unsigned short port);
 
-    struct sockaddr_in *socket;
 private:
 };
 

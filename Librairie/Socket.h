@@ -1,5 +1,5 @@
-#ifndef INPRESAIRPORT_SOCKET_H
-#define INPRESAIRPORT_SOCKET_H
+#ifndef SERVEUR_SOCKET_H
+#define SERVEUR_SOCKET_H
 
 #include "Structs.h"
 #include "Exception.h"
@@ -12,15 +12,17 @@ class Socket {
 public:
     Socket();
 
-    //Socket(ip&, unsigned short port);
-    //bool bind();
-    ~Socket();
+    Socket(ipv4 &addr, unsigned short port);
 
+    virtual ~Socket();
 protected:
+    virtual void Send(void *message, size_t size);
 
-    virtual void Bind(ipv4 &, unsigned short port) = 0;
+    virtual void Recv(void *message, size_t size);
 
+    virtual void Bind(ipv4 &, unsigned short port);
     int descripteur;
+    struct sockaddr_in *socketOut;
 };
 
-#endif //INPRESAIRPORT_SOCKET_H
+#endif //SERVERU_SOCKET_H
