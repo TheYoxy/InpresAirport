@@ -15,12 +15,13 @@ public:
 
     ipv4(unsigned char a1, unsigned char a2, unsigned char a3, unsigned char a4);
 
-    std::string toString();
+    std::string toString() const;
 
+    static const ipv4 LocalHost;
 private:
     void verification(const char *addr);
 
-    const std::string ExceptionHeader = "Mauvaise adresse ip: ";
+    static const std::string ExceptionHeader;
     unsigned char b1;
     unsigned char b2;
     unsigned char b3;

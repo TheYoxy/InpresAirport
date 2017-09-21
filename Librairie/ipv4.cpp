@@ -43,9 +43,12 @@ void ipv4::verification(const char *addr) {
     if (pt != 3) throw Exception(ExceptionHeader + "Il y a trop de points.");
 }
 
-std::string ipv4::toString() {
+std::string ipv4::toString() const {
     char *c = new char[15];
     sprintf(c, "%d.%d.%d.%d", this->b1, this->b2, this->b3, this->b4);
     std::string retour = c;
     return retour;
 }
+
+const ipv4 ipv4::LocalHost("127.0.0.1");
+const std::string ipv4::ExceptionHeader("Mauvaise adresse ip: ");
