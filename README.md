@@ -1,4 +1,14 @@
 # InpresAirport
+#### Délais de présentation
+Application | Semaine | Pondération
+--- | --- | ---
+1: Client/Serveur multithread TCP en C/C++ | 2/10/2017 | 20
+2: JDBC | 9/10/2017 | 10
+3: Client serveur multithread TCP en Java | 23/10/2017 | 20
+4: Programmation web java classique | 20/11/2017 | 20
+5: Client-serveur UDP en C/C++ et Java | 4/12/2017 | 10
+6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80
+7: Communications réseaux C/C++ - Java | Examen de laboratoire de janvier 2018 | 20
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
 Dossier attendu: 
@@ -84,6 +94,10 @@ On évitera la construction de flux réseaux d'entrée et de sortie, `NetworkStr
     ---
 ## 2. Les accès aux bases de données
 ### 2.1 La base de données BD_AIRPORT
+Dossier attendu: 
+-  Schéma relationnel de BD_AIRPORT.
+-  Diagramme de classe *UML* des classes de *database.utilities*.
+
 Base de données *MySql* BD_AIRPORT doit contenir toutes les informations utiles concernant le fonctionnement de l'aéroport (**Uniquement**). Ses tables, si on admet un certain nombre d'approximations, de simplifications et d'omission sans importance pour le projet tel que défini ici (Avec le minimum de champs, en définitive), seront en première analyse celle d'une base de données classique, que l'on peut définir dans un premier temps sommairement comme contenant les tables:
 
 Table | Description
@@ -96,3 +110,17 @@ Agents | Elle contient tous les intervenants de l'aéroport (Agents de compagnie
 
 On peut ajouter des tables ou des champs aux tables existantes, des vues ou des contraintes, mais uniquement si elles sont justifiées par le projet.
 ###2.2 Un outil d'accès aux bases de données
+L'accès à la base de données ne devrait pas se faire avec les primitives JDBC utilisée telles quelles, mais plutôt au moyen d'objets métiers encapsulant le travail, idéalement des *Java Beans* mais **sans utilisation d'un mécanisme d'event**.
+On demande donc de construire un groupe de telles classes (package *database.utilities*) permettant l'accès (c'est-à-dire à tout le moins la connextion et les sélections de base) le plus simple possible.
+On souhaite pourvoir accéder, au minimum, à des bases relationnelles de type *MySql* ou *Oracle*.
+Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi construite proposera une interface graphique de base permettant:
+- Soit de se connecter à la base *MySql* DB_AIRPORT pour y réaliser des requêtes élémentaires de type `select * from ... where...`,`select count(*) from` et `update ... set ... where ...` avec l'affichage des résultats (requêtes adaptées à la table visée - pas de tentatives de généricité à ce stade).
+- Soit de se connecter ) une base BD_JOURNALDEBORD, qui est une base Oracle à deux tables: 
+
+    Table|Description
+    --- | ---
+    Activites | Cours, cours-labo et travail labo en équipe, date, description, référence de l'intervenant principal `= prof si cours ou cours-labo, étudiant si activité en équipe de laboratoire`
+    Intervenants | Profs,Etudiants
+
+    Rien n'interdit de lancer simultanément plusieurs instances de cette applications : attention donc aux accès concurrents.
+## 3. Le serveur Serveur_Bagages 
