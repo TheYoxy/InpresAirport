@@ -6,21 +6,26 @@
 #include "ipv4.h"
 #include <cstdio>
 #include <sys/socket.h>
+
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
 class Socket {
 public:
     Socket();
 
-    Socket(ipv4 &addr, unsigned short port);
+    Socket(const ipv4 &addr, unsigned short port);
 
     virtual ~Socket();
+
+    virtual void SendTo(const char *message, size_t size, const ipv4 &addr, unsigned short port);
+
+    virtual void Recv(char *message, size_t size);
+
 protected:
-    virtual void Send(void *message, size_t size);
+    virtual void Bind(const ipv4 &, unsigned short port);
 
-    virtual void Recv(void *message, size_t size);
+    std::string getLieu() const;
 
-    virtual void Bind(ipv4 &, unsigned short port);
     int descripteur;
     struct sockaddr_in *socketOut;
 };

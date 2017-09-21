@@ -1,24 +1,14 @@
-//
-// Created by floryan on 21/09/17.
-//
-
-#include <cstring>
 #include "SocketServeur.h"
 
-SocketServeur::SocketServeur() : SocketServeur((ipv4 &) new ipv4(), 65001) {
 
-}
-
-SocketServeur::SocketServeur(ipv4 &addr, unsigned short port) {
-    try {
-        Bind(addr, port);
-    }
-    catch (Exception e) {
-        throw e;
-    }
+SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) : Socket(addr, port) {
 }
 
 
-SocketServeur::~SocketServeur() : ~Socket() {
+SocketServeur::~SocketServeur() {
 
+}
+
+std::string SocketServeur::getLieu() const {
+    return "SocketServeur: ";
 }

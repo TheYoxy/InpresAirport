@@ -8,15 +8,14 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-class SocketClient : Socket {
+class SocketClient : public Socket {
 public:
-    SocketClient();
-
-    SocketClient(ipv4 &addr, unsigned short port);
+    SocketClient(const ipv4 &addr = ipv4().LocalHost, unsigned short port = 26100);
 
     ~SocketClient();
 
 protected:
+    std::string getLieu() const;
 
 private:
 };

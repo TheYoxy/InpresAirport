@@ -1,19 +1,14 @@
 #include <cstring>
 #include "SocketClient.h"
 
-SocketClient::SocketClient() : SocketClient((ipv4 &) new ipv4(), 65000) {
+SocketClient::SocketClient(const ipv4 &addr, unsigned short port) : Socket(addr, port) {
+}
+
+SocketClient::~SocketClient() {
 
 }
 
-SocketClient::SocketClient(ipv4 &addr, unsigned short port) : Socket() {
-    try {
-        Bind(addr, port);
-    }
-    catch (Exception e) {
-        throw e;
-    }
+std::string SocketClient::getLieu() const {
+    return "SocketClient: ";
 }
 
-SocketClient::~SocketClient() : ~Socket() {
-
-}
