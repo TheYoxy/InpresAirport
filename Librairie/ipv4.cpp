@@ -1,5 +1,4 @@
 #include "ipv4.h"
-#include "Exception.h"
 
 ipv4::ipv4(const char *addr) {
     try {
@@ -52,3 +51,13 @@ std::string ipv4::toString() const {
 
 const ipv4 ipv4::LocalHost("127.0.0.1");
 const std::string ipv4::ExceptionHeader("Mauvaise adresse ip: ");
+
+int ipv4::to32bits() const {
+    return (int) inet_addr(this->toString().c_str());
+}
+
+in_addr ipv4::toAddr() const {
+    in_addr retour;
+    inet_aton(toString().c_str(), &retour);
+    return retour;
+}

@@ -1,13 +1,11 @@
-//
-// Created by floryan on 20/09/17.
-//
-
 #ifndef SERVEUR_IPV4_H
 #define SERVEUR_IPV4_H
 
 #include <cstdio>
 #include <iostream>
 #include <ctype.h>
+#include <arpa/inet.h>
+#include "Exception.h"
 
 class ipv4 {
 public:
@@ -16,6 +14,10 @@ public:
     ipv4(unsigned char a1, unsigned char a2, unsigned char a3, unsigned char a4);
 
     std::string toString() const;
+
+    int to32bits() const;
+
+    in_addr toAddr() const;
 
     static const ipv4 LocalHost;
 private:
