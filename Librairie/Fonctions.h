@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include "Structs.h"
+#include "ipv4.h"
 
+struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port);
 
 #endif //SERVEUR_FONCTIONS_H
