@@ -1,6 +1,6 @@
 # InpresAirport
-##1. Serveur_CheckIN et Application_CheckIn
-###1.1. L'enregistrement des passagers : client-serveur
+## 1. Serveur_CheckIN et Application_CheckIn
+### 1.1. L'enregistrement des passagers : client-serveur
 Le **Serveur_CheckIn** a donc pour mission essentielle de gérer les arrivées des
 passagers qui sont en possession d'un billet pour un vol donné : il s'agit essentiellement de la
 vérification des billets, de la validation des billets présentés ainsi que de l'enregistrement des
@@ -24,10 +24,11 @@ librairie de fonctions dont l'implémentation sera modifiée ultérieurement (av
 de réécriture de code). On pense donc ici à des fonctions du type suivant (ce sont des
 exemples - libre à vous d'en concevoir d'autres du même style) :
 
-####Exemple : Librairie AccessBilBag
+#### Exemple : Librairie AccessBilBag
+
 Fonction | Sémantique | Valeur retournée
--| :-: | -
-`int verifyTicket(char * number, int nbPassengers)`| Vérification de l'existence d'un billet d'avion avec un certain nombre d’accompagnants. | 0 ou 1
+--- | --- | --- 
+`int verifyTicket(char * number, int nbPassengers)` | Vérification de l'existence d'un billet d'avion avec un certain nombre d’accompagnants. | 0 ou 1
 `float addLuggage(cahr * number, float weight, char suitcase)`|Enregistrement d'un bagage de poids donné, sous forme de valise ou pas, pour le billet d'avion précisé.| Poids total actuel pour le billet.
 
 ### **1.3 Quelques conseils méthodologiques pour le développement de CIMP**
