@@ -1,6 +1,11 @@
 # InpresAirport
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
+Dossier attendu: 
+- Tableau des commandes et diagramme du protocole CIMP - du type ci-contre.
+- Code *C*/*C++* du serveur Serveur_CheckIn.
+- Vues des trames échangées par un sniffer lors du début des opérations.
+
 Le **Serveur_CheckIn** a donc pour mission essentielle de gérer les arrivées des
 passagers qui sont en possession d'un billet pour un vol donné : il s'agit essentiellement de la
 vérification des billets, de la validation des billets présentés ainsi que de l'enregistrement des
@@ -47,5 +52,47 @@ Fonction | Sémantique | Valeur retournée
 Par exemple:
 		- `Socket`
 		- `SocketClient`
-		- `SocketServeur`
+		- `SocketServeur`\
 On évitera la construction de flux réseaux d'entrée et de sortie, `NetworkStreamBase` `ONetworkStream` `INetworkStream`, car cela devient trop ambitieux pour le temps dont on dispose.
+3. Quelques remarques s'imposent:
+    - Une fonction ou une méthode de bibliothèque ne présente d'intérpet que si elle est plus facile à utiliser que la (les) fonction(s) qu'elle remplace.
+    - Une fonction ou une méthode de bibliothèque ne présente d'intérêt que si elle est indépendante du cas particulier du projet considéré ici.
+    
+        Bien | Pas bien
+        --- | ---
+        `xxx receiveSize(void * struc, int size)` | `xxx receive(ListePassagers *lc,int size)` et pas `xxx getPassagers(...,...)`
+        Couche basse : réutilisable dans une autre application |  Une seule couche: la fonction receive ne peut être utilisée dans une autre application
+        `xxx receiveSep(char *chaine, char *sep)` | 
+        Couche basse : réutilisable dans une autre application |
+        avec `ListePassagers getPassengers (...,...)` |
+        Couche haute : propre à cette application - utilise l'une des fonctions ci-dessus |
+    - En tenant compte de l'administration du serveur, il serait avisé de faire intervenir dans le code du serveur la notion d'état de celui-ci (*Certaines commandes n'ont de sens que si elles sont précédées d'une autre*).
+4. Il est impérieux de surveiller les écoutes, les connexions et les communisations réseaux
+    - Au moyen des commandes **ping** et surtout **netstat** (Pour linux: `netstat -an | grep *NuméroDePort*`).
+    - En utilisant un **sniffer* comme *Wireshark* ou autre encore analysant le trafic réseau (Attention au localhost qui ne permet pas de sniffer simplement). Cette pratique sera demandée lors des évaluations.
+5. Il serait aussi intéréssant de prévoir un fichier de configuration lu par le serveur à son démarrage. A l'image des fichiers properties de *Java*, il s'agit d'un simple fichier texte dont chaque ligne comporte une propriété du serveur et la valeur de celle-ci.
+    
+    Fichier de configuration : | serveur_checkin.conf
+    --- | ---
+    Port_Service=70000 |
+    Port_Admin=70009 |
+    sep-trame=$ |
+    fin-trame=# |
+    sep-csv=; |
+    pwd-master=tusaisquetuesbeautoi |
+    pwd-admin=jeaclachralf.. |
+    ---
+## 2. Les accès aux bases de données
+### 2.1 La base de données BD_AIRPORT
+Base de données *MySql* BD_AIRPORT doit contenir toutes les informations utiles concernant le fonctionnement de l'aéroport (**Uniquement**). Ses tables, si on admet un certain nombre d'approximations, de simplifications et d'omission sans importance pour le projet tel que défini ici (Avec le minimum de champs, en définitive), seront en première analyse celle d'une base de données classique, que l'on peut définir dans un premier temps sommairement comme contenant les tables:
+
+Table | Description
+--- | --- 
+Billets | Pierre d'angle de la base de données. Elle permet de repérér tout passager (*nom,prenom,numéro de carte d'identité ou de passeport,...*) par son billet. Ce billet permet d'accèder au vol correspondant ainsi qu'aux bagages qui y son associés.
+Vols | Renseignements sur chaque vol (*destination, heure arrivée éventuelle, heure de départ, heure prévue d'arrivée à destination, avion utilisé, etc*).
+Avions | Les appareils utilisés pour les vols, avec notamment une indication *check_OK* pour signifier qu'il est en état de vol ou non.
+Bagages | Elle remplacera bien-sûr le fichier csv évoqué plus haut.
+Agents | Elle contient tous les intervenants de l'aéroport (Agents de compagnies aériennes, bagagistes, employés agréés de tour-opérateur, aiguilleurs du ciel, etc).
+
+On peut ajouter des tables ou des champs aux tables existantes, des vues ou des contraintes, mais uniquement si elles sont justifiées par le projet.
+###2.2 Un outil d'accès aux bases de données
