@@ -35,8 +35,9 @@ void ipv4::verification(const char *addr) {
         if (s[i] != '.') {
             if (!isdigit(s[i]))
                 throw Exception(ExceptionHeader +
-                                std::string("Le caractère") + s[i] + std::string(" à la postion ") + std::to_string(i) +
-                                std::string("n'est pas un chiffre."));
+                                std::string("Le caractère `") + s[i] + std::string("` à la postion ") +
+                                std::to_string(i) +
+                                std::string(" n'est pas un chiffre."));
         } else pt++;
     }
     if (pt != 3) throw Exception(ExceptionHeader + "Il y a trop de points.");
