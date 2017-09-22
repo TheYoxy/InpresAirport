@@ -139,7 +139,7 @@ Bagages | Elle remplacera bien-sûr le fichier csv évoqué plus haut.
 Agents | Elle contient tous les intervenants de l'aéroport (Agents de compagnies aériennes, bagagistes, employés agréés de tour-opérateur, aiguilleurs du ciel, etc).
 
 On peut ajouter des tables ou des champs aux tables existantes, des vues ou des contraintes, mais uniquement si elles sont justifiées par le projet.
-###2.2 Un outil d'accès aux bases de données
+### 2.2 Un outil d'accès aux bases de données
 L'accès à la base de données ne devrait pas se faire avec les primitives JDBC utilisée telles quelles, mais plutôt au moyen d'objets métiers encapsulant le travail, idéalement des *Java Beans* mais **sans utilisation d'un mécanisme d'event**.
 On demande donc de construire un groupe de telles classes (package *database.utilities*) permettant l'accès (c'est-à-dire à tout le moins la connextion et les sélections de base) le plus simple possible.
 On souhaite pourvoir accéder, au minimum, à des bases relationnelles de type *MySql* ou *Oracle*.
