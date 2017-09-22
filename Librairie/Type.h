@@ -13,6 +13,7 @@ enum Type {
     CHECK_LUGGAGE,
     PAYMENT_DONE,
     TOO_MUCH_CONNECTIONS,
+    ACK,
     LOGIN,
     LOGOUT,
 };
