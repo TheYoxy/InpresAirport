@@ -2,11 +2,6 @@
 #define SERVEUR_SOCKETCLIENT_H
 
 #include "Socket.h"
-#include "Fonctions.h"
-#include "ipv4.h"
-#include <netinet/in.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 
 class SocketClient : public Socket {
 public:
@@ -14,8 +9,10 @@ public:
 
     ~SocketClient();
 
+    void Connect(const ipv4 &addr, unsigned short port);
+
 protected:
-    std::string getLieu() const;
+    static std::string getLieu();
 
 private:
 };

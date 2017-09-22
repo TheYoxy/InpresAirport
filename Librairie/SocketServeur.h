@@ -2,16 +2,19 @@
 #define SERVEUR_SOCKETSERVEUR_H
 
 #include "Socket.h"
-#include "SocketClient.h"
 
 class SocketServeur : public Socket {
 public:
-    SocketServeur(const ipv4 &addr = ipv4().LocalHost, unsigned short port = 26101);
+    SocketServeur(const ipv4 &addr = ipv4().LocalHost, unsigned short port = 26010);
 
     ~SocketServeur();
 
+    void Listen();
+
+    Socket &Accept(struct sockaddr_in *ip);
+
 protected:
-    std::string getLieu() const;
+    static std::string getLieu();
 
 private:
 };

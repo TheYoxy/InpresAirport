@@ -1,11 +1,17 @@
 #ifndef SERVEUR_SOCKET_H
 #define SERVEUR_SOCKET_H
 
-#include "Structs.h"
+#include <unistd.h>
+#include <cstring>
+#include <cstdio>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include "Exception.h"
 #include "ipv4.h"
-#include <cstdio>
-#include <sys/socket.h>
+#include "Structs.h"
+#include "Fonctions.h"
+
 
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
@@ -13,19 +19,33 @@ class Socket {
 public:
     Socket();
 
+    Socket(int descripteur, struct sockaddr_in *socket);
+
     Socket(const ipv4 &addr, unsigned short port);
 
+    Socket &operator=(const Socket &socket);
     virtual ~Socket();
 
+    //UDP
     virtual void SendTo(const char *message, size_t size, const ipv4 &addr, unsigned short port);
 
-    virtual void Recv(char *message, size_t size);
+    virtual void RecvFrom(char *message, size_t size);
+
+    //TCP
+    virtual void Send(const char *message);
+
+    virtual void Send(std::string &message);
+
+    virtual void Recv(char *message, int *size);
+
+    virtual void Close();
 
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
 
-    std::string getLieu() const;
+    static std::string getLieu();
 
+    //VAR
     int descripteur;
     struct sockaddr_in *socketOut;
 };

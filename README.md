@@ -9,6 +9,36 @@ Application | Semaine | Pondération
 5: Client-serveur UDP en C/C++ et Java | 4/12/2017 | 10
 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80
 7: Communications réseaux C/C++ - Java | Examen de laboratoire de janvier 2018 | 20
+#### Fonctions utiles:
+##### TCP
+- ###### Client:
+    - socket
+    - connect
+    - send
+    - recv
+    - close
+- ###### Serveur:
+    - socket
+    - bind
+    - listen
+    - accept
+    - send
+    - recv
+    - close
+    
+*Pour les send et recv l'ordre n'a pas d'importance, on peut appeler l'un avant l'autre ou vice-versa. Ils sont par ailleurs facultatifs.*
+##### UDP
+- ###### Client
+    - socket
+    - sendto
+    - recvfrom
+    - close
+- ###### Serveur
+    - socket
+    - bind
+    - recvfrom
+    - sendto
+    - close
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
 Dossier attendu: 

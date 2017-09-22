@@ -12,7 +12,7 @@ ipv4::ipv4(const char *addr) {
 
 ipv4::ipv4(unsigned char a1, unsigned char a2, unsigned char a3, unsigned char a4) {
     unsigned char **tabl = new unsigned char *[4]{&a1, &a2, &a3, &a4};
-    unsigned char **local = new unsigned char *[4]{&a1, &a2, &a3, &a4};
+    unsigned char **local = new unsigned char *[4]{&b1, &b2, &b3, &b4};
     for (int i = 0; i < 4; i++) {
         if (*tabl[i] < 0 || *tabl[i] > 255) {
             if (*tabl[i] < 0)

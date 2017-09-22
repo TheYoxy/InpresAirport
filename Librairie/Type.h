@@ -13,7 +13,8 @@ enum Type {
     CHECK_LUGGAGE,
     PAYMENT_DONE,
     TOO_MUCH_CONNECTIONS,
+    LOGIN,
+    LOGOUT,
 };
-
 
 #endif //SERVEUR_TYPE_H
