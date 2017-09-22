@@ -87,3 +87,17 @@ void Socket::Close() {
     if (close(descripteur) == -1)
         throw Exception(getLieu() + " Erreur de close: " + strerror(errno));
 }
+
+unsigned short Socket::getPort() {
+    if (this->socketOut == nullptr)
+        throw Exception("SocketOut is null");
+    return this->socketOut->sin_port;
+}
+
+std::string Socket::getIp() {
+    if (this->socketOut == nullptr)
+        throw Exception("SocketOut is null");
+    std::string retour;
+    retour = inet_ntoa(this->socketOut->sin_addr);
+    return retour;
+}

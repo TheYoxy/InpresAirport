@@ -24,6 +24,7 @@ public:
     Socket(const ipv4 &addr, unsigned short port);
 
     Socket &operator=(const Socket &socket);
+
     virtual ~Socket();
 
     //UDP
@@ -39,6 +40,10 @@ public:
     virtual void Recv(char *message, int *size);
 
     virtual void Close();
+
+    std::string getIp();
+
+    unsigned short getPort();
 
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
