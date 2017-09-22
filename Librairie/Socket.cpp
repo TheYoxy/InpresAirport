@@ -6,6 +6,7 @@ Socket::Socket() {
 }
 
 Socket::Socket(struct sockaddr_in *socket) : Socket() {
+    socketOut = socket;
     if (bind(this->descripteur, (struct sockaddr *) socket, sizeof(struct sockaddr_in)) == -1) {
         close(this->descripteur);
         throw Exception(getLieu() + "Impossible de bind " + inet_ntoa(socket->sin_addr) + ":" +
