@@ -50,6 +50,7 @@ std::string ipv4::toString() const {
     return retour;
 }
 
+const ipv4 ipv4::Any("0.0.0.0");
 const ipv4 ipv4::LocalHost("127.0.0.1");
 const std::string ipv4::ExceptionHeader("Mauvaise adresse ip: ");
 

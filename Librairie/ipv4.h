@@ -1,6 +1,7 @@
 #ifndef SERVEUR_IPV4_H
 #define SERVEUR_IPV4_H
 
+#include <stdio.h>
 #include <cstdio>
 #include <iostream>
 #include <ctype.h>
@@ -20,6 +21,7 @@ public:
     in_addr toAddr() const;
 
     static const ipv4 LocalHost;
+    static const ipv4 Any;
 private:
     void verification(const char *addr);
 
