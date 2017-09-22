@@ -11,7 +11,7 @@ public:
 
     void Listen();
 
-    Socket &Accept(struct sockaddr_in *ip);
+    Socket *Accept();
 
 protected:
     static std::string getLieu();
