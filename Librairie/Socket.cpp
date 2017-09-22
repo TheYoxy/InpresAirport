@@ -5,6 +5,14 @@ Socket::Socket() {
         throw Exception(getLieu() + "Impossible de créer la socket");
 }
 
+Socket::Socket(struct sockaddr_in *socket) : Socket() {
+    if (bind(this->descripteur, (struct sockaddr *) socket, sizeof(struct sockaddr_in)) == -1) {
+        close(this->descripteur);
+        throw Exception(getLieu() + "Impossible de bind " + inet_ntoa(socket->sin_addr) + ":" +
+                        std::to_string(socket->sin_port) + "\n" + strerror(errno));
+    }
+}
+
 Socket::Socket(int descripteur, struct sockaddr_in *socket) {
     this->descripteur = descripteur;
     this->socketOut = new struct sockaddr_in;
@@ -24,6 +32,16 @@ Socket::Socket(const ipv4 &addr, unsigned short port) : Socket() {
 }
 
 Socket::~Socket() {}
+
+void Socket::Bind(const ipv4 &addr, unsigned short port) {
+    this->socketOut = CreationSockStruct(addr, port);
+    if (bind(this->descripteur, (struct sockaddr *) this->socketOut, sizeof(struct sockaddr_in)) == -1) {
+        close(this->descripteur);
+        throw Exception(getLieu() + "Impossible de bind " + addr.toString() + ":" + std::to_string(port) + "\n" +
+                        strerror(errno));
+    }
+//    std::cout << getLieu() << "Bind de " + addr.toString() + ":" + std::to_string(port) + " réussi\n" << std::endl;
+}
 
 Socket &Socket::operator=(const Socket &socket) {
     this->descripteur = socket.descripteur;
@@ -48,16 +66,6 @@ void Socket::RecvFrom(char *message, size_t size) {
     unsigned int sizesock = sizeof(struct sockaddr_in);
     int sizeRcv = (int) (recvfrom(this->descripteur, message, size, 0, (struct sockaddr *) s, &sizesock));
     if (sizeRcv == -1) throw Exception(getLieu() + "Impossible de recevoir le message: " + strerror(errno));
-}
-
-void Socket::Bind(const ipv4 &addr, unsigned short port) {
-    this->socketOut = CreationSockStruct(addr, port);
-    if (bind(this->descripteur, (struct sockaddr *) this->socketOut, sizeof(struct sockaddr_in)) == -1) {
-        close(this->descripteur);
-        throw Exception(getLieu() + "Impossible de bind " + addr.toString() + ":" + std::to_string(port) + "\n" +
-                        strerror(errno));
-    }
-//    std::cout << getLieu() << "Bind de " + addr.toString() + ":" + std::to_string(port) + " réussi\n" << std::endl;
 }
 
 std::string Socket::getLieu() {

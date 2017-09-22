@@ -7,6 +7,10 @@ class SocketClient : public Socket {
 public:
     SocketClient(const ipv4 &addr = ipv4().LocalHost, unsigned short port = 26100);
 
+    SocketClient(struct sockaddr_in *socket);
+
+    SocketClient(int descripteur, struct sockaddr_in *socket);
+
     ~SocketClient();
 
     void Connect(const ipv4 &addr, unsigned short port);

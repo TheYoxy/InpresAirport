@@ -28,3 +28,11 @@ void SocketClient::Connect(const ipv4 &addr, unsigned short port) {
 std::string SocketClient::getLieu() {
     return "SocketClient: ";
 }
+
+SocketClient::SocketClient(int descripteur, struct sockaddr_in *socket) : Socket(descripteur, socket) {
+
+}
+
+SocketClient::SocketClient(struct sockaddr_in *socket) : Socket(socket) {
+
+}

@@ -6,6 +6,14 @@ int maxSocketNbr = 1;
 SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) : Socket(addr, port) {
 }
 
+SocketServeur::SocketServeur(struct sockaddr_in *socket) : Socket(socket) {
+
+}
+
+SocketServeur::SocketServeur(int descripteur, struct sockaddr_in *socket) : Socket(descripteur, socket) {
+
+}
+
 SocketServeur::~SocketServeur() {
 }
 
@@ -51,3 +59,4 @@ Socket *SocketServeur::Accept() {
 std::string SocketServeur::getLieu() {
     return "SocketServeur: ";
 }
+

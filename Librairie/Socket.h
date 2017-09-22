@@ -19,6 +19,8 @@ class Socket {
 public:
     Socket();
 
+    Socket(struct sockaddr_in *socket);
+
     Socket(int descripteur, struct sockaddr_in *socket);
 
     Socket(const ipv4 &addr, unsigned short port);
