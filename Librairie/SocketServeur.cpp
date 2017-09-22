@@ -1,7 +1,6 @@
 #include "SocketServeur.h"
 
 using namespace std;
-int maxSocketNbr = 1;
 
 SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) : Socket(addr, port) {
 }
@@ -23,7 +22,6 @@ void SocketServeur::Listen() {
 }
 
 Socket *SocketServeur::Accept() {
-    int nbMaxClients = 0;
     unsigned int size;
     int so;
     struct sockaddr_in ip;
@@ -33,12 +31,12 @@ Socket *SocketServeur::Accept() {
     Socket *s = new Socket(so, &ip);
     try {
         std::string message;
-        if (nbMaxClients >= maxSocketNbr) {
+        if (clients >= maxSocketNbr) {
             s->Send(getMessage(TOO_MUCH_CONNECTIONS, ""));
         } else {
             s->Send(getMessage(ACK, ""));
         }
-        if (nbMaxClients >= maxSocketNbr) {
+        if (clients >= maxSocketNbr) {
             delete s;
             return nullptr;
         }
@@ -51,8 +49,7 @@ Socket *SocketServeur::Accept() {
     catch (Exception e) {
         throw e;
     }
-    nbMaxClients++;
-
+    clients++;
     return s;
 }
 

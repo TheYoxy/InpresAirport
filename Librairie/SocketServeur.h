@@ -3,6 +3,9 @@
 
 #include "Socket.h"
 
+int maxSocketNbr = 1;
+int clients = 0;
+
 class SocketServeur : public Socket {
 public:
     SocketServeur(const ipv4 &addr = ipv4().Any, unsigned short port = 26010);
