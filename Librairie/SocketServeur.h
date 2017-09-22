@@ -5,7 +5,7 @@
 
 class SocketServeur : public Socket {
 public:
-    SocketServeur(const ipv4 &addr = ipv4().LocalHost, unsigned short port = 26010);
+    SocketServeur(const ipv4 &addr = ipv4().Any, unsigned short port = 26010);
 
     SocketServeur(struct sockaddr_in *socket);
 
