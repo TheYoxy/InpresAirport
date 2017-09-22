@@ -69,7 +69,7 @@ void Socket::Send(const char *message) {
         throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
 }
 
-void Socket::Send(std::string &message) {
+void Socket::Send(const std::string message) {
     char *m = new char[message.length() + 1];
     memset(m, 0, message.length() + 1);
     strcpy(m, message.c_str());

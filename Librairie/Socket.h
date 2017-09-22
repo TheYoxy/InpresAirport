@@ -35,7 +35,7 @@ public:
     //TCP
     virtual void Send(const char *message);
 
-    virtual void Send(std::string &message);
+    virtual void Send(std::string message);
 
     virtual void Recv(char *message, int *size);
 
