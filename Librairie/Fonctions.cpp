@@ -53,7 +53,7 @@ void lectureFichierParams(const char *nomFichier) {
             int fin = atoi(buffer);
             Parametres.nbPortRange = static_cast<short>(fin - debut + 1);
             unsigned short *portRange = new unsigned short[fin - debut];
-            for (int i = 0; i == fin - debut; i++)
+            for (int i = 0; i <= fin - debut; i++)
                 portRange[i] = static_cast<unsigned short>(debut + i);
             Parametres.PortRange = portRange;
         } else if (!strcmp(param, "Admin")) {
