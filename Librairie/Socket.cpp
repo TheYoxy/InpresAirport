@@ -80,14 +80,11 @@ void Socket::Send(const std::string message) {
     while (!stop) {
         if (send(descripteur, message.data(), message.length() + 1, 0) == -1)
             throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
-        Type flag = (Type) 0;
+        Type flag = ACK;
         if (recv(descripteur, &flag, 1, 0) == -1)
             throw Exception(getLieu() + "Impossible de recevoir l'accusé de réception du message: " + strerror(errno));
-        if (flag == ACK) {
+        if (flag == ACK)
             stop = true;
-            std::cout << "ACK reçu" << std::endl;
-        } else
-            std::cout << "ACK pas reçu," << flag << " reçu, renvoi" << std::endl;
     }
 }
 
@@ -95,9 +92,12 @@ int Socket::Recv(char *message, int size) {
     int taille;
     if ((taille = (int) (recv(descripteur, message, (size_t) size, 0))) == -1)
         throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
-    Type flag = ACK;
-    if (send(descripteur, &flag, 1, 0) == -1)
-        throw Exception(getLieu() + "Impossible d'envoyer l'accusé de réception" + strerror(errno));
+    try {
+        SendAck();
+    }
+    catch (Exception e) {
+        throw e;
+    }
     return taille;
 }
 
@@ -125,9 +125,12 @@ int Socket::Recv(std::string &message) {
             taille++;
         }
     }
-    Type flag = ACK;
-    if (send(descripteur, &flag, 1, 0) == -1)
-        throw Exception(getLieu() + "Impossible d'envoyer l'accusé de réception" + strerror(errno));
+    try {
+        SendAck();
+    }
+    catch (Exception e) {
+        throw e;
+    }
     return taille;
 }
 
@@ -161,4 +164,10 @@ int Socket::getDescripteur() {
 
 std::string Socket::getLieu() {
     return std::to_string(__LINE__) + ">Socket: ";
+}
+
+void Socket::SendAck() {
+    Type flag = ACK;
+    if (send(descripteur, &flag, 1, 0) == -1)
+        throw Exception(getLieu() + "Impossible d'envoyer l'accusé de réception" + strerror(errno));
 }

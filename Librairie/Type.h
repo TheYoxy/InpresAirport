@@ -3,14 +3,14 @@
 
 
 enum Type {
+    ACK,
+    DISCONNECT,
     LOGIN_OFFICER,
     LOGOUT_OFFICER,
     CHECK_TICKET,
     CHECK_LUGGAGE,
     PAYMENT_DONE,
     TOO_MUCH_CONNECTIONS,
-    ACK,
-    DISCONNECT
 };
 
 #endif //SERVEUR_TYPE_H

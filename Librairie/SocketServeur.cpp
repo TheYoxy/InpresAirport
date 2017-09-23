@@ -39,23 +39,25 @@ Socket *SocketServeur::Accept() {
         throw Exception(getLieu() + "Erreur connexion: " + strerror(errno));
 
     Socket *s = new Socket(so, ip);
-    Type type;
-    if (clients >= maxSocketNbr) {
-        type = TOO_MUCH_CONNECTIONS;
-    } else {
-        type = ACK;
-    }
-    if (send(s->getDescripteur(), &type, 1, 0) == -1)
-        throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
-    if (clients >= maxSocketNbr) {
-        delete s;
-        return nullptr;
-    }
-    if (recv(s->getDescripteur(), &type, 1, 0) == -1)
-        throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
-    if (type != ACK) {
-        delete s;
-        s = nullptr;
+    bool stop = false;
+    while (!stop) {
+        Type type;
+        if (clients >= maxSocketNbr) {
+            type = TOO_MUCH_CONNECTIONS;
+        } else {
+            type = ACK;
+        }
+        if (send(s->getDescripteur(), &type, 1, 0) == -1)
+            throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
+        if (clients >= maxSocketNbr) {
+            delete s;
+            return nullptr;
+        }
+        if (recv(s->getDescripteur(), &type, 1, 0) == -1)
+            throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
+        if (type == ACK) {
+            stop = true;
+        }
     }
     clients++;
     return s;
