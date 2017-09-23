@@ -39,6 +39,7 @@ Application | Semaine | Pondération
     - recvfrom
     - sendto
     - close
+    
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
 Dossier attendu: 
@@ -50,11 +51,12 @@ Le **Serveur_CheckIn** a donc pour mission essentielle de gérer les arrivées d
 passagers qui sont en possession d'un billet pour un vol donné : il s'agit essentiellement de la
 vérification des billets, de la validation des billets présentés ainsi que de l'enregistrement des
 bagages.
-Le serveur est un serveur multithread C/Unix en modèle pool de threads. Il est chargé
+Le serveur est un serveur multithread C/Unix en modèle **pool de threads**. Il est chargé
 de répondre aux requêtes provenant de **Application_CheckIn (C/C++)** utilisée par les agents
 des compagnies aériennes qui assurent l'accueil des passagers pour les différents vols
 programmés. Le serveur attend ce type de requête sur le PORT_CHCK. Il utilise le protocole
 applicatif (basé TCP) **CIMP** (CheckIn Management Protocol).
+
 ### 1.2 La gestion des bagages : accès à Serveur_Bagages
 On utilise donc ici des fichiers de données de type csv. Il est bien clair que ce serveur
 **Serveur_CheckIn** devra agir directement sur la base de données (exposée au point suivant)
@@ -109,7 +111,7 @@ On évitera la construction de flux réseaux d'entrée et de sortie, `NetworkStr
     - En tenant compte de l'administration du serveur, il serait avisé de faire intervenir dans le code du serveur la notion d'état de celui-ci (*Certaines commandes n'ont de sens que si elles sont précédées d'une autre*).
 4. Il est impérieux de surveiller les écoutes, les connexions et les communisations réseaux
     - Au moyen des commandes **ping** et surtout **netstat** (Pour linux: `netstat -an | grep *NuméroDePort*`).
-    - En utilisant un **sniffer* comme *Wireshark* ou autre encore analysant le trafic réseau (Attention au localhost qui ne permet pas de sniffer simplement). Cette pratique sera demandée lors des évaluations.
+    - En utilisant un **sniffer** comme *Wireshark* ou autre encore analysant le trafic réseau (Attention au localhost qui ne permet pas de sniffer simplement). Cette pratique sera demandée lors des évaluations.
 5. Il serait aussi intéréssant de prévoir un fichier de configuration lu par le serveur à son démarrage. A l'image des fichiers properties de *Java*, il s'agit d'un simple fichier texte dont chaque ligne comporte une propriété du serveur et la valeur de celle-ci.
     
     Fichier de configuration : | serveur_checkin.conf
