@@ -4,26 +4,33 @@
 #include <stdlib.h>
 #include <iostream>
 #include "../Librairie/SocketClient.h"
-#include "../Librairie/SocketServeur.h"
+#include "../Librairie/ConnexionException.h"
 
 using namespace std;
 
 
-
-int main(int argc, char * argv[])
-{
-	ipv4 IpSocket;
-    u_short PortSocket;
+int main(int argc, char *argv[]) {
 
     bool fail = 1;
     char login[20], password[20], numBillet[40];
     int numVol;
-    SocketClient SoCl;
-
-    //Creation du socket client 
-    // = new ipv4();
-    //SocketClient socketC = new SocketClient(IpSocket ,PortSocket);
-
+    try {
+        SocketClient SoCl(ipv4().Any);
+        SoCl.Connect(ipv4("192.168.1.5"), 26010);
+        cout << "Client connecté" << endl;
+        cout << "Sleep" << endl;
+        sleep(10);
+        cout << "FinSleep" << endl;
+    }
+    catch (ConnexionException ce) {
+        cout << ce.getMessage() << endl;
+    }
+    catch (Exception e) {
+        cout << e.getMessage() << endl;
+    }
+    return -1;
+    //SocketClient socketC(IpSocket ,PortSocket);
+    /*
     do
     {
     	cout << "Application CHECK IN" << endl << "--------------------" << endl;
@@ -47,13 +54,12 @@ int main(int argc, char * argv[])
         cout << "\n\n\n\n\n" << endl;
 
     }while()
-
-
+*/
 }
 
 
 
-void login(char *login, char *mdp)
+/*void login(char *login, char *mdp)
 {
 	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     string message = login + "-" + password;
@@ -83,3 +89,4 @@ void check_ticket()
 	//envoie chaine de caractère au serv avec requete CHECK_TICKET
 	//Attend reponse pour encoder bagages
 }
+*/
