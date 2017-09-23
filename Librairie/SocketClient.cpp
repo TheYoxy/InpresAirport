@@ -34,6 +34,19 @@ void SocketClient::Connect(const ipv4 &addr, unsigned short port) {
     }
 }
 
+void SocketClient::Disconnect() {
+    bool stop = false;
+    while (!stop) {
+        Type flag = DISCONNECT;
+        if (send(descripteur, &flag, 1, 0) == -1)
+            throw Exception(getLieu() + "Erreur lors de la deconnection: " + strerror(errno));
+        if (recv(descripteur, &flag, 1, 0) == -1)
+            throw Exception(getLieu() + "Erreur lors de la reception de l'ACK de la deconnection: " + strerror(errno));
+        if (flag == ACK)
+            stop = true;
+    }
+}
+
 std::string SocketClient::getLieu() {
     return "SocketClient: ";
 }

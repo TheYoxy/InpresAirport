@@ -14,8 +14,7 @@ enum Type {
     PAYMENT_DONE,
     TOO_MUCH_CONNECTIONS,
     ACK,
-    LOGIN,
-    LOGOUT,
+    DISCONNECT
 };
 
 #endif //SERVEUR_TYPE_H
