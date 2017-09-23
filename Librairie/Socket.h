@@ -56,10 +56,10 @@ public:
 
     int getDescripteur();
 
+    static std::string getLieu();
+
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
-
-    static std::string getLieu();
 
     //VAR
     int descripteur;

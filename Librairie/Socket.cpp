@@ -112,7 +112,6 @@ int Socket::Recv(std::string &message, int size) {
 
 int Socket::Recv(std::string &message) {
     char lu;
-    bool first = false;
     bool stop = false;
     int taille = 0;
     message.clear();
@@ -161,5 +160,5 @@ int Socket::getDescripteur() {
 }
 
 std::string Socket::getLieu() {
-    return "Socket: ";
+    return std::to_string(__LINE__) + ">Socket: ";
 }
