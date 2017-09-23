@@ -3,24 +3,30 @@
 //
 #include <stdlib.h>
 #include <iostream>
+#include <netdb.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
 
+extern SParametres Parametres;
 using namespace std;
 
 
 int main(int argc, char *argv[]) {
-
+    lectureFichierParams("../config.conf");
     bool fail = 1;
     char login[20], password[20], numBillet[40];
     int numVol;
+    struct hostent *host = gethostbyname("floryan-virtual-machine");
+    std::string ip;
+    for (int i = 0; i < host->h_length; i++)
+        ip += std::to_string((int) host->h_addr[i]) + ".";
+    ip.pop_back();
+    cout << "Ip de l'host: " << ip << endl;
     try {
         SocketClient SoCl(ipv4().Any);
-        SoCl.Connect(ipv4("192.168.1.5"), 26010);
+        SoCl.Connect(ipv4(ip.c_str()), 26010);
         cout << "Client connecté" << endl;
-        cout << "Sleep" << endl;
-        sleep(10);
-        cout << "FinSleep" << endl;
+        SoCl.Disconnect();
     }
     catch (ConnexionException ce) {
         cout << ce.getMessage() << endl;
@@ -29,7 +35,6 @@ int main(int argc, char *argv[]) {
         cout << e.getMessage() << endl;
     }
     return -1;
-    //SocketClient socketC(IpSocket ,PortSocket);
     /*
     do
     {
@@ -54,7 +59,7 @@ int main(int argc, char *argv[]) {
         cout << "\n\n\n\n\n" << endl;
 
     }while()
-*/
+    */
 }
 
 
