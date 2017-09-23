@@ -2,7 +2,7 @@
 
 using namespace std;
 std::string FileSeparator = "\r\n";
-
+SParametres Parametres;
 struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     struct sockaddr_in *retour = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
     memset(retour, 0, sizeof(struct sockaddr_in));
@@ -36,4 +36,37 @@ SMessage getStructMessageFromString(std::string message) {
     retour.type = (Type) message[0];
     retour.message = message.substr(1);
     return retour;
+}
+
+//Aucun delete sur buffer, car buffer est managé par le système
+void lectureFichierParams(const char *nomFichier) {
+    ifstream lecture(nomFichier, ifstream::in);
+    char *param;
+    do {
+        char *buffer = new char[1024];
+        lecture.getline(buffer, 1024);
+        param = strsep(&buffer, "=");
+        if (!strcmp(param, "ServeurPortDebut")) {
+            int debut = atoi(buffer);
+            buffer = new char[1024];
+            lecture.getline(buffer, 1024);
+            param = strsep(&buffer, "=");
+            int fin = atoi(buffer);
+            Parametres.nbPortRange = fin - debut + 1;
+            int *portRange = new int[fin - debut];
+            for (int i = 0; i == fin - debut; i++)
+                portRange[i] = debut + i;
+            Parametres.PortRange = portRange;
+        } else if (!strcmp(param, "Admin")) {
+            Parametres.PortAdmin = atoi(buffer);
+        } else if (!strcmp(param, "Fin-Trames")) {
+            Parametres.FinTramesSeparator = buffer;
+        } else if (!strcmp(param, "Sep-csv")) {
+            Parametres.CSVSeparator = buffer;
+        } else if (!strcmp(param, "Sep-Trames")) {
+            Parametres.TramesSeparator = buffer;
+        } else
+            cout << param << " inconnu" << endl;
+    } while (!lecture.eof());
+    delete param;
 }

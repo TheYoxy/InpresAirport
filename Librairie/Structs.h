@@ -11,4 +11,13 @@ struct __Message {
     Type type;
     std::string message;
 };
+typedef struct __Params SParametres;
+struct __Params {
+    int nbPortRange;
+    int *PortRange;
+    int PortAdmin;
+    std::string FinTramesSeparator;
+    std::string CSVSeparator;
+    std::string TramesSeparator;
+};
 #endif //SERVEUR_STRUCTS_H

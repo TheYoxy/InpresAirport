@@ -9,7 +9,7 @@
 #include "ipv4.h"
 #include "Type.h"
 #include <cstring>
-
+#include <fstream>
 struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port);
 
 const std::string getMessage(Type t, const char *message);
@@ -20,4 +20,5 @@ SMessage getStructMessageFromString(std::string message);
 
 std::string getStringFromStructMessage(SMessage m);
 
+void lectureFichierParams(const char *nomFichier);
 #endif //SERVEUR_FONCTIONS_H
