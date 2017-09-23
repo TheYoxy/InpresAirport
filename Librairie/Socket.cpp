@@ -1,6 +1,7 @@
 #include "Socket.h"
 
 extern SParametres Parametres;
+
 Socket::Socket() {
     if ((this->descripteur = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         throw Exception(getLieu() + "Impossible de créer la socket");
@@ -163,7 +164,7 @@ int Socket::getDescripteur() {
 }
 
 std::string Socket::getLieu() {
-    return std::to_string(__LINE__) + ">Socket: ";
+    return std::to_string(__LINE__) + "> Socket: ";
 }
 
 void Socket::SendAck() {
