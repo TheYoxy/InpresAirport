@@ -40,11 +40,12 @@ public:
 
     virtual void Send(std::string message);
 
-    virtual void Recv(char *message, int *size);
+    virtual int Recv(char *message, int size);
 
-    virtual void Recv(std::string &message, int size);
+    virtual int Recv(std::string &message, int size);
 
-    virtual void Recv(std::string &message);
+    virtual int Recv(std::string &message);
+
     virtual void Close();
 
     std::string toString();
@@ -54,6 +55,7 @@ public:
     unsigned short getPort();
 
     int getDescripteur();
+
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
 
