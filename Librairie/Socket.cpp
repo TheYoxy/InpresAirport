@@ -1,5 +1,6 @@
 #include "Socket.h"
 
+extern SParametres Parametres;
 Socket::Socket() {
     if ((this->descripteur = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         throw Exception(getLieu() + "Impossible de créer la socket");
@@ -71,16 +72,7 @@ void Socket::RecvFrom(char *message, size_t size) {
 
 /**************************************************************/
 void Socket::Send(const char *message) {
-    bool stop = false;
-    while (!stop) {
-        if (send(descripteur, message, strlen(message) + 1, 0) == -1)
-            throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
-        Type flag;
-        if (recv(descripteur, &flag, 1, 0) == -1)
-            throw Exception(getLieu() + "Impossible de recevoir l'accusé de réception du message: " + strerror(errno));
-        if (flag == ACK)
-            stop = true;
-    }
+    Send(std::string(message));
 }
 
 void Socket::Send(const std::string message) {
@@ -88,11 +80,14 @@ void Socket::Send(const std::string message) {
     while (!stop) {
         if (send(descripteur, message.data(), message.length() + 1, 0) == -1)
             throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
-        Type flag;
+        Type flag = (Type) 0;
         if (recv(descripteur, &flag, 1, 0) == -1)
             throw Exception(getLieu() + "Impossible de recevoir l'accusé de réception du message: " + strerror(errno));
-        if (flag == ACK)
+        if (flag == ACK) {
             stop = true;
+            std::cout << "ACK reçu" << std::endl;
+        } else
+            std::cout << "ACK pas reçu," << flag << " reçu, renvoi" << std::endl;
     }
 }
 
@@ -107,13 +102,12 @@ int Socket::Recv(char *message, int size) {
 }
 
 int Socket::Recv(std::string &message, int size) {
-    int taille;
-    if ((taille = (int) recv(descripteur, &message, (size_t) size, 0)) == -1)
-        throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
-    Type flag = ACK;
-    if (send(descripteur, &flag, 1, 0) == -1)
-        throw Exception(getLieu() + "Impossible d'envoyer l'accusé de réception" + strerror(errno));
-    return taille;
+    char *msg = new char[size];
+    int retour = Recv(msg, size);
+    message.clear();
+    message = msg;
+    delete msg;
+    return retour;
 }
 
 int Socket::Recv(std::string &message) {
@@ -121,13 +115,12 @@ int Socket::Recv(std::string &message) {
     bool first = false;
     bool stop = false;
     int taille = 0;
+    message.clear();
     while (!stop) {
         if (recv(descripteur, &lu, 1, 0) == -1)
             throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
-        if (first) {
-            if (lu == '\n')stop = true;
-        } else if (lu == '\r') {
-            first = true;
+        if (lu == Parametres.FinTramesSeparator) {
+            stop = true;
         } else {
             message.push_back(lu);
             taille++;
