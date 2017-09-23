@@ -8,20 +8,6 @@ catch (Exception e) {
     throw e;
 }
 
-SocketClient::SocketClient(int descripteur, struct sockaddr_in *socket) try : Socket(descripteur, socket) {
-
-}
-catch (Exception e) {
-    throw e;
-}
-
-SocketClient::SocketClient(struct sockaddr_in *socket) try : Socket(socket) {
-
-}
-catch (Exception e) {
-    throw e;
-}
-
 SocketClient::~SocketClient() {
 }
 
