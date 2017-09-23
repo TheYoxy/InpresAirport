@@ -3,8 +3,6 @@
 
 #include "Socket.h"
 
-int maxSocketNbr = 1;
-int clients = 0;
 
 class SocketServeur : public Socket {
 public:

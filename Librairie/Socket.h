@@ -14,7 +14,6 @@
 #include "Structs.h"
 #include "Fonctions.h"
 
-
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
 class Socket {
@@ -43,12 +42,18 @@ public:
 
     virtual void Recv(char *message, int *size);
 
+    virtual void Recv(std::string &message, int size);
+
+    virtual void Recv(std::string &message);
     virtual void Close();
+
+    std::string toString();
 
     std::string getIp();
 
     unsigned short getPort();
 
+    int getDescripteur();
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
 

@@ -87,9 +87,31 @@ void Socket::Send(const std::string message) {
 }
 
 void Socket::Recv(char *message, int *size) {
-    if (recv(descripteur, message, (size_t) *size, 0) == -1)
+    int taille;
+    if ((taille = (int) (recv(descripteur, message, (size_t) *size, 0))) == -1)
         throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
+    *size = taille;
+}
 
+void Socket::Recv(std::string &message) {
+    char lu;
+    bool first = false;
+    bool stop = false;
+    while (!stop) {
+        if (recv(descripteur, &lu, 1, 0) == -1)
+            throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
+        if (first) {
+            if (lu == '\n')stop = true;
+        } else if (lu == '\r') {
+            first = true;
+        } else
+            message.push_back(lu);
+    }
+}
+
+void Socket::Recv(std::string &message, int size) {
+    if (recv(descripteur, &message, 50, 0) == -1)
+        throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
 }
 
 void Socket::Close() {
@@ -109,4 +131,12 @@ std::string Socket::getIp() {
     std::string retour;
     retour = inet_ntoa(this->socketOut->sin_addr);
     return retour;
+}
+
+std::string Socket::toString() {
+    return getIp() + ":" + std::to_string(getPort());
+}
+
+int Socket::getDescripteur() {
+    return descripteur;
 }

@@ -2,7 +2,10 @@
 #include "SocketClient.h"
 #include "ConnexionException.h"
 
-SocketClient::SocketClient(const ipv4 &addr, unsigned short port) : Socket(addr, port) {
+SocketClient::SocketClient(const ipv4 &addr, unsigned short port) try : Socket(addr, port) {
+}
+catch (Exception e) {
+    throw e;
 }
 
 SocketClient::~SocketClient() {
@@ -14,14 +17,20 @@ void SocketClient::Connect(const ipv4 &addr, unsigned short port) {
         throw Exception(getLieu() + "Erreur de connect: " + strerror(errno));
     Type flag;
     if (recv(descripteur, &flag, 1, 0) == -1)
-        throw Exception(getLieu() + "Erreur de recv dans le connect: " + strerror(errno));
+        throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
     switch (flag) {
         case TOO_MUCH_CONNECTIONS:
             throw ConnexionException("Trop de personnes");
         case ACK:
-            if (send(descripteur, &flag, 1, 0) == -1)
-                throw Exception(getLieu() + "Erreur de send dans le connect: " + strerror(errno));
+            try {
+                if (send(descripteur, &flag, 1, 0) == -1)
+                    throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
+            } catch (Exception e) {
+                throw ConnexionException(e.getMessage());
+            }
             break;
+        default :
+            throw ConnexionException("Erreur de flag");
     }
 }
 
