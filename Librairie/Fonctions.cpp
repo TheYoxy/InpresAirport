@@ -59,11 +59,11 @@ void lectureFichierParams(const char *nomFichier) {
         } else if (!strcmp(param, "Admin")) {
             Parametres.PortAdmin = atoi(buffer);
         } else if (!strcmp(param, "Fin-Trames")) {
-            Parametres.FinTramesSeparator = buffer;
+            Parametres.FinTramesSeparator = buffer[0];
         } else if (!strcmp(param, "Sep-csv")) {
-            Parametres.CSVSeparator = buffer;
+            Parametres.CSVSeparator = buffer[0];
         } else if (!strcmp(param, "Sep-Trames")) {
-            Parametres.TramesSeparator = buffer;
+            Parametres.TramesSeparator = buffer[0];
         } else
             cout << param << " inconnu" << endl;
     } while (!lecture.eof());

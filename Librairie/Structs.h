@@ -16,8 +16,8 @@ struct __Params {
     short nbPortRange;
     unsigned short *PortRange;
     int PortAdmin;
-    std::string FinTramesSeparator;
-    std::string CSVSeparator;
-    std::string TramesSeparator;
+    char FinTramesSeparator;
+    char CSVSeparator;
+    char TramesSeparator;
 };
 #endif //SERVEUR_STRUCTS_H

@@ -1,7 +1,3 @@
-//
-// Created by floryan on 21/09/17.
-//
-
 #ifndef SERVEUR_TYPE_H
 #define SERVEUR_TYPE_H
 
