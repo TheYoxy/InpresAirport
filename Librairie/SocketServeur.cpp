@@ -13,12 +13,16 @@ catch (Exception e) {
     throw e;
 }
 
-SocketServeur::SocketServeur(struct sockaddr_in *socket) : Socket(socket) {
+SocketServeur::SocketServeur(struct sockaddr_in *socket) try : Socket(socket) {
 
+} catch (Exception e) {
+    throw e;
 }
 
-SocketServeur::SocketServeur(int descripteur, struct sockaddr_in *socket) : Socket(descripteur, socket) {
+SocketServeur::SocketServeur(int descripteur, struct sockaddr_in *socket) try : Socket(descripteur, socket) {
 
+} catch (Exception e) {
+    throw e;
 }
 
 SocketServeur::~SocketServeur() {
