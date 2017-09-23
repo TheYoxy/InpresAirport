@@ -13,8 +13,8 @@ struct __Message {
 };
 typedef struct __Params SParametres;
 struct __Params {
-    int nbPortRange;
-    int *PortRange;
+    short nbPortRange;
+    unsigned short *PortRange;
     int PortAdmin;
     std::string FinTramesSeparator;
     std::string CSVSeparator;

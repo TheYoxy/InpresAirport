@@ -1,13 +1,8 @@
 #include "SocketServeur.h"
 
 using namespace std;
-
-#ifndef _GLOBAL
-#define _GLOBAL
 int maxSocketNbr = 1;
 int clients = 0;
-#endif
-
 SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) try : Socket(addr, port) {}
 catch (Exception e) {
     throw e;

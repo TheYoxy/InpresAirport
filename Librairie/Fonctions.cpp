@@ -1,7 +1,6 @@
 #include "Fonctions.h"
 
 using namespace std;
-std::string FileSeparator = "\r\n";
 SParametres Parametres;
 struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     struct sockaddr_in *retour = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
@@ -16,14 +15,14 @@ struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
 const string getMessage(Type t, const char *message) {
     std::string retour = " ";
     retour[0] = t;
-    retour += message + FileSeparator;
+    retour += message + Parametres.FinTramesSeparator;
     return retour;
 }
 
 const string getMessage(Type t, std::string &message) {
     std::string retour = " ";
     retour[0] = t;
-    retour += message + FileSeparator;
+    retour += message + Parametres.FinTramesSeparator;
     return retour;
 }
 
@@ -52,10 +51,10 @@ void lectureFichierParams(const char *nomFichier) {
             lecture.getline(buffer, 1024);
             param = strsep(&buffer, "=");
             int fin = atoi(buffer);
-            Parametres.nbPortRange = fin - debut + 1;
-            int *portRange = new int[fin - debut];
+            Parametres.nbPortRange = static_cast<short>(fin - debut + 1);
+            unsigned short *portRange = new unsigned short[fin - debut];
             for (int i = 0; i == fin - debut; i++)
-                portRange[i] = debut + i;
+                portRange[i] = static_cast<unsigned short>(debut + i);
             Parametres.PortRange = portRange;
         } else if (!strcmp(param, "Admin")) {
             Parametres.PortAdmin = atoi(buffer);
