@@ -31,22 +31,24 @@ public:
     virtual ~Socket();
 
     //UDP
-    virtual void SendTo(const char *message, size_t size, const ipv4 &addr, unsigned short port);
+    void SendTo(const char *message, size_t size, const ipv4 &addr, unsigned short port);
 
-    virtual void RecvFrom(char *message, size_t size);
+    void RecvFrom(char *message, size_t size);
 
     //TCP
-    virtual void Send(const char *message);
+    void Send(const char *message);
 
-    virtual void Send(std::string message);
+    void Send(std::string message);
 
-    virtual int Recv(char *message, int size);
+    int Recv(char *message, int size);
 
-    virtual int Recv(std::string &message, int size);
+    int Recv(std::string &message, int size);
 
-    virtual int Recv(std::string &message);
+    int Recv(std::string &message);
 
-    virtual void Close();
+    void SendAck();
+
+    void Close();
 
     std::string toString();
 
