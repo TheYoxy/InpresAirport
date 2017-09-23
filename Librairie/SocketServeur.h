@@ -1,8 +1,7 @@
 #ifndef SERVEUR_SOCKETSERVEUR_H
 #define SERVEUR_SOCKETSERVEUR_H
-
+#define nbThread 5
 #include "Socket.h"
-
 
 class SocketServeur : public Socket {
 public:
