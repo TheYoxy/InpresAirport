@@ -16,4 +16,8 @@ const std::string getMessage(Type t, const char *message);
 
 const std::string getMessage(Type t, std::string &message);
 
+SMessage getStructMessageFromString(std::string message);
+
+std::string getStringFromStructMessage(SMessage m);
+
 #endif //SERVEUR_FONCTIONS_H

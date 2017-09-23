@@ -6,7 +6,8 @@
 
 #include "Type.h"
 
-struct Message {
+typedef struct __Message SMessage;
+struct __Message {
     Type type;
     std::string message;
 };
