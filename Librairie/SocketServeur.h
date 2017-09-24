@@ -13,13 +13,12 @@ public:
 
     ~SocketServeur();
 
-    void Listen();
-
     Socket *Accept();
 
 protected:
 
 private:
+    void Listen();
 };
 
 

@@ -30,6 +30,7 @@ void SocketServeur::Listen() {
 }
 
 Socket *SocketServeur::Accept() {
+    Listen();
     unsigned int size = sizeof(struct sockaddr_in);
     int so;
 
