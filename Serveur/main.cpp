@@ -11,8 +11,11 @@ extern int clients;
 
 int indexClient;
 
-void traitementConnexion();
+void traitementConnexion(int *num);
 
+std::string getThread();
+
+/*Variables utilisées par les thread pour le pool de thread*/
 Socket *connexion;
 pthread_cond_t condConnexion;
 pthread_mutex_t mutexConnexion;
@@ -35,12 +38,15 @@ int main(int argc, char **args) {
         pthread_t pthread[nbThread];
 
         for (int i = 0; i < nbThread; i++) {
-            pthread_create(&pthread[i], nullptr, reinterpret_cast<void *(*)(void *)>(traitementConnexion), nullptr);
+            //Passage d'un pointeur pour que la valeur ne soit pas modifiée
+            int *param = new int;
+            *param = i + 1;
+            pthread_create(&pthread[i], nullptr, reinterpret_cast<void *(*)(void *)>(traitementConnexion), param);
             pthread_detach(pthread[i]);
         }
 
         SocketServeur socket(ipv4().Any, Parametres.PortRange[0]);
-        cout << "(Serveur): " << socket.getIp() << ":" << socket.getPort() << endl;
+        cout << "(Socket principal)> " << socket.getIp() << ":" << socket.getPort() << endl;
         while (1) {
             try {
                 socket.Listen();
@@ -61,8 +67,19 @@ int main(int argc, char **args) {
     return 0;
 }
 
-void traitementConnexion() {
+std::string getThread(int num) {
+    std::string retour;
+    retour += "th_" + std::to_string(num) + "> ";
+    return retour;
+}
+
+void traitementConnexion(int *num) {
+    int numero = *num;
+    //Suppression de l'allocation dynamique
+    delete num;
+
     Socket *s = nullptr;
+    cout << getThread(numero) << "Démarrage" << endl;
     while (1) {
         pthread_mutex_lock(&mutexConnexion);
         while (s == nullptr) {
@@ -70,45 +87,47 @@ void traitementConnexion() {
             s = connexion;
         }
         pthread_mutex_unlock(&mutexConnexion);
-        cout << s->toString() << " est connecté." << endl;
+        cout << getThread(numero) << s->toString() << " est connecté." << endl;
         bool stop = false;
         while (!stop) {
             try {
                 std::string message;
                 s->Recv(message);
+                s->SendAck();
                 SMessage sMessage = getStructMessageFromString(message);
                 switch (sMessage.type) {
                     case LOGIN_OFFICER:
+
                         break;
                     case LOGOUT_OFFICER:
+
                         break;
                     case CHECK_TICKET:
+
                         break;
                     case CHECK_LUGGAGE:
+
                         break;
                     case PAYMENT_DONE:
+
                         break;
                         //Unique point de sortie d'un socket passif du serveur
                     case DISCONNECT: {
-                        Type flag = ACK;
-                        if (send(s->getDescripteur(), &flag, 1, 0) == -1)
-                            throw Exception(
-                                    s->getLieu() + "Erreur lors de l'envoi de l'ACK de la déconnexion" +
-                                    strerror(errno));
-                        cout << s->toString() << " s'est déconnecté." << endl;
+                        cout << getThread(numero) << s->toString() << " s'est déconnecté." << endl;
                         delete s;
                         s = nullptr;
                         clients--;
                         stop = true;
                     }
-                    break;
+                        break;
                     default:
-                        cout << "Message <" << sMessage.message << "> de type <" << sMessage.type << "> reçu de "
+                        cout << getThread(numero) << "Message <" << sMessage.message << "> de type <" << sMessage.type
+                             << "> reçu de "
                              << s->toString() << endl;
                         break;
                 }
             } catch (Exception e) {
-                cout << e.getMessage() << endl;
+                cerr << getThread(numero) << e.getMessage() << endl;
             }
         }
     }
