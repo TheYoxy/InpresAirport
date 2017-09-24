@@ -65,9 +65,36 @@ void lectureFichierParams(const char *nomFichier) {
         } else if (!strcmp(param, "Sep-Trames")) {
             Parametres.TramesSeparator = buffer[0];
         } else if (!strcmp(param, "userDB")) {
-            Parametres.userDB = buffer[0];
+            Parametres.userDB = buffer;
         } else
             cout << param << " inconnu" << endl;
     } while (!lecture.eof());
     delete param;
 }
+
+//On passe pas message par référence car on a besoin d'une copie de celui-ci
+std::vector<string> split(std::string message, char delimiter) {
+    char *cmessage = new char[message.capacity() + 1];
+    strcpy(cmessage, message.c_str());
+    vector<string> vecteur;
+    string::size_type index;
+    do {
+        index = message.find(delimiter);
+        vecteur.push_back(message.substr(0, index));
+        message = message.substr(index + 1);
+    } while (index != string::npos);
+    return vecteur;
+}
+
+std::string readLine(std::istream &stream) {
+    char c;
+    std::string message;
+    stream.seekg(0);
+    do {
+        c = (char) stream.get();
+        message.push_back(c);
+    } while (c != '\n' && c != 0);
+    message.pop_back();
+    return message;
+}
+

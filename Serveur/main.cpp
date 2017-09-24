@@ -1,4 +1,3 @@
-#include <netdb.h>
 #include <signal.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/SocketServeur.h"
@@ -23,6 +22,7 @@ void EcrireMessageOut(const std::string &message);
 std::string getThread();
 
 bool userExist(const std::string &user, const std::string &password);
+
 /*Variables utilisées par les thread pour le pool de thread*/
 Socket *connexion;
 pthread_cond_t condConnexion;
@@ -47,9 +47,6 @@ int main(int argc, char **args) {
         return -1;
     }
     lectureFichierParams(args[1]);
-    std::string a, b;
-    userExist(a, b);
-    return 0;
     try {
         socketPrincipal = new SocketServeur(ipv4().Any, Parametres.PortRange[0]);
         cout << "(Socket principal)> " << socketPrincipal->getIp() << ":" << socketPrincipal->getPort() << endl;
@@ -134,29 +131,22 @@ std::string getThread() {
 }
 
 void EcrireMessageErrThread(const std::string &message) {
-    cerr << getThread() << message << endl;
-    pthread_mutex_lock(&mutexLog);
-    log << "cerr> " << message << endl;
-    pthread_mutex_unlock(&mutexLog);
+    EcrireMessageErr(getThread() + message);
 }
 
 void EcrireMessageOutThread(const std::string &message) {
-    cerr << getThread() << message << endl;
-    pthread_mutex_lock(&mutexLog);
-    log << "cout> " << message << endl;
-    pthread_mutex_unlock(&mutexLog);
+    EcrireMessageOut(getThread() + message);
 }
-
 void EcrireMessageErr(const std::string &message) {
-    cerr << message << endl;
     pthread_mutex_lock(&mutexLog);
+    cerr << message << endl;
     log << "cerr> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
 void EcrireMessageOut(const std::string &message) {
-    cout << message << endl;
     pthread_mutex_lock(&mutexLog);
+    cout << message << endl;
     log << "cout> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
@@ -164,9 +154,21 @@ void EcrireMessageOut(const std::string &message) {
 bool userExist(const std::string &user, const std::string &password) {
     std::string message;
     ifstream userFile(Parametres.userDB);
-    userFile >> message;
-    cout << "Lu: " << message << endl;
+    do {
+        message = readLine(userFile);
+        vector<string> splits;
+        splits = split(message, Parametres.CSVSeparator);
+        if (splits[0] == user && splits[1] == password) {
+//            cout << "User: " << splits[0] << "==" << user << endl;
+//            cout << "Password: " << splits[1] << "==" << password << endl;
+            userFile.close();
+            return true;
+        }
+    } while (!userFile.eof());
+    userFile.close();
+    return false;
 }
+
 void traitementConnexion(int *num) {
     // Initialisation des threads
     sigset_t mask;
