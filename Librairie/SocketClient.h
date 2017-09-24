@@ -14,7 +14,6 @@ public:
     void Disconnect();
 
 protected:
-    static std::string getLieu();
 
 };
 

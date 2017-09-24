@@ -18,7 +18,6 @@ public:
     Socket *Accept();
 
 protected:
-    static std::string getLieu();
 
 private:
 };

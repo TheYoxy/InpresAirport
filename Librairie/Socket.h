@@ -14,6 +14,7 @@
 #include "Structs.h"
 #include "Fonctions.h"
 
+#define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
 class Socket {
@@ -57,8 +58,6 @@ public:
     unsigned short getPort();
 
     int getDescripteur();
-
-    static std::string getLieu();
 
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);

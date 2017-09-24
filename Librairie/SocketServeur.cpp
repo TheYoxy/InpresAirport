@@ -3,6 +3,7 @@
 using namespace std;
 int maxSocketNbr = nbThread;
 int clients = 0;
+
 SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) try : Socket(addr, port) {}
 catch (Exception e) {
     throw e;
@@ -25,7 +26,7 @@ SocketServeur::~SocketServeur() {
 
 void SocketServeur::Listen() {
     if (listen(descripteur, SOMAXCONN) == -1)
-        throw Exception(getLieu() + "Erreur listen: " + strerror(errno));
+        throw Exception(EXCEPTION() + "Erreur listen: " + strerror(errno));
 }
 
 Socket *SocketServeur::Accept() {
@@ -36,7 +37,7 @@ Socket *SocketServeur::Accept() {
     memset(ip, 0, sizeof(struct sockaddr_in));
 
     if ((so = accept(descripteur, (struct sockaddr *) ip, &size)) == -1)
-        throw Exception(getLieu() + "Erreur connexion: " + strerror(errno));
+        throw Exception(EXCEPTION() + "Erreur connexion: " + strerror(errno));
 
     Socket *s = new Socket(so, ip);
     bool stop = false;
@@ -48,13 +49,13 @@ Socket *SocketServeur::Accept() {
             type = ACK;
         }
         if (send(s->getDescripteur(), &type, 1, 0) == -1)
-            throw Exception(getLieu() + "Impossible d'envoyer le message " + strerror(errno));
+            throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
         if (clients >= maxSocketNbr) {
             delete s;
             return nullptr;
         }
         if (recv(s->getDescripteur(), &type, 1, 0) == -1)
-            throw Exception(getLieu() + "Impossible de recevoir le message " + strerror(errno));
+            throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
         if (type == ACK) {
             stop = true;
         }
@@ -62,8 +63,3 @@ Socket *SocketServeur::Accept() {
     clients++;
     return s;
 }
-
-std::string SocketServeur::getLieu() {
-    return "SocketServeur: ";
-}
-
