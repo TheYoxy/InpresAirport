@@ -11,7 +11,7 @@ class Exception {
 public:
     Exception(std::string message);
 
-    virtual std::string getMessage();
+    virtual const std::string getMessage() const;
 
 protected:
     std::string message;

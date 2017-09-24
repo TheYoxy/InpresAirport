@@ -4,10 +4,10 @@
 
 #include "Exception.h"
 
-std::string Exception::getMessage() {
-    return this->message;
-}
-
 Exception::Exception(std::string message) {
     this->message = message;
+}
+
+const std::string Exception::getMessage() const {
+    return this->message;
 }
