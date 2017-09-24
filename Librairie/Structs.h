@@ -19,5 +19,6 @@ struct __Params {
     char FinTramesSeparator;
     char CSVSeparator;
     char TramesSeparator;
+    std::string userDB;
 };
 #endif //SERVEUR_STRUCTS_H

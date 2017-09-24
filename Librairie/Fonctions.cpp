@@ -64,6 +64,8 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.CSVSeparator = buffer[0];
         } else if (!strcmp(param, "Sep-Trames")) {
             Parametres.TramesSeparator = buffer[0];
+        } else if (!strcmp(param, "userDB")) {
+            Parametres.userDB = buffer[0];
         } else
             cout << param << " inconnu" << endl;
     } while (!lecture.eof());
