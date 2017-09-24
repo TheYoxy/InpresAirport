@@ -1,10 +1,13 @@
+#include <fcntl.h>
 #include "Socket.h"
 
 extern SParametres Parametres;
 
 Socket::Socket() {
+    this->open = false;
     if ((this->descripteur = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         throw Exception(EXCEPTION() + "Impossible de créer la socket");
+    this->open = true;
 }
 
 Socket::Socket(struct sockaddr_in *socket) : Socket() {
@@ -34,7 +37,9 @@ Socket::Socket(const ipv4 &addr, unsigned short port) : Socket() {
     }
 }
 
-Socket::~Socket() {}
+Socket::~Socket() {
+    Close();
+}
 
 void Socket::Bind(const ipv4 &addr, unsigned short port) {
     this->socketOut = CreationSockStruct(addr, port);
@@ -146,6 +151,7 @@ void Socket::SendAck() {
 void Socket::Close() {
     if (close(descripteur) == -1)
         throw Exception(EXCEPTION() + " Erreur de close: " + strerror(errno));
+    open = false;
 }
 
 unsigned short Socket::getPort() {
@@ -168,4 +174,8 @@ std::string Socket::getIp() {
 
 int Socket::getDescripteur() {
     return descripteur;
+}
+
+bool Socket::isOpen() {
+    return open;
 }

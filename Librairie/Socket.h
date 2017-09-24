@@ -15,6 +15,7 @@
 #include "Fonctions.h"
 
 #define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
+
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
 class Socket {
@@ -59,12 +60,15 @@ public:
 
     int getDescripteur();
 
+    bool isOpen();
+
 protected:
     virtual void Bind(const ipv4 &, unsigned short port);
 
     //VAR
     int descripteur;
     struct sockaddr_in *socketOut;
+    bool open;
 };
 
 #endif //SERVERU_SOCKET_H
