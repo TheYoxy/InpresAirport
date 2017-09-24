@@ -16,7 +16,11 @@ int main(int argc, char *argv[]) {
     bool fail = 1;
     char login[20], password[20], numBillet[40];
     int numVol;
-    struct hostent *host = gethostbyname("floryan-virtual-machine");
+    struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
+    if (host == nullptr) {
+        cout << "Impossible de résoudre le nom d'hôte" << endl;
+        return -1;
+    }
     std::string ip;
     for (int i = 0; i < host->h_length; i++)
         ip += std::to_string((int) host->h_addr[i]) + ".";
@@ -26,6 +30,8 @@ int main(int argc, char *argv[]) {
         SocketClient SoCl(ipv4().Any);
         SoCl.Connect(ipv4(ip.c_str()), 26010);
         cout << "Client connecté" << endl;
+        cout << "Login: " << endl;
+        cin >> login;
         SoCl.Disconnect();
     }
     catch (ConnexionException ce) {

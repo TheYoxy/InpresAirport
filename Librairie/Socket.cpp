@@ -6,7 +6,12 @@ extern SParametres Parametres;
 Socket::Socket() {
     this->open = false;
     if ((this->descripteur = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-        throw Exception(EXCEPTION() + "Impossible de créer la socket");
+        throw Exception(EXCEPTION() + "Impossible de créer la socket" + strerror(errno));
+    int tru = 1;
+    if (setsockopt(this->descripteur, SOL_SOCKET, SO_REUSEADDR, &tru, sizeof(int)) == -1)
+        throw Exception(EXCEPTION() + "Impossible de bind le reuseaddr" + strerror(errno));
+    if (setsockopt(this->descripteur, SOL_SOCKET, SO_REUSEPORT, &tru, sizeof(int)) == -1)
+        throw Exception(EXCEPTION() + "Impossible de bind le reuseport" + strerror(errno));
     this->open = true;
 }
 
@@ -15,7 +20,7 @@ Socket::Socket(struct sockaddr_in *socket) : Socket() {
     if (bind(this->descripteur, (struct sockaddr *) socket, sizeof(struct sockaddr_in)) == -1) {
         close(this->descripteur);
         throw Exception(EXCEPTION() + "Impossible de bind " + inet_ntoa(socket->sin_addr) + ":" +
-                        std::to_string(socket->sin_port) + "\n" + strerror(errno));
+                        std::to_string(socket->sin_port) + strerror(errno));
     }
 }
 
