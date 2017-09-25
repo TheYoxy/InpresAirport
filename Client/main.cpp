@@ -6,12 +6,15 @@
 #include <netdb.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
-#include "struct.h"
-
+#include "../Librairie/Structs.h"
 extern SParametres Parametres;
 using namespace std;
 
 SocketClient* SoCl;
+
+short Login(string login, string mdp);
+void logout(char *login);
+void check_ticket();
 
 int main(int argc, char *argv[]) {
     lectureFichierParams("../config.conf");
@@ -33,7 +36,7 @@ int main(int argc, char *argv[]) {
     cout << "Ip de l'host: " << ip << endl;
     try {
         SoCl = new SocketClient(ipv4().Any);
-        SoCl.Connect(ipv4(ip.c_str()), Parametres.portRange[0]);
+        SoCl->Connect(ipv4(ip.c_str()), Parametres.PortRange[0]);
         cout << "Client connecté" << endl;
     }
     catch (ConnexionException ce) {
@@ -48,15 +51,16 @@ int main(int argc, char *argv[]) {
     try{
         while(!state)
         {
-            cout << "INPRESAIRPORT : veuillez vous identifier" << endl;
+            cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
             cout << "Login: " << endl;
             cin >> login;
             cout << "Password :" << endl;
             cin >> password;
-            state = login(login, password);
+            state = Login(login, password);
             while(state)
             {
-                cout << "menu" <<
+                cout << "1. Encoder billet" << endl;
+                cout << "2. Encoder bagage" << endl;
             }
         }
 
@@ -101,17 +105,17 @@ int main(int argc, char *argv[]) {
 
 
 
-short login(string login, string mdp)
+short Login(string login, string mdp)
 {
 	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     short returnVal = 0;
-    string message = login + Parametres.CSVSeparator + password;
+    string message = login + Parametres.TramesSeparator + mdp;
     Type flag = LOGIN_OFFICER;
-    SoCl.send(message);
+    SoCl->Send(message);
     message = "";
     //On attend la réponse
     try {
-        SoCl.Recv(message)
+        SoCl->Recv(message);
         SMessage sMessage = getStructMessageFromString(message);
         switch(sMessage.type)
         {
@@ -129,13 +133,13 @@ short login(string login, string mdp)
 void logout(char *login)
 {
 	//Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
-    string message = login;
     Type flag = LOGOUT_OFFICER;
-    SoCl.send(message);
-    message = "";
+    string message = flag + login;
+    SoCl->Send(message);
+    message.clear();
     //On attend la réponse
     try {
-        SoCl.Recv(message)
+        SoCl->Recv(message);
         SMessage sMessage = getStructMessageFromString(message);
         switch(sMessage.type)
         {
