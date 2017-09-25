@@ -162,7 +162,7 @@ void Socket::Close() {
 unsigned short Socket::getPort() {
     if (this->socketOut == nullptr)
         throw Exception(EXCEPTION() + "SocketOut is null");
-    return this->socketOut->sin_port;
+    return htons(this->socketOut->sin_port);
 }
 
 std::string Socket::toString() {

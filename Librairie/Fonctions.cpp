@@ -7,19 +7,19 @@ struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     memset(retour, 0, sizeof(struct sockaddr_in));
     retour->sin_family = AF_INET;
     retour->sin_addr = addr.toAddr();
-    retour->sin_port = port;
+    retour->sin_port = htons(port);
     //cerr << "Création de " << addr.toString() << ":" << port << endl;
     return retour;
 }
 
-const string getMessage(Type t, const char *message) {
+const std::string getMessage(Type t, const char *message) {
     std::string retour = " ";
     retour[0] = t;
     retour += message + Parametres.FinTramesSeparator;
     return retour;
 }
 
-const string getMessage(Type t, std::string &message) {
+const std::string getMessage(Type t, const std::string &message) {
     std::string retour = " ";
     retour[0] = t;
     retour += message + Parametres.FinTramesSeparator;
@@ -30,7 +30,7 @@ std::string getStringFromStructMessage(SMessage m) {
     return getMessage(m.type, m.message);
 }
 
-SMessage getStructMessageFromString(std::string message) {
+SMessage getStructMessageFromString(const std::string &message) {
     SMessage retour;
     retour.type = (Type) message[0];
     retour.message = message.substr(1);
@@ -104,7 +104,7 @@ std::string readLine(std::istream &stream) {
     do {
         c = (char) stream.get();
         message.push_back(c);
-    } while (c != '\n' && c != 0);
+    } while (c != '\n' && c != -1);
     message.pop_back();
     return message;
 }

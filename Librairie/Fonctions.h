@@ -16,9 +16,9 @@ struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port);
 
 const std::string getMessage(Type t, const char *message);
 
-const std::string getMessage(Type t, std::string &message);
+const std::string getMessage(Type t, const std::string &message);
 
-SMessage getStructMessageFromString(std::string message);
+SMessage getStructMessageFromString(const std::string &message);
 
 std::string getStringFromStructMessage(SMessage m);
 
