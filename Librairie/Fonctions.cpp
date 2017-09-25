@@ -40,36 +40,34 @@ SMessage getStructMessageFromString(std::string message) {
 //Aucun delete sur buffer, car buffer est managé par le système
 void lectureFichierParams(const char *nomFichier) {
     ifstream lecture(nomFichier, ifstream::in);
-    char *param;
+    int debut = -1, fin = -1;
     do {
-        char *buffer = new char[1024];
-        lecture.getline(buffer, 1024);
-        param = strsep(&buffer, "=");
-        if (!strcmp(param, "ServeurPortDebut")) {
-            int debut = atoi(buffer);
-            buffer = new char[1024];
-            lecture.getline(buffer, 1024);
-            param = strsep(&buffer, "=");
-            int fin = atoi(buffer);
+        std::vector<std::string> vector = split(readLine(lecture), '=');
+        if (!vector[0].compare("ServeurPortDebut")) {
+            debut = atoi(vector[1]);
+        } else if (!vector[0].compare("ServeurPortFin")) {
+            fin = atoi(vector[1]);
+        } else if (!vector[0].compare("Admin")) {
+            Parametres.PortAdmin = atoi(vector[1]);
+        } else if (!vector[0].compare("Fin-Trames")) {
+            Parametres.FinTramesSeparator = vector[1][0];
+        } else if (!vector[0].compare("Sep-csv")) {
+            Parametres.CSVSeparator = vector[1][0];
+        } else if (!vector[0].compare("Sep-Trames")) {
+            Parametres.TramesSeparator = vector[1][0];
+        } else if (!vector[0].compare("userDB")) {
+            Parametres.userDB = vector[1];
+        } else
+            cout << "Paramètre : \"" << vector[0] << "\" inconnu" << endl;
+        if (fin != -1 && debut != -1) {
             Parametres.nbPortRange = static_cast<short>(fin - debut + 1);
             unsigned short *portRange = new unsigned short[fin - debut];
             for (int i = 0; i <= fin - debut; i++)
                 portRange[i] = static_cast<unsigned short>(debut + i);
             Parametres.PortRange = portRange;
-        } else if (!strcmp(param, "Admin")) {
-            Parametres.PortAdmin = atoi(buffer);
-        } else if (!strcmp(param, "Fin-Trames")) {
-            Parametres.FinTramesSeparator = buffer[0];
-        } else if (!strcmp(param, "Sep-csv")) {
-            Parametres.CSVSeparator = buffer[0];
-        } else if (!strcmp(param, "Sep-Trames")) {
-            Parametres.TramesSeparator = buffer[0];
-        } else if (!strcmp(param, "userDB")) {
-            Parametres.userDB = buffer;
-        } else
-            cout << param << " inconnu" << endl;
+        }
     } while (!lecture.eof());
-    delete param;
+
 }
 
 //On passe pas message par référence car on a besoin d'une copie de celui-ci
