@@ -6,10 +6,12 @@
 #include <netdb.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
+#include "struct.h"
 
 extern SParametres Parametres;
 using namespace std;
 
+SocketClient* SoCl;
 
 int main(int argc, char *argv[]) {
     lectureFichierParams("../config.conf");
@@ -17,22 +19,26 @@ int main(int argc, char *argv[]) {
     char login[20], password[20], numBillet[40];
     int numVol;
     struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
+    SMessage message;
+
     if (host == nullptr) {
         cout << "Impossible de résoudre le nom d'hôte" << endl;
         return -1;
     }
-    std::string ip;
+    string ip;
     for (int i = 0; i < host->h_length; i++)
         ip += std::to_string((int) host->h_addr[i]) + ".";
     ip.pop_back();
     cout << "Ip de l'host: " << ip << endl;
     try {
-        SocketClient SoCl(ipv4().Any);
-        SoCl.Connect(ipv4(ip.c_str()), 26010);
+        SoCl = new SocketClient(ipv4().Any);
+        SoCl.Connect(ipv4(ip.c_str()), Parametres.portRange[0]);
         cout << "Client connecté" << endl;
         cout << "Login: " << endl;
         cin >> login;
-        SoCl.Disconnect();
+        cout << "Password :" << endl;
+        cin >> password;
+        //SoCl.Disconnect();
     }
     catch (ConnexionException ce) {
         cout << ce.getMessage() << endl;
@@ -70,15 +76,15 @@ int main(int argc, char *argv[]) {
 
 
 
-/*void login(char *login, char *mdp)
+void login(char *login, char *mdp)
 {
 	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     string message = login + "-" + password;
-    cout << "Message avant l'envoi: " << message << endl << "Taille: " << message.length() << endl;
-    //SoCl.send();
+    Type flag = LOGIN_OFFICER;
+    SoCl.send(message);
     //On attend la réponse
     try {
-        SocketServeur sv;
+        SoCl.Recv;
         char *rcv = new char[50];
         memset(rcv, 0, 50);
         size_t taille = 50;
@@ -100,4 +106,3 @@ void check_ticket()
 	//envoie chaine de caractère au serv avec requete CHECK_TICKET
 	//Attend reponse pour encoder bagages
 }
-*/
