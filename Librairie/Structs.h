@@ -13,12 +13,12 @@ struct __Message {
 };
 typedef struct __Params SParametres;
 struct __Params {
-    short nbPortRange;
-    unsigned short *PortRange;
-    int PortAdmin;
-    char FinTramesSeparator;
-    char CSVSeparator;
-    char TramesSeparator;
-    std::string userDB;
+    short nbPortRange = -1;
+    unsigned short *PortRange = nullptr;
+    int PortAdmin = -1;
+    char FinTramesSeparator = -1;
+    char CSVSeparator = -1;
+    char TramesSeparator = -1;
+    std::string userDB = "";
 };
 #endif //SERVEUR_STRUCTS_H
