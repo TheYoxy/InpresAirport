@@ -6,38 +6,69 @@
 #include <netdb.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
+#include "struct.h"
 
 extern SParametres Parametres;
 using namespace std;
 
+SocketClient* SoCl;
 
 int main(int argc, char *argv[]) {
     lectureFichierParams("../config.conf");
-    bool fail = 1;
-    char login[20], password[20], numBillet[40];
+    bool state = 0;
+    string login, password, numBillet, ip;
     int numVol;
     struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
+    SMessage message;
+
+    /************************* LIAISON AVEC LE SERVEUR ****************************************/
     if (host == nullptr) {
         cout << "Impossible de résoudre le nom d'hôte" << endl;
         return -1;
     }
-    std::string ip;
+
     for (int i = 0; i < host->h_length; i++)
         ip += std::to_string((int) host->h_addr[i]) + ".";
     ip.pop_back();
     cout << "Ip de l'host: " << ip << endl;
     try {
-        SocketClient SoCl(ipv4().Any);
-        SoCl.Connect(ipv4(ip.c_str()), 26010);
+        SoCl = new SocketClient(ipv4().Any);
+        SoCl.Connect(ipv4(ip.c_str()), Parametres.portRange[0]);
         cout << "Client connecté" << endl;
-        cout << "Login: " << endl;
-        cin >> login;
-        SoCl.Disconnect();
     }
     catch (ConnexionException ce) {
         cout << ce.getMessage() << endl;
     }
     catch (Exception e) {
+        cout << e.getMessage() << endl;
+    }
+    /************************************ FIN LIAISON ******************************************/
+
+    /******************************* CENTRE DE L APPLICATION ***********************************/
+    try{
+        while(!state)
+        {
+            cout << "INPRESAIRPORT : veuillez vous identifier" << endl;
+            cout << "Login: " << endl;
+            cin >> login;
+            cout << "Password :" << endl;
+            cin >> password;
+            state = login(login, password);
+            while(state)
+            {
+                cout << "menu" <<
+            }
+        }
+
+        //SoCl.Disconnect();
+
+        while(state == 1)
+        {
+
+        }
+    }
+    catch(Exception e)
+    {
         cout << e.getMessage() << endl;
     }
     return -1;
@@ -70,29 +101,51 @@ int main(int argc, char *argv[]) {
 
 
 
-/*void login(char *login, char *mdp)
+short login(string login, string mdp)
 {
 	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
-    string message = login + "-" + password;
-    cout << "Message avant l'envoi: " << message << endl << "Taille: " << message.length() << endl;
-    //SoCl.send();
+    short returnVal = 0;
+    string message = login + Parametres.CSVSeparator + password;
+    Type flag = LOGIN_OFFICER;
+    SoCl.send(message);
+    message = "";
     //On attend la réponse
     try {
-        SocketServeur sv;
-        char *rcv = new char[50];
-        memset(rcv, 0, 50);
-        size_t taille = 50;
-        sv.Recv(rcv, taille);
-        printf("Message : %s", rcv);
+        SoCl.Recv(message)
+        SMessage sMessage = getStructMessageFromString(message);
+        switch(sMessage.type)
+        {
+            case ACK: cout << "Login reussi" << endl;
+                    returnVal = 1;
+                    break;
+        }
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
     }
+    return returnVal;
 }
 
 void logout(char *login)
 {
 	//Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
+    string message = login;
+    Type flag = LOGOUT_OFFICER;
+    SoCl.send(message);
+    message = "";
+    //On attend la réponse
+    try {
+        SoCl.Recv(message)
+        SMessage sMessage = getStructMessageFromString(message);
+        switch(sMessage.type)
+        {
+            case ACK: cout << "Logout reussi" << endl;
+                    break;
+        }
+    }
+    catch (Exception e) {
+        cerr << e.getMessage() << endl;
+    }
 }
 
 void check_ticket()
@@ -100,4 +153,3 @@ void check_ticket()
 	//envoie chaine de caractère au serv avec requete CHECK_TICKET
 	//Attend reponse pour encoder bagages
 }
-*/
