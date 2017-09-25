@@ -15,7 +15,7 @@ typedef struct __Params SParametres;
 struct __Params {
     short nbPortRange = -1;
     unsigned short *PortRange = nullptr;
-    unsigned short PortAdmin = -1;
+    unsigned short PortAdmin = 0;
     char FinTramesSeparator = -1;
     char CSVSeparator = -1;
     char TramesSeparator = -1;

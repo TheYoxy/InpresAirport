@@ -1,5 +1,6 @@
 #ifndef SERVEUR_SOCKET_H
 #define SERVEUR_SOCKET_H
+#define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
 
 #include <unistd.h>
 #include <cstring>
@@ -13,8 +14,6 @@
 #include "ipv4.h"
 #include "Structs.h"
 #include "Fonctions.h"
-
-#define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
 
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
