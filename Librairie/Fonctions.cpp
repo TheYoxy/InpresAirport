@@ -7,19 +7,19 @@ struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     memset(retour, 0, sizeof(struct sockaddr_in));
     retour->sin_family = AF_INET;
     retour->sin_addr = addr.toAddr();
-    retour->sin_port = port;
+    retour->sin_port = htons(port);
     //cerr << "Création de " << addr.toString() << ":" << port << endl;
     return retour;
 }
 
-const string getMessage(Type t, const char *message) {
+const std::string getMessage(Type t, const char *message) {
     std::string retour = " ";
     retour[0] = t;
     retour += message + Parametres.FinTramesSeparator;
     return retour;
 }
 
-const string getMessage(Type t, std::string &message) {
+const std::string getMessage(Type t, const std::string &message) {
     std::string retour = " ";
     retour[0] = t;
     retour += message + Parametres.FinTramesSeparator;
@@ -30,7 +30,7 @@ std::string getStringFromStructMessage(SMessage m) {
     return getMessage(m.type, m.message);
 }
 
-SMessage getStructMessageFromString(std::string message) {
+SMessage getStructMessageFromString(const std::string &message) {
     SMessage retour;
     retour.type = (Type) message[0];
     retour.message = message.substr(1);
@@ -40,36 +40,48 @@ SMessage getStructMessageFromString(std::string message) {
 //Aucun delete sur buffer, car buffer est managé par le système
 void lectureFichierParams(const char *nomFichier) {
     ifstream lecture(nomFichier, ifstream::in);
-    char *param;
+    int debut = -1, fin = -1;
     do {
-        char *buffer = new char[1024];
-        lecture.getline(buffer, 1024);
-        param = strsep(&buffer, "=");
-        if (!strcmp(param, "ServeurPortDebut")) {
-            int debut = atoi(buffer);
-            buffer = new char[1024];
-            lecture.getline(buffer, 1024);
-            param = strsep(&buffer, "=");
-            int fin = atoi(buffer);
+        std::vector<std::string> vector = split(readLine(lecture), '=');
+        if (!vector[0].compare("ServeurPortDebut")) {
+            debut = atoi(vector[1].c_str());
+        } else if (!vector[0].compare("ServeurPortFin")) {
+            fin = atoi(vector[1].c_str());
+        } else if (!vector[0].compare("Admin")) {
+            Parametres.PortAdmin = static_cast<unsigned short>(atoi(vector[1].c_str()));
+        } else if (!vector[0].compare("Fin-Trames")) {
+            Parametres.FinTramesSeparator = vector[1][0];
+        } else if (!vector[0].compare("Sep-csv")) {
+            Parametres.CSVSeparator = vector[1][0];
+        } else if (!vector[0].compare("Sep-Trames")) {
+            Parametres.TramesSeparator = vector[1][0];
+        } else if (!vector[0].compare("userDB")) {
+            Parametres.userDB = vector[1];
+        } else
+            cout << "Paramètre : \"" << vector[0] << "\" inconnu" << endl;
+        if (fin != -1 && debut != -1 && Parametres.PortRange == nullptr) {
             Parametres.nbPortRange = static_cast<short>(fin - debut + 1);
             unsigned short *portRange = new unsigned short[fin - debut];
             for (int i = 0; i <= fin - debut; i++)
                 portRange[i] = static_cast<unsigned short>(debut + i);
             Parametres.PortRange = portRange;
-        } else if (!strcmp(param, "Admin")) {
-            Parametres.PortAdmin = atoi(buffer);
-        } else if (!strcmp(param, "Fin-Trames")) {
-            Parametres.FinTramesSeparator = buffer[0];
-        } else if (!strcmp(param, "Sep-csv")) {
-            Parametres.CSVSeparator = buffer[0];
-        } else if (!strcmp(param, "Sep-Trames")) {
-            Parametres.TramesSeparator = buffer[0];
-        } else if (!strcmp(param, "userDB")) {
-            Parametres.userDB = buffer;
-        } else
-            cout << param << " inconnu" << endl;
+        }
     } while (!lecture.eof());
-    delete param;
+    if (Parametres.nbPortRange == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.PortRange == nullptr)
+        throw Exception(EXCEPTION() + "Le champs PortRange n'a pas de valeur définie");
+    else if (Parametres.PortAdmin == 0)
+        throw Exception(EXCEPTION() + "Le champs PortAdmin n'a pas de valeur définie");
+    else if (Parametres.FinTramesSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs FinTramesSeparator n'a pas de valeur définie");
+    else if (Parametres.CSVSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.TramesSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.userDB == "") {
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    }
 }
 
 //On passe pas message par référence car on a besoin d'une copie de celui-ci
@@ -89,11 +101,10 @@ std::vector<string> split(std::string message, char delimiter) {
 std::string readLine(std::istream &stream) {
     char c;
     std::string message;
-    stream.seekg(0);
     do {
         c = (char) stream.get();
         message.push_back(c);
-    } while (c != '\n' && c != 0);
+    } while (c != '\n' && c != -1);
     message.pop_back();
     return message;
 }

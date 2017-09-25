@@ -5,6 +5,8 @@
 enum Type {
     ACK,
     DISCONNECT,
+    ACCEPT,
+    REFUSE,
     LOGIN_OFFICER,
     LOGOUT_OFFICER,
     CHECK_TICKET,
