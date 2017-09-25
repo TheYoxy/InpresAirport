@@ -3,7 +3,7 @@
 //
 #ifndef SERVEUR_FONCTIONS_H
 #define SERVEUR_FONCTIONS_H
-
+#define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
 #include <vector>
 #include <iostream>
 #include "Structs.h"

@@ -44,11 +44,11 @@ void lectureFichierParams(const char *nomFichier) {
     do {
         std::vector<std::string> vector = split(readLine(lecture), '=');
         if (!vector[0].compare("ServeurPortDebut")) {
-            debut = atoi(vector[1]);
+            debut = atoi(vector[1].c_str());
         } else if (!vector[0].compare("ServeurPortFin")) {
-            fin = atoi(vector[1]);
+            fin = atoi(vector[1].c_str());
         } else if (!vector[0].compare("Admin")) {
-            Parametres.PortAdmin = atoi(vector[1]);
+            Parametres.PortAdmin = static_cast<unsigned short>(atoi(vector[1].c_str()));
         } else if (!vector[0].compare("Fin-Trames")) {
             Parametres.FinTramesSeparator = vector[1][0];
         } else if (!vector[0].compare("Sep-csv")) {
@@ -59,7 +59,7 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.userDB = vector[1];
         } else
             cout << "Paramètre : \"" << vector[0] << "\" inconnu" << endl;
-        if (fin != -1 && debut != -1) {
+        if (fin != -1 && debut != -1 && Parametres.PortRange == nullptr) {
             Parametres.nbPortRange = static_cast<short>(fin - debut + 1);
             unsigned short *portRange = new unsigned short[fin - debut];
             for (int i = 0; i <= fin - debut; i++)
@@ -67,7 +67,21 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.PortRange = portRange;
         }
     } while (!lecture.eof());
-
+    if (Parametres.nbPortRange == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.PortRange == nullptr)
+        throw Exception(EXCEPTION() + "Le champs PortRange n'a pas de valeur définie");
+    else if (Parametres.PortAdmin == 0)
+        throw Exception(EXCEPTION() + "Le champs PortAdmin n'a pas de valeur définie");
+    else if (Parametres.FinTramesSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs FinTramesSeparator n'a pas de valeur définie");
+    else if (Parametres.CSVSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.TramesSeparator == -1)
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    else if (Parametres.userDB == "") {
+        throw Exception(EXCEPTION() + "Le champs nbPortRange n'a pas de valeur définie");
+    }
 }
 
 //On passe pas message par référence car on a besoin d'une copie de celui-ci
@@ -87,7 +101,6 @@ std::vector<string> split(std::string message, char delimiter) {
 std::string readLine(std::istream &stream) {
     char c;
     std::string message;
-    stream.seekg(0);
     do {
         c = (char) stream.get();
         message.push_back(c);
