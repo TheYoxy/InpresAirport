@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
     SMessage message;
 
+    /************************* LIAISON AVEC LE SERVEUR ****************************************/
     if (host == nullptr) {
         cout << "Impossible de résoudre le nom d'hôte" << endl;
         return -1;
@@ -34,12 +35,6 @@ int main(int argc, char *argv[]) {
         SoCl = new SocketClient(ipv4().Any);
         SoCl.Connect(ipv4(ip.c_str()), Parametres.portRange[0]);
         cout << "Client connecté" << endl;
-        cout << "Login: " << endl;
-        cin >> login;
-        cout << "Password :" << endl;
-        cin >> password;
-        state = login(login, password);
-        //SoCl.Disconnect();
     }
     catch (ConnexionException ce) {
         cout << ce.getMessage() << endl;
@@ -47,10 +42,34 @@ int main(int argc, char *argv[]) {
     catch (Exception e) {
         cout << e.getMessage() << endl;
     }
+    /************************************ FIN LIAISON ******************************************/
 
-    while(state == 1)
+    /******************************* CENTRE DE L APPLICATION ***********************************/
+    try{
+        while(!state)
+        {
+            cout << "INPRESAIRPORT : veuillez vous identifier" << endl;
+            cout << "Login: " << endl;
+            cin >> login;
+            cout << "Password :" << endl;
+            cin >> password;
+            state = login(login, password);
+            while(state)
+            {
+                cout << "menu" <<
+            }
+        }
+
+        //SoCl.Disconnect();
+
+        while(state == 1)
+        {
+
+        }
+    }
+    catch(Exception e)
     {
-
+        cout << e.getMessage() << endl;
     }
     return -1;
     /*
