@@ -34,6 +34,8 @@ pthread_mutex_t mutexConnexion;
 pthread_mutex_t mutexLog;
 ofstream log("err.log");
 pthread_key_t keyNumThread;
+/* Mutex pour le fichier des utilisateurs */
+pthread_mutex_t mutexUserDB;
 /* Variables globales pour couper le serveur */
 pthread_t pthread[nbThread];
 // Création du socket
@@ -70,10 +72,15 @@ int main(int argc, char **args) {
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -4;
         }
-        if (pthread_key_create(&keyNumThread, nullptr) == -1) {
+        if (pthread_mutex_init(&mutexUserDB, nullptr) == -1) {
             cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -5;
+        }
+        if (pthread_key_create(&keyNumThread, nullptr) == -1) {
+            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            return -6;
         }
         struct sigaction sig;
         sigemptyset(&sig.sa_mask);
@@ -81,7 +88,7 @@ int main(int argc, char **args) {
         if (sigaction(SIGINT, &sig, nullptr) == -1) {
             cerr << "Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
             log << "cerr> Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
-            return -6;
+            return -7;
         }
         for (int i = 0; i < nbThread; i++) {
             //Passage d'un pointeur pour que la valeur ne soit pas modifiée
@@ -158,6 +165,7 @@ void EcrireMessageOut(const std::string &message) {
 
 bool userExist(const std::string &user, const std::string &password) {
     std::string message;
+    pthread_mutex_lock(&mutexUserDB);
     ifstream userFile(Parametres.userDB);
     do {
         message = readLine(userFile);
@@ -165,10 +173,12 @@ bool userExist(const std::string &user, const std::string &password) {
         splits = split(message, Parametres.CSVSeparator);
         if (splits[0] == user && splits[1] == password) {
             userFile.close();
+            pthread_mutex_unlock(&mutexUserDB);
             return true;
         }
     } while (!userFile.eof());
     userFile.close();
+    pthread_mutex_unlock(&mutexUserDB);
     return false;
 }
 
