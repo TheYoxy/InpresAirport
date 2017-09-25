@@ -1,27 +1,33 @@
-//
-// Created by floryan on 20/09/17.
-//
 #include <stdlib.h>
 #include <iostream>
 #include <netdb.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
-#include "../Librairie/Structs.h"
+
+#define CLEAN "\x1B[2J\x1B[H"
+
 extern SParametres Parametres;
 using namespace std;
 
-SocketClient* SoCl;
+SocketClient *SoCl;
 
-short Login(string login, string mdp);
+bool Login(string login, string mdp);
+
 void logout(char *login);
+
 void check_ticket();
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        cout << "Il manque des paramètre pour l'execution du programme" << endl;
+        cout << "./Client [nom-de-la-machine-hôte]" << endl;
+        return -1;
+    }
     lectureFichierParams("../config.conf");
-    bool state = 0;
     string login, password, numBillet, ip;
     int numVol;
-    struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
+
+    struct hostent *host = gethostbyname(argv[1]);
     SMessage message;
 
     /************************* LIAISON AVEC LE SERVEUR ****************************************/
@@ -38,6 +44,51 @@ int main(int argc, char *argv[]) {
         SoCl = new SocketClient(ipv4().Any);
         SoCl->Connect(ipv4(ip.c_str()), Parametres.PortRange[0]);
         cout << "Client connecté" << endl;
+        bool boucle = true;
+        while (boucle) {
+#ifndef DEBUG
+            cout << CLEAN;
+#endif
+            cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
+            cout << "Login: " << endl;
+            cin >> login;
+            cout << "Password :" << endl;
+            cin >> password;
+            boucle = Login(login, password);
+            bool menu = true;
+            while (menu) {
+                int choix;
+#ifndef DEBUG
+                cout << CLEAN;
+#endif
+                cout << "1. Encoder billet" << endl;
+                cout << "2. Encoder bagage" << endl;
+                cout << "0. Quitter" << endl;
+                cin >> choix;
+                switch (choix) {
+                    case 0:
+#ifndef DEBUG
+                        cout << CLEAN;
+#endif
+                        cout << "0. Quitter l'application" << endl;
+                        cout << "1. Se déconnecter de l'application" << endl;
+                        cin >> choix;
+                        if (choix == 1)
+                            boucle = false;
+                        menu = false;
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        SoCl->Disconnect();
     }
     catch (ConnexionException ce) {
         cout << ce.getMessage() << endl;
@@ -48,47 +99,7 @@ int main(int argc, char *argv[]) {
     /************************************ FIN LIAISON ******************************************/
 
     /******************************* CENTRE DE L APPLICATION ***********************************/
-    try{
-        while(!state)
-        {
-            cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
-            cout << "Login: " << endl;
-            cin >> login;
-            cout << "Password :" << endl;
-            cin >> password;
-            state = Login(login, password);
-            while(state)
-            {
-                cout << "1. Encoder billet" << endl;
-                cout << "2. Encoder bagage" << endl;
-            }
-        }
-
-        //SoCl.Disconnect();
-
-        while(state == 1)
-        {
-
-        }
-    }
-    catch(Exception e)
-    {
-        cout << e.getMessage() << endl;
-    }
-    return -1;
-    /*
-    do
-    {
-    	cout << "Application CHECK IN" << endl << "--------------------" << endl;
-    	cout << "Login :" << endl;
-    	cin >> login;
-		cout << "Password :" << endl;
-    	cin >> password;
-    	cout << "Connexion......." << endl;
-        cout << "\n\n\n\n\n" << endl;
-        login(&login, &password);
-    }while(fail != 0)
-
+    return 0;
     do
     {
         cout << "Application CHECK IN" << endl << "--------------------" << endl;
@@ -104,11 +115,9 @@ int main(int argc, char *argv[]) {
 }
 
 
-
-short Login(string login, string mdp)
-{
-	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
-    short returnVal = 0;
+bool Login(string login, string mdp) {
+    //Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
+    bool retour = false;
     string message = login + Parametres.TramesSeparator + mdp;
     Type flag = LOGIN_OFFICER;
     SoCl->Send(message);
@@ -117,22 +126,20 @@ short Login(string login, string mdp)
     try {
         SoCl->Recv(message);
         SMessage sMessage = getStructMessageFromString(message);
-        switch(sMessage.type)
-        {
-            case ACK: cout << "Login reussi" << endl;
-                    returnVal = 1;
-                    break;
-        }
+        if (sMessage.type == ACCEPT) {
+            cout << "Login reussi" << endl;
+            retour = true;
+        } else if (sMessage.type == REFUSE)
+            cout << "Erreur de combinaison login/mot de passe"
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
     }
-    return returnVal;
+    return retour;
 }
 
-void logout(char *login)
-{
-	//Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
+void logout(char *login) {
+    //Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
     Type flag = LOGOUT_OFFICER;
     string message = flag + login;
     SoCl->Send(message);
@@ -141,19 +148,14 @@ void logout(char *login)
     try {
         SoCl->Recv(message);
         SMessage sMessage = getStructMessageFromString(message);
-        switch(sMessage.type)
-        {
-            case ACK: cout << "Logout reussi" << endl;
-                    break;
-        }
+        cout << "Logout reussi" << endl;
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
     }
 }
 
-void check_ticket()
-{
-	//envoie chaine de caractère au serv avec requete CHECK_TICKET
-	//Attend reponse pour encoder bagages
+void check_ticket() {
+    //envoie chaine de caractère au serv avec requete CHECK_TICKET
+    //Attend reponse pour encoder bagages
 }
