@@ -15,8 +15,8 @@ SocketClient* SoCl;
 
 int main(int argc, char *argv[]) {
     lectureFichierParams("../config.conf");
-    bool fail = 1;
-    char login[20], password[20], numBillet[40];
+    bool state = 0;
+    string login, password, numBillet, ip;
     int numVol;
     struct hostent *host = gethostbyname(/*"floryan-virtual-machine"*/"floryan-msi-portable");
     SMessage message;
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
         cout << "Impossible de résoudre le nom d'hôte" << endl;
         return -1;
     }
-    string ip;
+
     for (int i = 0; i < host->h_length; i++)
         ip += std::to_string((int) host->h_addr[i]) + ".";
     ip.pop_back();
@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
         cin >> login;
         cout << "Password :" << endl;
         cin >> password;
+        state = login(login, password);
         //SoCl.Disconnect();
     }
     catch (ConnexionException ce) {
@@ -45,6 +46,11 @@ int main(int argc, char *argv[]) {
     }
     catch (Exception e) {
         cout << e.getMessage() << endl;
+    }
+
+    while(state == 1)
+    {
+
     }
     return -1;
     /*
@@ -76,29 +82,51 @@ int main(int argc, char *argv[]) {
 
 
 
-void login(char *login, char *mdp)
+short login(string login, string mdp)
 {
 	//Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
-    string message = login + "-" + password;
+    short returnVal = 0;
+    string message = login + Parametres.CSVSeparator + password;
     Type flag = LOGIN_OFFICER;
     SoCl.send(message);
+    message = "";
     //On attend la réponse
     try {
-        SoCl.Recv;
-        char *rcv = new char[50];
-        memset(rcv, 0, 50);
-        size_t taille = 50;
-        sv.Recv(rcv, taille);
-        printf("Message : %s", rcv);
+        SoCl.Recv(message)
+        SMessage sMessage = getStructMessageFromString(message);
+        switch(sMessage.type)
+        {
+            case ACK: cout << "Login reussi" << endl;
+                    returnVal = 1;
+                    break;
+        }
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
     }
+    return returnVal;
 }
 
 void logout(char *login)
 {
 	//Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
+    string message = login;
+    Type flag = LOGOUT_OFFICER;
+    SoCl.send(message);
+    message = "";
+    //On attend la réponse
+    try {
+        SoCl.Recv(message)
+        SMessage sMessage = getStructMessageFromString(message);
+        switch(sMessage.type)
+        {
+            case ACK: cout << "Logout reussi" << endl;
+                    break;
+        }
+    }
+    catch (Exception e) {
+        cerr << e.getMessage() << endl;
+    }
 }
 
 void check_ticket()
