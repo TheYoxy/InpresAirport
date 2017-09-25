@@ -1,9 +1,12 @@
 #include <signal.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/SocketServeur.h"
+
+#define CLEAN "\x1B[2J\x1B[H"
 //FLUX ERREUR: FICHIER LOG
 //FLUX OUT: CONSOLE
 //POOL DE THREAD A IMPLEMENTER
+//netstat -tulpn
 using namespace std;
 extern SParametres Parametres;
 extern int maxSocketNbr;
@@ -41,6 +44,7 @@ SocketServeur *socketPrincipal = nullptr;
 void HandlerSignal(int sig);
 
 int main(int argc, char **args) {
+    cout << CLEAN;
     if (argc == 1) {
         cerr << "Trop peu d'arguments à l'execution" << endl;
         log << "cerr> Trop peu d'arguments à l'execution" << endl;
@@ -112,7 +116,7 @@ int main(int argc, char **args) {
 
 
 void HandlerSignal(int sig) {
-    cout << "SIGINT reçu" << endl;
+    cout << "\rSIGINT reçu" << endl;
     cout << "Début du handler de supression" << endl;
     for (int i = 0; i < nbThread; i++) {
         if (pthread_cancel(pthread[i]) != 0) {
@@ -137,6 +141,7 @@ void EcrireMessageErrThread(const std::string &message) {
 void EcrireMessageOutThread(const std::string &message) {
     EcrireMessageOut(getThread() + message);
 }
+
 void EcrireMessageErr(const std::string &message) {
     pthread_mutex_lock(&mutexLog);
     cerr << message << endl;
@@ -159,14 +164,18 @@ bool userExist(const std::string &user, const std::string &password) {
         vector<string> splits;
         splits = split(message, Parametres.CSVSeparator);
         if (splits[0] == user && splits[1] == password) {
-//            cout << "User: " << splits[0] << "==" << user << endl;
-//            cout << "Password: " << splits[1] << "==" << password << endl;
             userFile.close();
             return true;
         }
     } while (!userFile.eof());
     userFile.close();
     return false;
+}
+
+void supressionThread(void *parms) {
+    cout << "Supression Thread" << endl;
+    pthread_getspecific(keyNumThread);
+
 }
 
 void traitementConnexion(int *num) {
@@ -206,60 +215,79 @@ void traitementConnexion(int *num) {
         EcrireMessageErrThread("Fin de l'execution de ce thread");
         return;
     }
-    // Fin initialisation du thread
-    while (1) {
-        pthread_mutex_lock(&mutexConnexion);
-        while (s == nullptr) {
-            pthread_cond_wait(&condConnexion, &mutexConnexion);
-            s = connexion;
-        }
-        pthread_mutex_unlock(&mutexConnexion);
-        EcrireMessageOutThread(s->toString() + " est connecté.");
-        bool stop = false;
-        while (!stop) {
-            try {
-                std::string message;
-                s->Recv(message);
-                s->SendAck();
-                SMessage sMessage = getStructMessageFromString(message);
-                switch (sMessage.type) {
-                    case LOGIN_OFFICER:
+    pthread_cleanup_push(supressionThread, nullptr);
+        // Fin initialisation du thread
+        while (1) {
+            pthread_mutex_lock(&mutexConnexion);
+            while (s == nullptr) {
+                pthread_cond_wait(&condConnexion, &mutexConnexion);
+                s = connexion;
+            }
+            pthread_mutex_unlock(&mutexConnexion);
+            EcrireMessageOutThread(s->toString() + " est connecté.");
+            bool stop = false;
+            bool log = false;
+            while (!stop) {
+                try {
+                    std::string message;
+                    s->Recv(message);
+                    s->SendAck();
+                    SMessage sMessage = getStructMessageFromString(message);
+                    switch (sMessage.type) {
+                        case LOGIN_OFFICER: {
+                            vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                            s->Send(getMessage(userExist(vsplit[0], vsplit[1]) ? ACCEPT : REFUSE, ""));
+                            log = true;
+                        }
+                            break;
+                        case LOGOUT_OFFICER:
+                            log = false;
+                            break;
+                        case CHECK_TICKET:
+                            if (log) {
 
-                        break;
-                    case LOGOUT_OFFICER:
+                            }
+                            break;
+                        case CHECK_LUGGAGE:
+                            if (log) {
 
-                        break;
-                    case CHECK_TICKET:
+                            }
+                            break;
+                        case PAYMENT_DONE:
+                            if (log) {
 
-                        break;
-                    case CHECK_LUGGAGE:
-
-                        break;
-                    case PAYMENT_DONE:
-
-                        break;
-                        //Unique point de sortie d'un socket passif du serveur
-                    case DISCONNECT: {
-                        EcrireMessageOutThread(s->toString() + " s'est déconnecté.");
-                        s->Close();
-                        delete s;
-                        s = nullptr;
-                        clients--;
-                        stop = true;
+                            }
+                            break;
+                            //Unique point de sortie d'un socket passif du serveur
+                        case DISCONNECT:
+                            EcrireMessageOutThread(s->toString() + " s'est déconnecté.");
+                            s->Close();
+                            delete s;
+                            s = nullptr;
+                            clients--;
+                            stop = true;
+                            break;
+                        default:
+                            EcrireMessageOutThread(std::string("Message <")
+                                                   + sMessage.message
+                                                   + "> de type <" +
+                                                   std::to_string(sMessage.type)
+                                                   + "> reçu de "
+                                                   + s->toString());
+                            break;
+                        case ACK:
+                            break;
+                        case ACCEPT:
+                            break;
+                        case REFUSE:
+                            break;
+                        case TOO_MUCH_CONNECTIONS:
+                            break;
                     }
-                        break;
-                    default:
-                        EcrireMessageOutThread(std::string("Message <")
-                                               + sMessage.message
-                                               + "> de type <" +
-                                               std::to_string(sMessage.type)
-                                               + "> reçu de "
-                                               + s->toString());
-                        break;
+                } catch (Exception e) {
+                    EcrireMessageErrThread(e.getMessage());
                 }
-            } catch (Exception e) {
-                EcrireMessageErrThread(e.getMessage());
             }
         }
-    }
+    pthread_cleanup_pop(1);
 }
