@@ -8,8 +8,8 @@
 
 typedef struct __Message SMessage;
 struct __Message {
-    Type type;
-    std::string message;
+    Type type = (Type) 0;
+    std::string message = "";
 };
 typedef struct __Params SParametres;
 struct __Params {
