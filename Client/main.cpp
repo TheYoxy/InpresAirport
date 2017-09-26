@@ -11,11 +11,11 @@ using namespace std;
 
 SocketClient *SoCl;
 
-bool Login(string login, string mdp);
+bool Login(const string &login, const string &mdp);
 
-void logout(char *login);
+void Logout(char *login);
 
-void check_ticket();
+void Check_ticket();
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -24,8 +24,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     lectureFichierParams("../config.conf");
-    string login, password, numBillet, ip;
-    int numVol;
+    string login, password,ip;
 
     struct hostent *host = gethostbyname(argv[1]);
     SMessage message;
@@ -44,6 +43,7 @@ int main(int argc, char *argv[]) {
         SoCl = new SocketClient(ipv4().Any);
         SoCl->Connect(ipv4(ip.c_str()), Parametres.PortRange[0]);
         cout << "Client connecté" << endl;
+    /************************************ FIN LIAISON ******************************************/
         bool boucle = true;
         while (boucle) {
 #ifndef DEBUG
@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
                         menu = false;
                         break;
                     case 1:
+                        Check_ticket();
                         break;
                     case 2:
                         break;
@@ -96,30 +97,16 @@ int main(int argc, char *argv[]) {
     catch (Exception e) {
         cout << e.getMessage() << endl;
     }
-    /************************************ FIN LIAISON ******************************************/
-
-    /******************************* CENTRE DE L APPLICATION ***********************************/
     return 0;
-    do
-    {
-        cout << "Application CHECK IN" << endl << "--------------------" << endl;
-        cout << "Numero de vol :" << endl;
-        cin >> numVol;
-        cout << "Numero du billet :" << endl;
-        cin >> numBillet;
-        cout << "Check......." << endl;
-        cout << "\n\n\n\n\n" << endl;
-
-    }while()
-    */
 }
 
 
-bool Login(string login, string mdp) {
+bool Login(const string &login, const string &mdp) {
     //Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     bool retour = false;
-    string message = login + Parametres.TramesSeparator + mdp;
     Type flag = LOGIN_OFFICER;
+    string message = login + Parametres.TramesSeparator + mdp;
+    message = getMessage(flag, message);
     SoCl->Send(message);
     message = "";
     //On attend la réponse
@@ -130,7 +117,7 @@ bool Login(string login, string mdp) {
             cout << "Login reussi" << endl;
             retour = true;
         } else if (sMessage.type == REFUSE)
-            cout << "Erreur de combinaison login/mot de passe"
+            cout << "Erreur de combinaison login/mot de passe" << endl;
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
@@ -138,7 +125,7 @@ bool Login(string login, string mdp) {
     return retour;
 }
 
-void logout(char *login) {
+void Logout(char *login) {
     //Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
     Type flag = LOGOUT_OFFICER;
     string message = flag + login;
@@ -155,7 +142,38 @@ void logout(char *login) {
     }
 }
 
-void check_ticket() {
+void Check_ticket() {
+    string numBillet, numVol;
+    bool retour;
+    Type flag = LOGOUT_OFFICER;
+    string message;
+
     //envoie chaine de caractère au serv avec requete CHECK_TICKET
+    do
+    {
+        cout << "Application CHECK IN" << endl << "--------------------" << endl;
+        cout << "Numero de vol :" << endl;
+        cin >> numVol;
+        cout << "Numero du billet :" << endl;
+        cin >> numBillet;
+        cout << "Check......." << endl;
+        cout << "\n\n\n\n\n" << endl;
+        message = numBillet + Parametres.TramesSeparator + numVol;
+        message = getMessage(flag, message);
+        SoCl->Send(message);
+        message.clear();
+        try {
+            SoCl->Recv(message);
+            SMessage sMessage = getStructMessageFromString(message);
+            if (sMessage.type == ACCEPT) {
+                cout << "Numero de billet accepté" << endl;
+                retour = true;
+            } else if (sMessage.type == REFUSE)
+                cout << "Numero de billet invalide" << endl;
+        }
+        catch (Exception e) {
+            cerr << e.getMessage() << endl;
+        }
+    }while(!retour);
     //Attend reponse pour encoder bagages
 }
