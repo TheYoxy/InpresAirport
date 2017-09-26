@@ -20,5 +20,6 @@ struct __Params {
     char CSVSeparator = -1;
     char TramesSeparator = -1;
     std::string userDB = "";
+    std::string ticketDB = "";
 };
 #endif //SERVEUR_STRUCTS_H

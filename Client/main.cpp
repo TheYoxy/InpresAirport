@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
                         Logout(login);
                         break;
                     case 1:
-                        Check_ticket();
+                        check_ticket();
                         break;
                     case 2:
                         break;
@@ -123,7 +123,6 @@ bool Login(const string &login, const string &mdp) {
             cout << "Login reussi" << endl;
             retour = true;
         } else if (sMessage.type == REFUSE)
-            cout << "Erreur de combinaison login/mot de passe" << endl;
             cout << "Erreur de combinaison login/mot de passe" << endl;
         else
             cout << "Message inconnu" << endl;
@@ -185,7 +184,7 @@ void Check_ticket() {
     cout << "ENREGISTREMENT BAGAGES" << endl;
     cout << "Nombre de bagages : " << endl;
     cin >> nbBagages;
-    message.clear;
+    message.clear();
     flag = CHECK_LUGGAGE;
 
     for(i=0; i < nbBagages; i++)
@@ -211,7 +210,7 @@ void Check_ticket() {
         cout << "Paiement effectué (O/N) : ";
         cin >> paye;
         flag = PAYMENT_DONE;
-        message.clear;
+        message.clear();
         message = getMessage(flag, message);//Envoi du flag uniquement message vide
         SoCl->Send(message);
     }

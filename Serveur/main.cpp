@@ -27,6 +27,8 @@ std::string getThread();
 
 bool userExist(const std::string &user, const std::string &password);
 
+bool ticketExist(const std::string &numTicket);
+
 /*Variables utilisées par les thread pour le pool de thread*/
 Socket *connexion;
 pthread_cond_t condConnexion;
@@ -37,6 +39,8 @@ ofstream log("err.log");
 pthread_key_t keyNumThread;
 /* Mutex pour le fichier des utilisateurs */
 pthread_mutex_t mutexUserDB;
+/* Mutex pour le fichier des tickets */
+pthread_mutex_t mutexTicketDB;
 /* Variables globales pour couper le serveur */
 pthread_t pthread[nbThread];
 // Création du socket
@@ -74,6 +78,11 @@ int main(int argc, char **args) {
             return -4;
         }
         if (pthread_mutex_init(&mutexUserDB, nullptr) == -1) {
+            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            return -5;
+        }
+        if (pthread_mutex_init(&mutexTicketDB, nullptr) == -1) {
             cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -5;
@@ -188,6 +197,26 @@ bool userExist(const std::string &user, const std::string &password) {
     return false;
 }
 
+bool ticketExist(const std::string &numTicket) {
+    string message;
+    pthread_mutex_lock(&mutexTicketDB);
+    ifstream ticketFile(Parametres.ticketDB);
+    do{
+        message = readLine(ticketFile);
+        vector<string> splits;
+        splits = split(message, Parametres.CSVSeparator);
+        if(splits[0] == numTicket)
+        {
+            ticketFile.close();
+            pthread_mutex_unlock(&mutexTicketDB);
+            return true;
+        }
+    }while(!ticketFile.eof());
+    ticketFile.close();
+    pthread_mutex_unlock(&mutexTicketDB);
+    return false;
+}
+
 void supressionThread(void *parms) {
     cout << "Supression Thread" << endl;
     pthread_getspecific(keyNumThread);
@@ -270,13 +299,16 @@ void traitementConnexion(int *num) {
                             EcrireMessageOutThread(sMessage.message + " a terminé sa session.");
                             break;
                         case CHECK_TICKET:
-                            if (log) {
-
+                            if (log){
+                                vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                                bool te = ticketExist(vsplit[0]);
+                                s->Send(getMessage(te ? ACCEPT : REFUSE, std::string("")));
                             }
                             break;
                         case CHECK_LUGGAGE:
                             if (log) {
-
+                                vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                                //bool cl = ticketExist(vsplit[0]);
                             }
                             break;
                         case PAYMENT_DONE:
