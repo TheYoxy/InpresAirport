@@ -30,7 +30,7 @@ target_compile_definitions(ClientDebug PUBLIC DEBUG)
 
 add_executable(ServeurDebug ${LIB} ${SOURCE_FILES_SERVER})
 target_link_libraries(ServeurDebug ${CMAKE_THREAD_LIBS_INIT})
-target_compile_definitions(ClientDebug PUBLIC DEBUG)
+target_compile_definitions(ServeurDebug PUBLIC DEBUG)
 
 add_executable(ClientRelease ${LIB} ${SOURCE_FILES_CLIENT})
 target_link_libraries(ClientRelease ${CMAKE_THREAD_LIBS_INIT})
