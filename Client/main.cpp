@@ -13,11 +13,12 @@ SocketClient *SoCl;
 
 bool Login(string login, string mdp);
 
-void logout(char *login);
-
 void check_ticket();
 
+void Logout(string login);
+
 int main(int argc, char *argv[]) {
+    cout << CLEAN;
     if (argc < 2) {
         cout << "Il manque des paramètre pour l'execution du programme" << endl;
         cout << "./Client [nom-de-la-machine-hôte]" << endl;
@@ -50,12 +51,12 @@ int main(int argc, char *argv[]) {
             cout << CLEAN;
 #endif
             cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
-            cout << "Login: " << endl;
+            cout << "Login: ";
             cin >> login;
-            cout << "Password :" << endl;
+            cout << "Password: ";
             cin >> password;
             boucle = Login(login, password);
-            bool menu = true;
+            bool menu = boucle;
             while (menu) {
                 int choix;
 #ifndef DEBUG
@@ -70,12 +71,13 @@ int main(int argc, char *argv[]) {
 #ifndef DEBUG
                         cout << CLEAN;
 #endif
-                        cout << "0. Quitter l'application" << endl;
                         cout << "1. Se déconnecter de l'application" << endl;
+                        cout << "0. Quitter l'application" << endl;
                         cin >> choix;
-                        if (choix == 1)
+                        if (choix == 0)
                             boucle = false;
                         menu = false;
+                        Logout(login);
                         break;
                     case 1:
                         break;
@@ -100,7 +102,8 @@ int main(int argc, char *argv[]) {
 
     /******************************* CENTRE DE L APPLICATION ***********************************/
     return 0;
-    do
+    /*
+     * do
     {
         cout << "Application CHECK IN" << endl << "--------------------" << endl;
         cout << "Numero de vol :" << endl;
@@ -118,10 +121,10 @@ int main(int argc, char *argv[]) {
 bool Login(string login, string mdp) {
     //Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     bool retour = false;
-    string message = login + Parametres.TramesSeparator + mdp;
-    Type flag = LOGIN_OFFICER;
+    string message = getMessage(LOGIN_OFFICER, login + Parametres.TramesSeparator + mdp);
+    cout << "Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")" << endl;
     SoCl->Send(message);
-    message = "";
+    message.clear();
     //On attend la réponse
     try {
         SoCl->Recv(message);
@@ -130,7 +133,9 @@ bool Login(string login, string mdp) {
             cout << "Login reussi" << endl;
             retour = true;
         } else if (sMessage.type == REFUSE)
-            cout << "Erreur de combinaison login/mot de passe"
+            cout << "Erreur de combinaison login/mot de passe" << endl;
+        else
+            cout << "Message inconnu" << endl;
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
@@ -138,16 +143,10 @@ bool Login(string login, string mdp) {
     return retour;
 }
 
-void logout(char *login) {
+void Logout(string login) {
     //Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
-    Type flag = LOGOUT_OFFICER;
-    string message = flag + login;
-    SoCl->Send(message);
-    message.clear();
-    //On attend la réponse
     try {
-        SoCl->Recv(message);
-        SMessage sMessage = getStructMessageFromString(message);
+        SoCl->Send(getMessage(LOGOUT_OFFICER, login));
         cout << "Logout reussi" << endl;
     }
     catch (Exception e) {
