@@ -1,7 +1,6 @@
 #include <signal.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/SocketServeur.h"
-
 #define CLEAN "\x1B[2J\x1B[H"
 //FLUX ERREUR: FICHIER LOG
 //FLUX OUT: CONSOLE
@@ -11,6 +10,8 @@ using namespace std;
 extern SParametres Parametres;
 extern int maxSocketNbr;
 extern int clients;
+//Mutex externe bloquant le nombre de clients
+extern pthread_mutex_t mutexClient;
 
 void traitementConnexion(int *num);
 
@@ -73,6 +74,11 @@ int main(int argc, char **args) {
             return -4;
         }
         if (pthread_mutex_init(&mutexUserDB, nullptr) == -1) {
+            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            return -5;
+        }
+        if (pthread_mutex_init(&mutexClient, nullptr) == -1) {
             cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -5;
@@ -239,19 +245,29 @@ void traitementConnexion(int *num) {
             bool log = false;
             while (!stop) {
                 try {
-                    std::string message;
+                    std::string message = "";
+                    message.clear();
                     s->Recv(message);
-                    s->SendAck();
                     SMessage sMessage = getStructMessageFromString(message);
+#ifdef DEBUG
+                    EcrireMessageErrThread("\tMessage reçu de " + s->toString());
+                    EcrireMessageErrThread("\tType : " + typeName(sMessage.type));
+                    EcrireMessageErrThread("\tMessage: " + sMessage.message);
+#endif
                     switch (sMessage.type) {
                         case LOGIN_OFFICER: {
                             vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                            s->Send(getMessage(userExist(vsplit[0], vsplit[1]) ? ACCEPT : REFUSE, ""));
-                            log = true;
+                            bool ue = userExist(vsplit[0], vsplit[1]);
+                            s->Send(getMessage(ue ? ACCEPT : REFUSE, std::string("")));
+                            if (ue) {
+                                log = true;
+                                EcrireMessageOutThread(vsplit[0] + " a ouvert sa session.");
+                            }
                         }
                             break;
                         case LOGOUT_OFFICER:
                             log = false;
+                            EcrireMessageOutThread(sMessage.message + " a terminé sa session.");
                             break;
                         case CHECK_TICKET:
                             if (log) {
@@ -274,11 +290,13 @@ void traitementConnexion(int *num) {
                             s->Close();
                             delete s;
                             s = nullptr;
+                            pthread_mutex_lock(&mutexClient);
                             clients--;
+                            pthread_mutex_unlock(&mutexClient);
                             stop = true;
                             break;
                         default:
-                            EcrireMessageOutThread(std::string("Message <")
+                            EcrireMessageOutThread(std::string("Message non-reconnu <")
                                                    + sMessage.message
                                                    + "> de type <" +
                                                    std::to_string(sMessage.type)

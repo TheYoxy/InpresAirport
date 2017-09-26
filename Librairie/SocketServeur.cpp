@@ -3,7 +3,9 @@
 using namespace std;
 int maxSocketNbr = nbThread;
 int clients = 0;
-
+#ifdef PTHREAD_MUTEX_INITIALIZER
+pthread_mutex_t mutexClient;
+#endif
 SocketServeur::SocketServeur(const ipv4 &addr, unsigned short port) try : Socket(addr, port) {}
 catch (Exception e) {
     throw e;
@@ -44,11 +46,17 @@ Socket *SocketServeur::Accept() {
     bool stop = false;
     while (!stop) {
         Type type;
+#ifdef PTHREAD_MUTEX_INITIALIZER
+        pthread_mutex_lock(&mutexClient);
+#endif
         if (clients >= maxSocketNbr) {
             type = TOO_MUCH_CONNECTIONS;
         } else {
             type = ACK;
         }
+#ifdef PTHREAD_MUTEX_INITIALIZER
+        pthread_mutex_unlock(&mutexClient);
+#endif
         if (send(s->getDescripteur(), &type, 1, 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
         if (clients >= maxSocketNbr) {
