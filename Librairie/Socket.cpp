@@ -89,14 +89,20 @@ void Socket::Send(const char *message) {
 void Socket::Send(const std::string message) {
     bool stop = false;
     while (!stop) {
-        if (send(descripteur, message.data(), message.length() + 1, 0) == -1)
+#ifdef DEBUG
+        std::cout << "\tSend string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
+                  << std::endl;
+        std::cout << "\tSend string: Message: " << message.substr(1) << std::endl;
+#endif
+        if (send(descripteur, message.data(), message.length(), 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
         Type flag = ACK;
         if (recv(descripteur, &flag, 1, 0) == -1)
             throw Exception(
                     EXCEPTION() + "Impossible de recevoir l'accusé de réception du message: " + strerror(errno));
-        if (flag == ACK)
+        if (flag == ACK) {
             stop = true;
+        }
     }
 }
 
@@ -106,6 +112,9 @@ int Socket::Recv(char *message, int size) {
         throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
     try {
         SendAck();
+#ifdef DEBUG
+        std::cout << "\tRecv char* taille: ACK envoyé" << std::endl;
+#endif
     }
     catch (Exception e) {
         throw e;
@@ -126,7 +135,7 @@ int Socket::Recv(std::string &message) {
     char lu;
     bool stop = false;
     int taille = 0;
-    message.clear();
+    message = "";
     while (!stop) {
         if (recv(descripteur, &lu, 1, 0) == -1)
             throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
@@ -138,7 +147,13 @@ int Socket::Recv(std::string &message) {
         }
     }
     try {
+#ifdef DEBUG
+        std::cout << "\t\tRecv string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
+                  << std::endl;
+        std::cout << "\t\tRecv string: Message: " << message.substr(1) << std::endl;
+#endif
         SendAck();
+        //std::cout << "\tRecv string: ACK envoyé" << std::endl;
     }
     catch (Exception e) {
         throw e;
