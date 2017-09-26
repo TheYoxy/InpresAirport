@@ -27,4 +27,6 @@ void lectureFichierParams(const char *nomFichier);
 std::vector<std::string> split(std::string message, char delimiter);
 
 std::string readLine(std::istream &stream);
+
+std::string typeName(Type t);
 #endif //SERVEUR_FONCTIONS_H

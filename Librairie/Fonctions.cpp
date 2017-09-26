@@ -109,3 +109,28 @@ std::string readLine(std::istream &stream) {
     return message;
 }
 
+std::string typeName(Type t) {
+    switch (t) {
+        case ACK:
+            return std::string("ACK");
+        case DISCONNECT:
+            return std::string("DISCONNECT");
+        case ACCEPT:
+            return std::string("ACCEPT");
+        case REFUSE:
+            return std::string("REFUSE");
+        case LOGIN_OFFICER:
+            return std::string("LOGIN_OFFICER");
+        case LOGOUT_OFFICER:
+            return std::string("LOGOUT_OFFICER");
+        case CHECK_TICKET:
+            return std::string("CHECK_TICKET");
+        case CHECK_LUGGAGE:
+            return std::string("CHECK_LUGGAGE");
+        case PAYMENT_DONE:
+            return std::string("PAYMENT_DONE");
+        case TOO_MUCH_CONNECTIONS:
+            return std::string("TOO_MUCH_CONNECTIONS");
+    }
+}
+
