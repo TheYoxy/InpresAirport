@@ -8,26 +8,19 @@ struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     retour->sin_family = AF_INET;
     retour->sin_addr = addr.toAddr();
     retour->sin_port = htons(port);
-    //cerr << "Création de " << addr.toString() << ":" << port << endl;
     return retour;
 }
 
-const std::string getMessage(Type t, const char *message) {
-    std::string retour = " ";
-    retour[0] = t;
-    retour += message + Parametres.FinTramesSeparator;
-    return retour;
-}
-
-const std::string getMessage(Type t, const std::string &message) {
-    std::string retour = " ";
-    retour[0] = t;
-    retour += message + Parametres.FinTramesSeparator;
-    return retour;
+std::string getMessage(const Type &t, const char *message) {
+    return getMessage(t, std::string(message));
 }
 
 std::string getStringFromStructMessage(SMessage m) {
     return getMessage(m.type, m.message);
+}
+
+std::string getMessage(const Type &t, const std::string &message) {
+    return (char) t + message + Parametres.FinTramesSeparator;
 }
 
 SMessage getStructMessageFromString(const std::string &message) {
@@ -109,7 +102,7 @@ std::string readLine(std::istream &stream) {
     return message;
 }
 
-std::string typeName(Type t) {
+std::string typeName(const Type &t) {
     switch (t) {
         case ACK:
             return std::string("ACK");
@@ -131,6 +124,8 @@ std::string typeName(Type t) {
             return std::string("PAYMENT_DONE");
         case TOO_MUCH_CONNECTIONS:
             return std::string("TOO_MUCH_CONNECTIONS");
+        default:
+            return std::string("INCONNU");
     }
 }
 

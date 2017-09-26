@@ -14,9 +14,9 @@
 
 struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port);
 
-const std::string getMessage(Type t, const char *message);
+std::string getMessage(const Type &t, const char *message);
 
-const std::string getMessage(Type t, const std::string &message);
+std::string getMessage(const Type &t, const std::string &message);
 
 SMessage getStructMessageFromString(const std::string &message);
 
@@ -28,5 +28,5 @@ std::vector<std::string> split(std::string message, char delimiter);
 
 std::string readLine(std::istream &stream);
 
-std::string typeName(Type t);
+std::string typeName(const Type &t);
 #endif //SERVEUR_FONCTIONS_H
