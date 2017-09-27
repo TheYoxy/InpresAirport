@@ -16,19 +16,19 @@ extern pthread_mutex_t mutexClient;
 
 void traitementConnexion(int *num);
 
-void EcrireMessageErrThread(const std::string &message);
+void EcrireMessageErrThread(const string &message);
 
-void EcrireMessageOutThread(const std::string &message);
+void EcrireMessageOutThread(const string &message);
 
-void EcrireMessageErr(const std::string &message);
+void EcrireMessageErr(const string &message);
 
-void EcrireMessageOut(const std::string &message);
+void EcrireMessageOut(const string &message);
 
-std::string getThread();
+string getThread();
 
-bool userExist(const std::string &user, const std::string &password);
+bool userExist(const string &user, const string &password);
 
-bool ticketExist(const std::string &numTicket);
+bool ticketExist(const vector<string> &ticket);
 
 /*Variables utilisées par les thread pour le pool de thread*/
 Socket *connexion;
@@ -54,7 +54,7 @@ void HandlerSignal(int sig);
 int main(int argc, char **args) {
     cout << CLEAN;
     if (argc == 1) {
-        cerr << "Trop peu d'arguments à l'execution" << endl;
+        Error(RED, "Trop peu d'arguments à l'execution");
         log << "cerr> Trop peu d'arguments à l'execution" << endl;
         return -1;
     }
@@ -64,47 +64,47 @@ int main(int argc, char **args) {
         cout << "(Socket principal)> " << socketPrincipal->getIp() << ":" << socketPrincipal->getPort() << endl;
         log << "cout> (Socket principal)> " << socketPrincipal->getIp() << ":" << socketPrincipal->getPort() << endl;
         if (pthread_cond_init(&condConnexion, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le condition condConnexion: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'initialiser la condition condConnexion: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser la condition condConnexion: " << strerror(errno) << endl;
             return -2;
         }
         if (pthread_mutex_init(&mutexConnexion, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexConnexion: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'initialiser le mutex mutexConnexion: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser le mutex mutexConnexion: " << strerror(errno) << endl;
             return -3;
         }
         if (pthread_mutex_init(&mutexLog, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'initialiser le mutex mutexLog: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -4;
         }
         if (pthread_mutex_init(&mutexUserDB, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'initialiser le mutex mutexUserDB: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -5;
         }
         if (pthread_mutex_init(&mutexTicketDB, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
-            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
-            return -5;
-        }
-        if (pthread_mutex_init(&mutexClient, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
-            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
-            return -5;
-        }
-        if (pthread_key_create(&keyNumThread, nullptr) == -1) {
-            cerr << "Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'initialiser le mutex mutexLog: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -6;
+        }
+        if (pthread_mutex_init(&mutexClient, nullptr) == -1) {
+            Error(RED, string("Impossible d'initialiser le mutex mutexClient: ") + strerror(errno));
+            log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
+            return -7;
+        }
+        if (pthread_key_create(&keyNumThread, nullptr) == -1) {
+            Error(RED, string("Impossible d'initialiser la clé keyNumThread: ") + strerror(errno));
+            log << "cerr> Impossible d'initialiser la clé keyNumThread: " << strerror(errno) << endl;
+            return -8;
         }
         struct sigaction sig;
         sigemptyset(&sig.sa_mask);
         sig.sa_handler = HandlerSignal;
         if (sigaction(SIGINT, &sig, nullptr) == -1) {
-            cerr << "Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
+            Error(RED, string("Impossible d'armer le signal SIGKILL: ") + strerror(errno));
             log << "cerr> Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
-            return -7;
+            return -9;
         }
         for (int i = 0; i < nbThread; i++) {
             //Passage d'un pointeur pour que la valeur ne soit pas modifiée
@@ -149,37 +149,37 @@ void HandlerSignal(int sig) {
     socketPrincipal = nullptr;
 }
 
-std::string getThread() {
+string getThread() {
     int num = *((int *) pthread_getspecific(keyNumThread));
-    std::string retour;
-    retour += "th_" + std::to_string(num) + "> ";
+    string retour;
+    retour += "th_" + to_string(num) + "> ";
     return retour;
 }
 
-void EcrireMessageErrThread(const std::string &message) {
+void EcrireMessageErrThread(const string &message) {
     EcrireMessageErr(getThread() + message);
 }
 
-void EcrireMessageOutThread(const std::string &message) {
+void EcrireMessageOutThread(const string &message) {
     EcrireMessageOut(getThread() + message);
 }
 
-void EcrireMessageErr(const std::string &message) {
+void EcrireMessageErr(const string &message) {
     pthread_mutex_lock(&mutexLog);
-    cerr << message << endl;
+    Error(RED, message);
     log << "cerr> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
-void EcrireMessageOut(const std::string &message) {
+void EcrireMessageOut(const string &message) {
     pthread_mutex_lock(&mutexLog);
     cout << message << endl;
     log << "cout> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
-bool userExist(const std::string &user, const std::string &password) {
-    std::string message;
+bool userExist(const string &user, const string &password) {
+    string message;
     pthread_mutex_lock(&mutexUserDB);
     ifstream userFile(Parametres.userDB);
     do {
@@ -197,15 +197,15 @@ bool userExist(const std::string &user, const std::string &password) {
     return false;
 }
 
-bool ticketExist(const std::string &numTicket) {
+bool ticketExist(const vector<string> &ticket) {
     string message;
     pthread_mutex_lock(&mutexTicketDB);
     ifstream ticketFile(Parametres.ticketDB);
+    vector<string> retour;
     do {
         message = readLine(ticketFile);
-        vector<string> splits;
-        splits = split(message, Parametres.CSVSeparator);
-        if (splits[0] == numTicket) {
+        retour = split(message, Parametres.CSVSeparator);
+        if (retour[0] == ticket[0] && retour[1] == ticket[1]) {
             ticketFile.close();
             pthread_mutex_unlock(&mutexTicketDB);
             return true;
@@ -213,13 +213,13 @@ bool ticketExist(const std::string &numTicket) {
     } while (!ticketFile.eof());
     ticketFile.close();
     pthread_mutex_unlock(&mutexTicketDB);
+    retour.clear();
     return false;
 }
 
 void supressionThread(void *parms) {
     cout << "Supression Thread" << endl;
     pthread_getspecific(keyNumThread);
-
 }
 
 void traitementConnexion(int *num) {
@@ -229,9 +229,9 @@ void traitementConnexion(int *num) {
 
     if (pthread_setspecific(keyNumThread, num) != 0) {
         EcrireMessageErr(
-                std::string("th_") + std::to_string(*num) + "> Impossible de mettre num(" + std::to_string(*num) +
+                string("th_") + to_string(*num) + "> Impossible de mettre num(" + to_string(*num) +
                 ") dans la variable spécifique au thread.");
-        EcrireMessageErr(std::string("th_") + std::to_string(*num) + "> Fin de l'execution de ce thread.");
+        EcrireMessageErr(string("th_") + to_string(*num) + "> Fin de l'execution de ce thread.");
         return;
     }
     if (sigemptyset(&mask) != 0) {
@@ -273,7 +273,7 @@ void traitementConnexion(int *num) {
             bool log = false;
             while (!stop) {
                 try {
-                    std::string message = "";
+                    string message = "";
                     message.clear();
                     s->Recv(message);
                     SMessage sMessage = getStructMessageFromString(message);
@@ -282,11 +282,12 @@ void traitementConnexion(int *num) {
                     EcrireMessageErrThread("\tType : " + typeName(sMessage.type));
                     EcrireMessageErrThread("\tMessage: " + sMessage.message);
 #endif
+                    vector<string> vsplit;
                     switch (sMessage.type) {
                         case LOGIN_OFFICER: {
-                            vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                            vsplit = split(sMessage.message, Parametres.TramesSeparator);
                             bool ue = userExist(vsplit[0], vsplit[1]);
-                            s->Send(getMessage(ue ? ACCEPT : REFUSE, std::string("")));
+                            s->Send(getMessage(ue ? ACCEPT : REFUSE, string("")));
                             if (ue) {
                                 log = true;
                                 EcrireMessageOutThread(vsplit[0] + " a ouvert sa session.");
@@ -299,18 +300,17 @@ void traitementConnexion(int *num) {
                             break;
                         case CHECK_TICKET:
                             if (log) {
-                                vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                bool te = ticketExist(vsplit[0]);
-                                s->Send(getMessage(te ? ACCEPT : REFUSE, std::string("")));
+                                vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                                s->Send(getMessage(ticketExist(vsplit) ? ACCEPT : REFUSE, string("")));
                             }
                             break;
                         case CHECK_LUGGAGE:
                             if (log) {
                                 double poidstot = 0.0, poidsExces = 0.0;
-                                vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+                                vsplit = split(sMessage.message, Parametres.TramesSeparator);
                                 for (int i = 0; vsplit[i] != ""; i += 2) {
-                                    poidstot += std::stod(vsplit[i]);
-                                    if (std::stod(vsplit[i]) > 20.0)
+                                    poidstot += stod(vsplit[i]);
+                                    if (stod(vsplit[i]) > 20.0)
                                         poidsExces += (stod(vsplit[i]) - 20.0);
                                 }
 
@@ -324,7 +324,6 @@ void traitementConnexion(int *num) {
                             //Unique point de sortie d'un socket passif du serveur
                         case DISCONNECT:
                             EcrireMessageOutThread(s->toString() + " s'est déconnecté.");
-                            s->Close();
                             delete s;
                             s = nullptr;
                             pthread_mutex_lock(&mutexClient);
@@ -333,10 +332,10 @@ void traitementConnexion(int *num) {
                             stop = true;
                             break;
                         default:
-                            EcrireMessageOutThread(std::string("Message non-reconnu <")
+                            EcrireMessageOutThread(string("Message non-reconnu <")
                                                    + sMessage.message
                                                    + "> de type <" +
-                                                   std::to_string(sMessage.type)
+                                                   to_string(sMessage.type)
                                                    + "> reçu de "
                                                    + s->toString());
                             break;
