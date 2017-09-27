@@ -43,7 +43,12 @@ Socket::Socket(const ipv4 &addr, unsigned short port) : Socket() {
 }
 
 Socket::~Socket() {
-    Close();
+    try {
+        Close();
+    }
+    catch (Exception e) {
+        throw e;
+    }
 }
 
 void Socket::Bind(const ipv4 &addr, unsigned short port) {
