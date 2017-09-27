@@ -22,8 +22,8 @@ void Logout(string login);
 int main(int argc, char *argv[]) {
     cout << CLEAN;
     if (argc < 2) {
-        cout << "Il manque des paramètre pour l'execution du programme" << endl;
-        cout << "./Client [nom-de-la-machine-hôte]" << endl;
+        Error(RED, "Il manque des paramètre pour l'execution du programme");
+        Error(RED, "./Client [nom-de-la-machine-serveur]");
         return -1;
     }
     lectureFichierParams("../config.conf");
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (int i = 0; i < host->h_length; i++)
-        ip += std::to_string((int) host->h_addr[i]) + ".";
+        ip += to_string((int) host->h_addr[i]) + ".";
     ip.pop_back();
     cout << "Ip de l'host: " << ip << endl;
     try {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 #ifndef Debug
                 cout << CLEAN;
 #endif
-                cout << "1. Encoder billet" << endl;
+                cout << "1. Vérification billet" << endl;
                 cout << "2. Encoder bagage" << endl;
                 cout << "0. Quitter" << endl;
                 cin >> choix;
@@ -146,7 +146,6 @@ void Logout(string login) {
 
 void Check_ticket() {
     string numBillet, numVol, nbAccompagants, valise, poids, paye;
-    int nbBagages, i;
     bool retour = false;
     Type flag = CHECK_TICKET;
     string message;
@@ -154,50 +153,63 @@ void Check_ticket() {
     //envoie chaine de caractère au serv avec requete CHECK_TICKET
     do {
         cout << "Application CHECK IN" << endl << "--------------------" << endl;
-        cout << "Numero de vol :" << endl;
+        cout << "Numero de vol :";
         cin >> numVol;
-        cout << "Numero du billet :" << endl;
+        cout << "Numero du billet :";
         cin >> numBillet;
-        cout << "Nombre d'accompagants :" << endl;
+        cout << "Nombre d'accompagants :";
         cin >> nbAccompagants;
         cout << "Check......." << endl;
 #ifndef Debug
         cout << CLEAN << endl;
 #endif
-        message = getMessage(flag, numBillet + Parametres.TramesSeparator + numVol + Parametres.TramesSeparator +
-                                   nbAccompagants);
-        SoCl->Send(message);
+        SoCl->Send(getMessage(flag, numBillet +
+                                    Parametres.TramesSeparator +
+                                    numVol +
+                                    Parametres.TramesSeparator +
+                                    nbAccompagants));
         message.clear();
         try {
             SoCl->Recv(message);
-            SMessage sMessage = getStructMessageFromString(message);
-            if (sMessage.type == ACCEPT) {
-                cout << "Enrigstrement du billet effectué avec succès !" << endl;
-                retour = true;
-            } else if (sMessage.type == REFUSE)
-                cout << "Numero de billet invalide" << endl;
+            switch (getStructMessageFromString(message).type) {
+                case ACCEPT:
+                    cout << "Enrigstrement du billet effectué avec succès !" << endl;
+                    retour = true;
+                    break;
+                case REFUSE:
+                    cout << "Numero de billet invalide" << endl;
+                    break;
+                default:
+                    break;
+            }
         }
         catch (Exception e) {
             cerr << e.getMessage() << endl;
         }
     } while (!retour);
+    //Attend reponse pour encoder bagages
+}
 
+void Encodage_Bagages() {
+    string message;
+    int nbBagages;
     cout << "ENREGISTREMENT BAGAGES" << endl;
     cout << "Nombre de bagages : " << endl;
     cin >> nbBagages;
     message.clear();
-    flag = CHECK_LUGGAGE;
 
-    for (i = 0; i < nbBagages; i++) {
+    for (int i = 0; i < nbBagages; i++) {
+        double poids, valise;
         cout << "Poids du bagage numero " << i + 1 << " :" << endl;
         cin >> poids;
         cout << "Valise ?";
         cin >> valise;
-        message += poids + Parametres.TramesSeparator + valise; //poids de la valise + separateur + valise O/N
+        message += poids + Parametres.TramesSeparator + valise +
+                   Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
         //ATTENTION pour dernier bagage remove le dernier séparateur avant séparateur de fin /!
     }
-    message = getMessage(flag, message);
-    SoCl->Send(message);
+    message.pop_back();
+    SoCl->Send(getMessage(CHECK_LUGGAGE, message));
     message.clear();
     try {
         SoCl->Recv(message);
@@ -209,15 +221,12 @@ void Check_ticket() {
         cout << "Excédent poids : " << splits[1] << "kg" << endl;
         cout << "Supplément à payer : " << splits[2] << "Euro" << endl;
         cout << "Paiement effectué (O/N) : ";
-        cin >> paye;
-        flag = PAYMENT_DONE;
-        message.clear();
-        message = getMessage(flag, message);//Envoi du flag uniquement message vide
-        SoCl->Send(message);
+        Error(RED, "La suite n'a pas encore été implémentée");
+        /*cin >> paye;
+        message = getMessage(PAYMENT_DONE, "");//Envoi du flag uniquement message vide
+        SoCl->Send(message);*/
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;
     }
-
-    //Attend reponse pour encoder bagages
 }
