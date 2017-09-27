@@ -36,7 +36,7 @@ pthread_cond_t condConnexion;
 pthread_mutex_t mutexConnexion;
 /* Variables utilisées pour le logging */
 pthread_mutex_t mutexLog;
-ofstream log("err.log");
+ofstream log("err.log", ios::app);
 pthread_key_t keyNumThread;
 /* Mutex pour le fichier des utilisateurs */
 pthread_mutex_t mutexUserDB;
@@ -51,9 +51,11 @@ SocketServeur *socketPrincipal = nullptr;
 
 void HandlerSignal(int sig);
 
+void InitialisationLog();
+
 int main(int argc, char **args) {
     cout << CLEAN;
-
+    InitialisationLog();
     if (argc == 1) {
         Error(RED, "Trop peu d'arguments à l'execution");
         log << "cerr> Trop peu d'arguments à l'execution" << endl;
@@ -349,4 +351,17 @@ void traitementConnexion(int *num) {
             }
         }
     pthread_cleanup_pop(1);
+}
+
+void InitialisationLog() {
+    struct tm debut = *localtime(reinterpret_cast<const time_t *>(time(NULL)));
+    for (int i = 0; i < 100; i++)
+        log << "-";
+    log << endl;
+    log << "Date de compilation: " << __DATE__ << endl;
+    log << "Date d'execution: " << debut.tm_mday + 1 << "/" << debut.tm_mon << "/" << debut.tm_year << " à "
+        << debut.tm_hour << ":" << debut.tm_min << ":" << debut.tm_sec << endl;
+    for (int i = 0; i < 100; i++)
+        log << "-";
+    log << endl;
 }
