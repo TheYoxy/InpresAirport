@@ -138,8 +138,7 @@ int main(int argc, char **args) {
 
 
 void HandlerSignal(int sig) {
-    cout << "\rSIGINT reçu" << endl;
-    cout << "Début du handler de supression" << endl;
+    cout << "\rDébut du handler de supression" << endl;
     for (int i = 0; i < nbThread; i++) {
         if (pthread_cancel(pthread[i]) != 0) {
             EcrireMessageErr("Impossible de cancel le thread numero[" + to_string(i) + "]");
