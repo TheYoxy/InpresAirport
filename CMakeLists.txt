@@ -22,18 +22,15 @@ set(SOURCE_FILES_SERVER
         Serveur/main.cpp)
 set(SOURCE_FILES_CLIENT
         Client/main.cpp)
+set(LIBRARY_OUTPUT_PATH Build/Lib)
 find_package(Threads REQUIRED)
+#set(CMAKE_BUILD_TYPE Release)
+#set(EXECUTABLE_OUTPUT_PATH ../)
+#set(CMAKE_MAKE_PROGRAM )
+add_executable(Client ${LIB} ${SOURCE_FILES_CLIENT})
+target_link_libraries(Client ${CMAKE_THREAD_LIBS_INIT})
+target_compile_definitions(Client PUBLIC ${CMAKE_BUILD_TYPE})
 
-add_executable(ClientDebug ${LIB} ${SOURCE_FILES_CLIENT})
-target_link_libraries(ClientDebug ${CMAKE_THREAD_LIBS_INIT})
-target_compile_definitions(ClientDebug PUBLIC DEBUG)
-
-add_executable(ServeurDebug ${LIB} ${SOURCE_FILES_SERVER})
-target_link_libraries(ServeurDebug ${CMAKE_THREAD_LIBS_INIT})
-target_compile_definitions(ServeurDebug PUBLIC DEBUG)
-
-add_executable(ClientRelease ${LIB} ${SOURCE_FILES_CLIENT})
-target_link_libraries(ClientRelease ${CMAKE_THREAD_LIBS_INIT})
-
-add_executable(ServeurRelease ${LIB} ${SOURCE_FILES_SERVER})
-target_link_libraries(ServeurRelease ${CMAKE_THREAD_LIBS_INIT})
+add_executable(Serveur ${LIB} ${SOURCE_FILES_SERVER})
+target_link_libraries(Serveur ${CMAKE_THREAD_LIBS_INIT})
+target_compile_definitions(Serveur PUBLIC ${CMAKE_BUILD_TYPE})
