@@ -223,7 +223,7 @@ bool ticketExist(const vector<string> &ticket) {
 }
 
 void supressionThread(void *parms) {
-    cout << "Supression Thread" << endl;
+    Error(YELLOW, "Supression Thread");
     pthread_getspecific(keyNumThread);
 }
 
@@ -356,7 +356,8 @@ void traitementConnexion(int *num) {
 }
 
 void InitialisationLog() {
-    struct tm debut = *localtime(reinterpret_cast<const time_t *>(time(NULL)));
+    time_t t = time(NULL);
+    struct tm debut = *localtime(&t);
     for (int i = 0; i < 100; i++)
         log << "-";
     log << endl;
