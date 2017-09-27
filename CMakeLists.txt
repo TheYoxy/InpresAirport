@@ -19,7 +19,7 @@ set(LIB Librairie/Socket.cpp
         Librairie/ConnexionException.h)
 set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES_SERVER
-        Serveur/main.cpp)
+        Serveur/main.cpp Serveur/FonctionServeur.h Serveur/FonctionServeur.cpp)
 set(SOURCE_FILES_CLIENT
         Client/main.cpp)
 set(LIBRARY_OUTPUT_PATH Build/Lib)
