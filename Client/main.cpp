@@ -194,7 +194,6 @@ void Check_ticket() {
         cout << "Valise ?" ;
         cin >> valise;
         message += poids + Parametres.TramesSeparator + valise +Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
-        //ATTENTION pour dernier bagage remove le dernier séparateur avant séparateur de fin /!
     }
     message = getMessage(flag, message);
     SoCl->Send(message);
@@ -213,6 +212,12 @@ void Check_ticket() {
         message.clear();
         message = getMessage(flag, message);//Envoi du flag uniquement message vide
         SoCl->Send(message);
+        message.clear();
+        SoCl->Recv(message);
+        sMessage = getStructMessageFromString(message);
+        if(sMessage.type != ACCEPT)
+            cout << "problème lors du paiement" << endl;
+
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;

@@ -262,7 +262,7 @@ void traitementConnexion(int *num) {
     }
     pthread_cleanup_push(supressionThread, nullptr);
         // Fin initialisation du thread
-        while (1) {
+        while () {
             pthread_mutex_lock(&mutexConnexion);
             while (s == nullptr) {
                 pthread_cond_wait(&condConnexion, &mutexConnexion);
@@ -316,12 +316,14 @@ void traitementConnexion(int *num) {
                                   if(std::stod(vsplit[i])> 20.0)
                                     poidsExces += (stod(vsplit[i])-20.0);
                                 }
+                                string message = poidsExces + Parametres.TramesSeparator + poidstot;
+                                s->Send(message);
 
                             }
                             break;
                         case PAYMENT_DONE:
                             if (log) {
-
+                                s->Send(getMessage(ACCEPT, ""));
                             }
                             break;
                             //Unique point de sortie d'un socket passif du serveur
