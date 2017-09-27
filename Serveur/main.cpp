@@ -3,6 +3,9 @@
 #include "../Librairie/SocketServeur.h"
 
 #define CLEAN "\x1B[2J\x1B[H"
+#define ErrorLock(couleur, message) pthread_mutex_lock(&mutexEcran);\
+ Error(couleur,message);\
+ pthread_mutex_unlock(&mutexEcran);
 //FLUX ERREUR: FICHIER LOG
 //FLUX OUT: CONSOLE
 //POOL DE THREAD A IMPLEMENTER
@@ -18,9 +21,13 @@ void traitementConnexion(int *num);
 
 void EcrireMessageErrThread(const string &message);
 
+void EcrireMessageErrThread(int couleur, const string &message);
+
 void EcrireMessageOutThread(const string &message);
 
 void EcrireMessageErr(const string &message);
+
+void EcrireMessageErr(int couleur, const string &message);
 
 void EcrireMessageOut(const string &message);
 
@@ -42,6 +49,8 @@ pthread_key_t keyNumThread;
 pthread_mutex_t mutexUserDB;
 /* Mutex pour le fichier des tickets */
 pthread_mutex_t mutexTicketDB;
+/* Mutex qui lock l'écriture à l'écran */
+pthread_mutex_t mutexEcran;
 /* Variables globales pour couper le serveur */
 pthread_t pthread[nbThread];
 // Création du socket
@@ -98,10 +107,15 @@ int main(int argc, char **args) {
             log << "cerr> Impossible d'initialiser le mutex mutexLog: " << strerror(errno) << endl;
             return -7;
         }
+        if (pthread_mutex_init(&mutexEcran, nullptr) == -1) {
+            Error(RED, string("Impossible d'initialiser le mutex mutexEcran: ") + strerror(errno));
+            log << "cerr> Impossible d'initialiser le mutex mutexEcran: " << strerror(errno) << endl;
+            return -8;
+        }
         if (pthread_key_create(&keyNumThread, nullptr) == -1) {
             Error(RED, string("Impossible d'initialiser la clé keyNumThread: ") + strerror(errno));
             log << "cerr> Impossible d'initialiser la clé keyNumThread: " << strerror(errno) << endl;
-            return -8;
+            return -9;
         }
         struct sigaction sig;
         sigemptyset(&sig.sa_mask);
@@ -109,7 +123,7 @@ int main(int argc, char **args) {
         if (sigaction(SIGINT, &sig, nullptr) == -1) {
             Error(RED, string("Impossible d'armer le signal SIGKILL: ") + strerror(errno));
             log << "cerr> Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
-            return -9;
+            return -10;
         }
         for (int i = 0; i < nbThread; i++) {
             //Passage d'un pointeur pour que la valeur ne soit pas modifiée
@@ -118,8 +132,8 @@ int main(int argc, char **args) {
             pthread_create(&pthread[i], nullptr, reinterpret_cast<void *(*)(void *)>(traitementConnexion), param);
             pthread_detach(pthread[i]);
         }
-
-        while (socketPrincipal != nullptr) {
+        bool bp = true;
+        while (bp) {
             try {
                 Socket *s = socketPrincipal->Accept();
                 pthread_mutex_lock(&mutexConnexion);
@@ -130,28 +144,34 @@ int main(int argc, char **args) {
             catch (Exception e) {
                 if (errno != EINTR)
                     EcrireMessageErr(e.getMessage());
-                else
-                    EcrireMessageErr("Fin de l'execution du serveur");
+                else {
+                    EcrireMessageOut("Fin de l'execution du serveur");
+                    bp = false;
+                }
             }
+        }
+        for (int i = 0; i < nbThread; i++) {
+            pthread_join(pthread[i], nullptr);
         }
     }
     catch (Exception e) {
         EcrireMessageErr(e.getMessage());
     }
+    delete socketPrincipal;
     log.close();
     return 0;
 }
 
 
 void HandlerSignal(int sig) {
-    cout << "\rDébut du handler de supression" << endl;
+    int couleur = CYAN;
+    EcrireMessageErr(couleur, "\rDébut du handler de supression");
     for (int i = 0; i < nbThread; i++) {
-        if (pthread_cancel(pthread[i]) != 0) {
-            EcrireMessageErr("Impossible de cancel le thread numero[" + to_string(i) + "]");
-        }
+        if (pthread_cancel(pthread[i]) != 0)
+            EcrireMessageErr(RED, "Impossible de cancel le thread numero[" + to_string(i) + "]");
+        else
+            EcrireMessageErr(couleur, "pthread_cancel(pthread[" + to_string(i) + "]) réussie");
     }
-    delete socketPrincipal;
-    socketPrincipal = nullptr;
 }
 
 string getThread() {
@@ -159,6 +179,10 @@ string getThread() {
     string retour;
     retour += "th_" + to_string(num) + "> ";
     return retour;
+}
+
+void EcrireMessageErrThread(int couleur, const string &message) {
+    EcrireMessageErr(couleur, getThread() + message);
 }
 
 void EcrireMessageErrThread(const string &message) {
@@ -169,11 +193,15 @@ void EcrireMessageOutThread(const string &message) {
     EcrireMessageOut(getThread() + message);
 }
 
-void EcrireMessageErr(const string &message) {
+void EcrireMessageErr(int couleur, const string &message) {
     pthread_mutex_lock(&mutexLog);
-    Error(RED, message);
+    ErrorLock(couleur, message);
     log << "cerr> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
+}
+
+void EcrireMessageErr(const string &message) {
+    EcrireMessageErr(RED, message);
 }
 
 void EcrireMessageOut(const string &message) {
@@ -223,8 +251,15 @@ bool ticketExist(const vector<string> &ticket) {
 }
 
 void supressionThread(void *parms) {
-    Error(YELLOW, "Supression Thread");
-    pthread_getspecific(keyNumThread);
+    int couleur = YELLOW;
+    ErrorLock(couleur, "Supression Thread");
+    int *i = static_cast<int *>(pthread_getspecific(keyNumThread));
+    ErrorLock(couleur, "getSpecific");
+    pthread_setspecific(keyNumThread, nullptr);
+    ErrorLock(couleur, "setSpecific");
+    delete i;
+    ErrorLock(couleur, "delete");
+    pthread_exit(0);
 }
 
 void traitementConnexion(int *num) {
@@ -233,9 +268,8 @@ void traitementConnexion(int *num) {
     Socket *s = nullptr;
 
     if (pthread_setspecific(keyNumThread, num) != 0) {
-        EcrireMessageErr(
-                string("th_") + to_string(*num) + "> Impossible de mettre num(" + to_string(*num) +
-                ") dans la variable spécifique au thread.");
+        EcrireMessageErr(string("th_") + to_string(*num) + "> Impossible de mettre num(" + to_string(*num) +
+                         ") dans la variable spécifique au thread.");
         EcrireMessageErr(string("th_") + to_string(*num) + "> Fin de l'execution de ce thread.");
         return;
     }
@@ -269,8 +303,13 @@ void traitementConnexion(int *num) {
         while (1) {
             pthread_mutex_lock(&mutexConnexion);
             while (s == nullptr) {
-                pthread_cond_wait(&condConnexion, &mutexConnexion);
-                s = connexion;
+                struct timespec temps;
+                temps.tv_nsec = 0;
+                temps.tv_sec = 1;
+                if (pthread_cond_timedwait(&condConnexion, &mutexConnexion, &temps) == -1 && errno == ETIMEDOUT)
+                    pthread_testcancel();
+                else
+                    s = connexion;
             }
             pthread_mutex_unlock(&mutexConnexion);
             EcrireMessageOutThread(s->toString() + " est connecté.");
@@ -283,9 +322,9 @@ void traitementConnexion(int *num) {
                     s->Recv(message);
                     SMessage sMessage = getStructMessageFromString(message);
 #ifdef Debug
-                    EcrireMessageErrThread("\tMessage reçu de " + s->toString());
-                    EcrireMessageErrThread("\tType : " + typeName(sMessage.type));
-                    EcrireMessageErrThread("\tMessage: " + sMessage.message);
+                    ErrorLock(CYAN, "\tMessage reçu de " + s->toString());
+                    ErrorLock(CYAN, "\tType : " + typeName(sMessage.type));
+                    ErrorLock(CYAN, "\tMessage: " + sMessage.message);
 #endif
                     vector<string> vsplit;
                     switch (sMessage.type) {
@@ -353,13 +392,14 @@ void traitementConnexion(int *num) {
             }
         }
     pthread_cleanup_pop(1);
+    ErrorLock(YELLOW, "Fin execution thread[" + to_string(*num) + "]");
 }
 
 void InitialisationLog() {
     time_t t = time(NULL);
     struct tm debut = *localtime(&t);
     for (int i = 0; i < 100; i++)
-        log << "-";
+        log << "=";
     log << endl;
     log << "Date de compilation: " << __DATE__ << endl;
     log << "Date d'execution: " << debut.tm_mday + 1 << "/" << debut.tm_mon << "/" << debut.tm_year << " à "
