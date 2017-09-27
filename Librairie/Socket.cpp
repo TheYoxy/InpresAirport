@@ -47,7 +47,7 @@ Socket::~Socket() {
         Close();
     }
     catch (Exception e) {
-        throw e;
+
     }
 }
 
@@ -95,9 +95,9 @@ void Socket::Send(const std::string message) {
     bool stop = false;
     while (!stop) {
 #ifdef Debug
-        std::cout << "\tSend string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
-                  << std::endl;
-        std::cout << "\tSend string: Message: " << message.substr(1) << std::endl;
+        Error(BLUE, std::string("\tSend string: Type: ") + std::to_string((Type) message[0]) + "("
+                << typeName((Type) message[0]) + ")");
+        Error(BLUE, std::string("\tSend string: Message: ") + message.substr(1));
 #endif
         if (send(descripteur, message.data(), message.length(), 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
@@ -118,7 +118,7 @@ int Socket::Recv(char *message, int size) {
     try {
         SendAck();
 #ifdef Debug
-        std::cout << "\tRecv char* taille: ACK envoyé" << std::endl;
+        Error(BLUE, "\tRecv char* taille: ACK envoyé");
 #endif
     }
     catch (Exception e) {
@@ -153,9 +153,9 @@ int Socket::Recv(std::string &message) {
     }
     try {
 #ifdef Debug
-        std::cout << "\t\tRecv string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
-                  << std::endl;
-        std::cout << "\t\tRecv string: Message: " << message.substr(1) << std::endl;
+        Error(GREEN, std::string("\tRecv string: Type: ") + std::to_string((Type) message[0]) + "("
+                << typeName((Type) message[0]) + ")");
+        Error(GREEN, std::string("\tRecv string: Message: ") + message.substr(1));
 #endif
         SendAck();
         //std::cout << "\tRecv string: ACK envoyé" << std::endl;
