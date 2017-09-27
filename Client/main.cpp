@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     lectureFichierParams("../config.conf");
-    string login, password,ip;
+    string login, password, ip;
 
     struct hostent *host = gethostbyname(argv[1]);
     SMessage message;
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         SoCl = new SocketClient(ipv4().Any);
         SoCl->Connect(ipv4(ip.c_str()), Parametres.PortRange[0]);
         cout << "Client connecté" << endl;
-    /************************************ FIN LIAISON ******************************************/
+        /************************************ FIN LIAISON ******************************************/
         bool boucle = true;
         while (boucle) {
 #ifndef DEBUG
@@ -146,14 +146,13 @@ void Logout(string login) {
 
 void Check_ticket() {
     string numBillet, numVol, nbAccompagants, valise, poids, paye;
-    int nbBagages,i;
-    bool retour;
+    int nbBagages, i;
+    bool retour = false;
     Type flag = CHECK_TICKET;
     string message;
 
     //envoie chaine de caractère au serv avec requete CHECK_TICKET
-    do
-    {
+    do {
         cout << "Application CHECK IN" << endl << "--------------------" << endl;
         cout << "Numero de vol :" << endl;
         cin >> numVol;
@@ -162,9 +161,11 @@ void Check_ticket() {
         cout << "Nombre d'accompagants :" << endl;
         cin >> nbAccompagants;
         cout << "Check......." << endl;
-        cout << "\n\n\n\n\n" << endl;
-        message = numBillet + Parametres.TramesSeparator + numVol + Parametres.TramesSeparator + nbAccompagants;
-        message = getMessage(flag, message);
+#ifndef DEBUG
+        cout << CLEAN << endl;
+#endif
+        message = getMessage(flag, numBillet + Parametres.TramesSeparator + numVol + Parametres.TramesSeparator +
+                                   nbAccompagants);
         SoCl->Send(message);
         message.clear();
         try {
@@ -179,7 +180,7 @@ void Check_ticket() {
         catch (Exception e) {
             cerr << e.getMessage() << endl;
         }
-    }while(!retour);
+    } while (!retour);
 
     cout << "ENREGISTREMENT BAGAGES" << endl;
     cout << "Nombre de bagages : " << endl;
@@ -187,13 +188,13 @@ void Check_ticket() {
     message.clear();
     flag = CHECK_LUGGAGE;
 
-    for(i=0; i < nbBagages; i++)
-    {
-        cout << "Poids du bagage numero " << i+1 << " :" << endl;
+    for (i = 0; i < nbBagages; i++) {
+        cout << "Poids du bagage numero " << i + 1 << " :" << endl;
         cin >> poids;
-        cout << "Valise ?" ;
+        cout << "Valise ?";
         cin >> valise;
-        message += poids + Parametres.TramesSeparator + valise +Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
+        message += poids + Parametres.TramesSeparator + valise +
+                   Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
         //ATTENTION pour dernier bagage remove le dernier séparateur avant séparateur de fin /!
     }
     message = getMessage(flag, message);
@@ -203,7 +204,8 @@ void Check_ticket() {
         SoCl->Recv(message);
         SMessage sMessage = getStructMessageFromString(message);
         vector<string> splits;
-        splits = split(message, Parametres.TramesSeparator); //Serveur renvoie poids total + excédent poids + plus supplément payé
+        splits = split(message,
+                       Parametres.TramesSeparator); //Serveur renvoie poids total + excédent poids + plus supplément payé
         cout << "Poids total : " << splits[0] << "kg" << endl;
         cout << "Excédent poids : " << splits[1] << "kg" << endl;
         cout << "Supplément à payer : " << splits[2] << "Euro" << endl;
