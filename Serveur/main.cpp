@@ -53,9 +53,12 @@ void HandlerSignal(int sig);
 
 int main(int argc, char **args) {
     cout << CLEAN;
+
     if (argc == 1) {
         Error(RED, "Trop peu d'arguments à l'execution");
         log << "cerr> Trop peu d'arguments à l'execution" << endl;
+        Error(RED, "./Serveur [FichierDeConfiguration]");
+        log << "cerr> ./Serveur [FichierDeConfiguration]" << endl;
         return -1;
     }
     lectureFichierParams(args[1]);
