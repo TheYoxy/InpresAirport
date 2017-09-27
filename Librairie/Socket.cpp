@@ -89,7 +89,7 @@ void Socket::Send(const char *message) {
 void Socket::Send(const std::string message) {
     bool stop = false;
     while (!stop) {
-#ifdef DEBUG
+#ifdef Debug
         std::cout << "\tSend string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
                   << std::endl;
         std::cout << "\tSend string: Message: " << message.substr(1) << std::endl;
@@ -112,7 +112,7 @@ int Socket::Recv(char *message, int size) {
         throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
     try {
         SendAck();
-#ifdef DEBUG
+#ifdef Debug
         std::cout << "\tRecv char* taille: ACK envoyé" << std::endl;
 #endif
     }
@@ -147,7 +147,7 @@ int Socket::Recv(std::string &message) {
         }
     }
     try {
-#ifdef DEBUG
+#ifdef Debug
         std::cout << "\t\tRecv string: Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")"
                   << std::endl;
         std::cout << "\t\tRecv string: Message: " << message.substr(1) << std::endl;

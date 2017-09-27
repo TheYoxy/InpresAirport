@@ -1,6 +1,7 @@
 #include <signal.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/SocketServeur.h"
+
 #define CLEAN "\x1B[2J\x1B[H"
 //FLUX ERREUR: FICHIER LOG
 //FLUX OUT: CONSOLE
@@ -200,17 +201,16 @@ bool ticketExist(const std::string &numTicket) {
     string message;
     pthread_mutex_lock(&mutexTicketDB);
     ifstream ticketFile(Parametres.ticketDB);
-    do{
+    do {
         message = readLine(ticketFile);
         vector<string> splits;
         splits = split(message, Parametres.CSVSeparator);
-        if(splits[0] == numTicket)
-        {
+        if (splits[0] == numTicket) {
             ticketFile.close();
             pthread_mutex_unlock(&mutexTicketDB);
             return true;
         }
-    }while(!ticketFile.eof());
+    } while (!ticketFile.eof());
     ticketFile.close();
     pthread_mutex_unlock(&mutexTicketDB);
     return false;
@@ -277,7 +277,7 @@ void traitementConnexion(int *num) {
                     message.clear();
                     s->Recv(message);
                     SMessage sMessage = getStructMessageFromString(message);
-#ifdef DEBUG
+#ifdef Debug
                     EcrireMessageErrThread("\tMessage reçu de " + s->toString());
                     EcrireMessageErrThread("\tType : " + typeName(sMessage.type));
                     EcrireMessageErrThread("\tMessage: " + sMessage.message);
@@ -298,22 +298,20 @@ void traitementConnexion(int *num) {
                             EcrireMessageOutThread(sMessage.message + " a terminé sa session.");
                             break;
                         case CHECK_TICKET:
-                            if (log){
+                            if (log) {
                                 vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
                                 bool te = ticketExist(vsplit[0]);
                                 s->Send(getMessage(te ? ACCEPT : REFUSE, std::string("")));
                             }
                             break;
                         case CHECK_LUGGAGE:
-
                             if (log) {
-                                double poidstot, poidsExces;
+                                double poidstot = 0.0, poidsExces = 0.0;
                                 vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                for(int i = 0; vsplit[i] != ""; i+=2)
-                                {
-                                  poidstot += std::stod(vsplit[i]);
-                                  if(std::stod(vsplit[i])> 20.0)
-                                    poidsExces += (stod(vsplit[i])-20.0);
+                                for (int i = 0; vsplit[i] != ""; i += 2) {
+                                    poidstot += std::stod(vsplit[i]);
+                                    if (std::stod(vsplit[i]) > 20.0)
+                                        poidsExces += (stod(vsplit[i]) - 20.0);
                                 }
 
                             }
@@ -341,14 +339,6 @@ void traitementConnexion(int *num) {
                                                    std::to_string(sMessage.type)
                                                    + "> reçu de "
                                                    + s->toString());
-                            break;
-                        case ACK:
-                            break;
-                        case ACCEPT:
-                            break;
-                        case REFUSE:
-                            break;
-                        case TOO_MUCH_CONNECTIONS:
                             break;
                     }
                 } catch (Exception e) {

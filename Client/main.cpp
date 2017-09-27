@@ -15,7 +15,7 @@ bool Login(const string &login, const string &mdp);
 
 void logout(char *login);
 
-void check_ticket();
+void Check_ticket();
 
 void Logout(string login);
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         /************************************ FIN LIAISON ******************************************/
         bool boucle = true;
         while (boucle) {
-#ifndef DEBUG
+#ifndef Debug
             cout << CLEAN;
 #endif
             cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
             bool menu = boucle;
             while (menu) {
                 int choix;
-#ifndef DEBUG
+#ifndef Debug
                 cout << CLEAN;
 #endif
                 cout << "1. Encoder billet" << endl;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
                 cin >> choix;
                 switch (choix) {
                     case 0:
-#ifndef DEBUG
+#ifndef Debug
                         cout << CLEAN;
 #endif
                         cout << "1. Se déconnecter de l'application" << endl;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
                         Logout(login);
                         break;
                     case 1:
-                        check_ticket();
+                        Check_ticket();
                         break;
                     case 2:
                         break;
@@ -161,7 +161,7 @@ void Check_ticket() {
         cout << "Nombre d'accompagants :" << endl;
         cin >> nbAccompagants;
         cout << "Check......." << endl;
-#ifndef DEBUG
+#ifndef Debug
         cout << CLEAN << endl;
 #endif
         message = getMessage(flag, numBillet + Parametres.TramesSeparator + numVol + Parametres.TramesSeparator +
@@ -193,8 +193,7 @@ void Check_ticket() {
         cin >> poids;
         cout << "Valise ?";
         cin >> valise;
-        message += poids + Parametres.TramesSeparator + valise +
-                   Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
+        message += poids + Parametres.TramesSeparator + valise; //poids de la valise + separateur + valise O/N
         //ATTENTION pour dernier bagage remove le dernier séparateur avant séparateur de fin /!
     }
     message = getMessage(flag, message);
