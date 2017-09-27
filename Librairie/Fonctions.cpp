@@ -50,6 +50,8 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.TramesSeparator = vector[1][0];
         } else if (!vector[0].compare("userDB")) {
             Parametres.userDB = vector[1];
+        } else if (!vector[0].compare("ticketDB")) {
+            Parametres.ticketDB = vector[1];
         } else
             cout << "Paramètre : \"" << vector[0] << "\" inconnu" << endl;
         if (fin != -1 && debut != -1 && Parametres.PortRange == nullptr) {
