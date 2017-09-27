@@ -305,9 +305,17 @@ void traitementConnexion(int *num) {
                             }
                             break;
                         case CHECK_LUGGAGE:
+
                             if (log) {
+                                double poidstot, poidsExces;
                                 vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                //bool cl = ticketExist(vsplit[0]);
+                                for(int i = 0; vsplit[i] != ""; i+=2)
+                                {
+                                  poidstot += std::stod(vsplit[i]);
+                                  if(std::stod(vsplit[i])> 20.0)
+                                    poidsExces += (stod(vsplit[i])-20.0);
+                                }
+
                             }
                             break;
                         case PAYMENT_DONE:
