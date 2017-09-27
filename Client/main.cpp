@@ -204,7 +204,7 @@ void Encodage_Bagages() {
         cin >> poids;
         cout << "Valise ?";
         cin >> valise;
-        message += poids + Parametres.TramesSeparator + valise +
+        message += to_string(poids) + Parametres.TramesSeparator + to_string(valise) +
                    Parametres.TramesSeparator; //poids de la valise + separateur + valise O/N
         //ATTENTION pour dernier bagage remove le dernier séparateur avant séparateur de fin /!
     }

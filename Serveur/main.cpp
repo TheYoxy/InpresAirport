@@ -264,9 +264,9 @@ void traitementConnexion(int *num) {
         EcrireMessageErrThread("Fin de l'execution de ce thread");
         return;
     }
+    // Fin initialisation du thread
     pthread_cleanup_push(supressionThread, nullptr);
-        // Fin initialisation du thread
-        while () {
+        while (1) {
             pthread_mutex_lock(&mutexConnexion);
             while (s == nullptr) {
                 pthread_cond_wait(&condConnexion, &mutexConnexion);
@@ -318,8 +318,8 @@ void traitementConnexion(int *num) {
                                     if (stod(vsplit[i]) > 20.0)
                                         poidsExces += (stod(vsplit[i]) - 20.0);
                                 }
-                                string message = poidsExces + Parametres.TramesSeparator + poidstot;
-                                s->Send(message);
+                                s->Send(getMessage(CHECK_LUGGAGE, to_string(poidsExces) + Parametres.TramesSeparator +
+                                                                  to_string(poidstot)));
 
                             }
                             break;
