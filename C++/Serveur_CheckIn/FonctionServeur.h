@@ -1,8 +1,8 @@
 #ifndef SERVEUR_FONCTIONSERVEUR_H
 #define SERVEUR_FONCTIONSERVEUR_H
 
-#include "../../Librairie/SocketClient.h"
-#include "../../Librairie/SocketServeur.h"
+#include "../Librairie/SocketClient.h"
+#include "../Librairie/SocketServeur.h"
 #include <fstream>
 #include <signal.h>
 

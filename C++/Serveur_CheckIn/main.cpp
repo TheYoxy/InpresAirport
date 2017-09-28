@@ -1,5 +1,5 @@
-#include "../../Librairie/SocketClient.h"
-#include "../../Librairie/SocketServeur.h"
+#include "../Librairie/SocketClient.h"
+#include "../Librairie/SocketServeur.h"
 #include "FonctionServeur.h"
 
 #define CLEAN "\x1B[2J\x1B[H"
