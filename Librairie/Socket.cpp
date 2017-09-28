@@ -127,7 +127,7 @@ int Socket::Recv(char *message, int size) {
     try {
         SendAck();
 #ifdef Debug
-        Error(BLUE, "\tRecv char* taille: ACK envoyé");
+        Error(GREEN, "\tRecv char* taille: ACK envoyé");
 #endif
     }
     catch (Exception e) {
@@ -191,6 +191,9 @@ void Socket::SendAck() {
 
 /**************************************************************/
 void Socket::Close() {
+#ifdef Debug
+    Error(MAGENTA, std::string("\tFermeture de ") + toString());
+#endif
     if (close(descripteur) == -1)
         throw Exception(EXCEPTION() + " Erreur de close: " + strerror(errno));
     open = false;
