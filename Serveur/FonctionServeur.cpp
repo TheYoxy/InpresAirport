@@ -42,24 +42,39 @@ void EcrireMessageOut(const string &message) {
 }
 
 void HandlerSignal(int sig) {
+#ifdef TRACE
     int couleur = CYAN;
     EcrireMessageErr(couleur, "\rDébut du handler de supression");
+#endif
     for (int i = 0; i < nbThread; i++) {
         if (pthread_cancel(pthread[i]) != 0)
             EcrireMessageErr(RED, "Impossible de cancel le thread numero[" + to_string(i) + "]");
+#ifdef TRACE
         else
             EcrireMessageErr(couleur, "pthread_cancel(pthread[" + to_string(i) + "]) réussie");
+#endif
     }
+#ifdef TRACE
     EcrireMessageErr(couleur, "Fin du handler de supression");
+#endif
 }
 
 void supressionThread(void *parms) {
     int couleur = YELLOW;
     int *i = static_cast<int *>(pthread_getspecific(keyNumThread)), num = *i;
+#ifdef TRACE
     ErrorLock(couleur, string("Supression Thread") + to_string(num));
+#endif
     pthread_setspecific(keyNumThread, nullptr);
+    Socket *s = static_cast<Socket *>(pthread_getspecific(keySocketThread));
+    if (s != nullptr) {
+        ErrorLock(couleur, string("Supression socket: ") + s->toString());
+        delete s;
+    }
     delete i;
+#ifdef TRACE
     ErrorLock(couleur, string("Fin supression Thread") + to_string(num));
+#endif
 }
 
 void traitementConnexion(int *num) {
@@ -114,8 +129,13 @@ void traitementConnexion(int *num) {
                         pthread_testcancel();
                     } else
                         throw Exception(EXCEPTION() + string("pthread_cond_timedwait: ") + strerror(ret));
-                } else
+                } else {
                     s = connexion;
+#ifdef TRACE
+                    ErrorLock(MAGENTA, s);
+#endif
+                    pthread_setspecific(keySocketThread, s);
+                }
             }
             pthread_mutex_unlock(&mutexConnexion);
             EcrireMessageOutThread(s->toString() + " est connecté.");
@@ -178,6 +198,7 @@ void traitementConnexion(int *num) {
                             EcrireMessageOutThread(s->toString() + " s'est déconnecté.");
                             delete s;
                             s = nullptr;
+                            pthread_setspecific(keySocketThread, nullptr);
                             pthread_mutex_lock(&mutexClient);
                             clients--;
                             pthread_mutex_unlock(&mutexClient);

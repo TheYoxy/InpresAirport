@@ -84,10 +84,6 @@ int main(int argc, char *argv[]) {
                     case 1:
                         Check_ticket();
                         break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
                     default:
                         break;
                 }

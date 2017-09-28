@@ -32,6 +32,8 @@ extern pthread_mutex_t mutexTicketDB;
 extern pthread_mutex_t mutexEcran;
 /* Variables globales pour couper le serveur */
 extern pthread_t pthread[nbThread];
+/* Clef qui stoque le socket d'un thread pour le cleanup */
+extern pthread_key_t keySocketThread;
 // Création du socket
 // Any = 0.0.0.0 => Ecoute toute les addresse
 // Parametres.PortRange[0] => Premier port disponible pour le serveur

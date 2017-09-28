@@ -29,6 +29,8 @@ pthread_mutex_t mutexTicketDB;
 pthread_mutex_t mutexEcran;
 /* Variables globales pour couper le serveur */
 pthread_t pthread[nbThread];
+/* Clef qui stoque le socket d'un thread pour le cleanup */
+pthread_key_t keySocketThread;
 // Création du socket
 // Any = 0.0.0.0 => Ecoute toute les addresse
 // Parametres.PortRange[0] => Premier port disponible pour le serveur
@@ -89,6 +91,11 @@ int main(int argc, char **args) {
             log << "cerr> Impossible d'initialiser la clé keyNumThread: " << strerror(errno) << endl;
             return -9;
         }
+        if (pthread_key_create(&keySocketThread, nullptr) == -1) {
+            Error(RED, string("Impossible d'initialiser la clé keyNumThread: ") + strerror(errno));
+            log << "cerr> Impossible d'initialiser la clé keyNumThread: " << strerror(errno) << endl;
+            return -10;
+        }
         struct sigaction sig;
         sigemptyset(&sig.sa_mask);
         sig.sa_handler = HandlerSignal;
@@ -96,7 +103,7 @@ int main(int argc, char **args) {
         if (sigaction(SIGINT, &sig, nullptr) == -1) {
             Error(RED, string("Impossible d'armer le signal SIGKILL: ") + strerror(errno));
             log << "cerr> Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
-            return -10;
+            return -11;
         }
         for (int i = 0; i < nbThread; i++) {
             //Passage d'un pointeur pour que la valeur ne soit pas modifiée
@@ -123,13 +130,17 @@ int main(int argc, char **args) {
                 }
             }
         }
+#ifdef TRACE
         EcrireMessageErr(CYAN, "Début join");
+#endif
         for (int i = 0; i < nbThread; i++) {
             int ret;
-            if ((ret = pthread_tryjoin_np(pthread[i], nullptr)) != -1)
+            if ((ret = pthread_tryjoin_np(pthread[i], nullptr)) != 0)
                 if (ret != EBUSY)
-                    EcrireMessageErr(CYAN, to_string(i) + ": " + strerror(ret));
+                    EcrireMessageErr(to_string(i) + ": " + strerror(ret));
+#ifdef TRACE
             EcrireMessageErr(CYAN, "pthread[" + to_string(i + 1) + "] libéré");
+#endif
         }
     }
     catch (Exception e) {
