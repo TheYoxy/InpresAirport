@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <netdb.h>
 #include "../Librairie/SocketClient.h"
@@ -12,8 +12,6 @@ using namespace std;
 SocketClient *SoCl;
 
 bool Login(const string &login, const string &mdp);
-
-void logout(char *login);
 
 void Check_ticket();
 
@@ -52,12 +50,17 @@ int main(int argc, char *argv[]) {
 #ifndef Debug
             cout << CLEAN;
 #endif
-            cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
-            cout << "Login: ";
-            cin >> login;
-            cout << "Password: ";
-            cin >> password;
-            boucle = Login(login, password);
+            int fail = 3;
+            while (fail){
+                cout << "INPRESAIRPORT : veuillez vous identifier." << endl;
+                cout << "Login: ";
+                cin >> login;
+                cout << "Password: ";
+                cin >> password;
+                boucle = Login(login, password);
+                if (!boucle)
+                    fail--;
+            }
             bool menu = boucle;
             while (menu) {
                 int choix;

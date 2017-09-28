@@ -18,6 +18,7 @@ set(LIB Librairie/Socket.cpp
         Librairie/ConnexionException.cpp
         Librairie/ConnexionException.h)
 
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY Build/)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY Build/)
