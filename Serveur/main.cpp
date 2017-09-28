@@ -92,6 +92,7 @@ int main(int argc, char **args) {
         struct sigaction sig;
         sigemptyset(&sig.sa_mask);
         sig.sa_handler = HandlerSignal;
+        sig.sa_flags = 0;
         if (sigaction(SIGINT, &sig, nullptr) == -1) {
             Error(RED, string("Impossible d'armer le signal SIGKILL: ") + strerror(errno));
             log << "cerr> Impossible d'armer le signal SIGKILL: " << strerror(errno) << endl;
@@ -102,7 +103,7 @@ int main(int argc, char **args) {
             int *param = new int;
             *param = i + 1;
             pthread_create(&pthread[i], nullptr, reinterpret_cast<void *(*)(void *)>(traitementConnexion), param);
-            pthread_detach(pthread[i]);
+            //pthread_detach(pthread[i]);
         }
         bool bp = true;
         while (bp) {
@@ -122,8 +123,13 @@ int main(int argc, char **args) {
                 }
             }
         }
+        EcrireMessageErr(CYAN, "Début join");
         for (int i = 0; i < nbThread; i++) {
-            pthread_join(pthread[i], nullptr);
+            int ret;
+            if ((ret = pthread_tryjoin_np(pthread[i], nullptr)) != -1)
+                if (ret != EBUSY)
+                    EcrireMessageErr(CYAN, to_string(i) + ": " + strerror(ret));
+            EcrireMessageErr(CYAN, "pthread[" + to_string(i + 1) + "] libéré");
         }
     }
     catch (Exception e) {
