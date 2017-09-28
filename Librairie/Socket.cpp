@@ -88,7 +88,12 @@ void Socket::RecvFrom(char *message, size_t size) {
 
 /**************************************************************/
 void Socket::Send(const char *message) {
-    Send(std::string(message));
+    try {
+        Send(std::string(message));
+    }
+    catch (Exception e) {
+        throw e;
+    }
 }
 
 void Socket::Send(const std::string message) {
@@ -101,6 +106,9 @@ void Socket::Send(const std::string message) {
 #endif
         if (send(descripteur, message.data(), message.length(), 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
+#ifdef Debug
+        Error(BLUE, std::string("\tSend string: Message envoyé"));
+#endif
         Type flag = ACK;
         if (recv(descripteur, &flag, 1, 0) == -1)
             throw Exception(
@@ -113,7 +121,8 @@ void Socket::Send(const std::string message) {
 
 int Socket::Recv(char *message, int size) {
     int taille;
-    if ((taille = (int) (recv(descripteur, message, (size_t) size, 0))) == -1)
+    char *msg = new char[size];
+    if ((taille = (int) (recv(descripteur, msg, (size_t) size, 0))) == -1)
         throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
     try {
         SendAck();
@@ -124,12 +133,20 @@ int Socket::Recv(char *message, int size) {
     catch (Exception e) {
         throw e;
     }
+    strcpy(message, msg);
     return taille;
 }
 
 int Socket::Recv(std::string &message, int size) {
     char *msg = new char[size];
-    int retour = Recv(msg, size);
+
+    int retour;
+    try {
+        retour = Recv(msg, size);
+    }
+    catch (Exception e) {
+        throw e;
+    }
     message.clear();
     message = msg;
     delete msg;
