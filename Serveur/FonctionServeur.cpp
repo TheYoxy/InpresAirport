@@ -100,6 +100,7 @@ void traitementConnexion(int *num) {
     }
     // Fin initialisation du thread
     pthread_cleanup_push(supressionThread, nullptr);
+        EcrireMessageErrThread(YELLOW, std::string("Lancement du thread ") + std::to_string(*num));
         while (1) {
             pthread_mutex_lock(&mutexConnexion);
             while (s == nullptr) {
