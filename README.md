@@ -156,3 +156,19 @@ Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi cons
 
     Rien n'interdit de lancer simultanément plusieurs instances de cette applications : attention donc aux accès concurrents.
 ## 3. Le serveur Serveur_Bagages 
+Nous allons ici nous préoccuper de l'implémentation du modèle client-serveur pour le serveur **Serveur_Bagages** (Clients: *Application_Bagages* et *Serveur_CheckIn*)
+### 3.1 Serveur_Bagages
+Ce serveur est donc un serveur **multithread** *Java/Windows-Unix* (en modèle **pool de threads**) qui est chargé de gèrer tous les accès à la base de données **BD_AIRPORT** qui relèvent de la gestion des bagages (donc à l'exclusion des opérations portant sur les billets, qui relèvent de **Serveur_Billets**):
+- Soit par les bagaistes de diverse compagnies aériennes
+- Soit par les agents de la compagnie aérienne du checkIn, qui agissent par le serveur SerChk interposé.
+
+Le serveur attends ses requêtes sur deux ports différents: 
+- **PORT_BAGAGES** pour les bagagistes
+- **PORT_CHECKIN** pour les requêtes provenant de *Serveur_CheckIn*
+### 3.2 Application_Bagages
+Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir avec eux, le serveur utilise le *protocole applicatif* (basé TCP) **LUGAP** (**LUG**gage h**A**ndling **P**rotocol), dont les commnades sont à définir pour satisfaire au scénario exemple suivant:
+
+*Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362- WACHARVILROM-22082017-0070-008.*
+
+L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.
+Un double-clic sur un item de la liste fait appraître dans une boîte de dialogue un tableau reprenant les bages enregistrés pour ce vol (Données provenant du fichier associé pour les 3 premières colonnes, initislisée avec les valeurs par défaut "N" ou "NEANT" selon le cas).
