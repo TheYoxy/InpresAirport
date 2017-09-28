@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (int i = 0; i < host->h_length; i++)
-        ip += to_string((int) host->h_addr[i]) + ".";
+        ip += to_string((unsigned char) host->h_addr[i]) + ".";
     ip.pop_back();
     cout << "Ip de l'host: " << ip << endl;
     try {
