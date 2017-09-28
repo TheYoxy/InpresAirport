@@ -2,17 +2,6 @@
 
 using namespace std;
 
-void HandlerSignal(int sig) {
-    int couleur = CYAN;
-    EcrireMessageErr(couleur, "\rDébut du handler de supression");
-    for (int i = 0; i < nbThread; i++) {
-        if (pthread_cancel(pthread[i]) != 0)
-            EcrireMessageErr(RED, "Impossible de cancel le thread numero[" + to_string(i) + "]");
-        else
-            EcrireMessageErr(couleur, "pthread_cancel(pthread[" + to_string(i) + "]) réussie");
-    }
-}
-
 string getThread() {
     int num = *((int *) pthread_getspecific(keyNumThread));
     string retour;
@@ -33,8 +22,8 @@ void EcrireMessageOutThread(const string &message) {
 }
 
 void EcrireMessageErr(int couleur, const string &message) {
-    pthread_mutex_lock(&mutexLog);
     ErrorLock(couleur, message);
+    pthread_mutex_lock(&mutexLog);
     log << "cerr> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
@@ -44,61 +33,33 @@ void EcrireMessageErr(const string &message) {
 }
 
 void EcrireMessageOut(const string &message) {
-    pthread_mutex_lock(&mutexLog);
+    pthread_mutex_lock(&mutexEcran);
     cout << message << endl;
+    pthread_mutex_unlock(&mutexEcran);
+    pthread_mutex_lock(&mutexLog);
     log << "cout> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
-bool userExist(const string &user, const string &password) {
-    string message;
-    pthread_mutex_lock(&mutexUserDB);
-    ifstream userFile(Parametres.userDB);
-    do {
-        message = readLine(userFile);
-        vector<string> splits;
-        splits = split(message, Parametres.CSVSeparator);
-        if (splits[0] == user && splits[1] == password) {
-            userFile.close();
-            pthread_mutex_unlock(&mutexUserDB);
-            return true;
-        }
-    } while (!userFile.eof());
-    userFile.close();
-    pthread_mutex_unlock(&mutexUserDB);
-    return false;
-}
-
-bool ticketExist(const vector<string> &ticket) {
-    string message;
-    pthread_mutex_lock(&mutexTicketDB);
-    ifstream ticketFile(Parametres.ticketDB);
-    vector<string> retour;
-    do {
-        message = readLine(ticketFile);
-        retour = split(message, Parametres.CSVSeparator);
-        if (retour[0] == ticket[0] && retour[1] == ticket[1]) {
-            ticketFile.close();
-            pthread_mutex_unlock(&mutexTicketDB);
-            return true;
-        }
-    } while (!ticketFile.eof());
-    ticketFile.close();
-    pthread_mutex_unlock(&mutexTicketDB);
-    retour.clear();
-    return false;
+void HandlerSignal(int sig) {
+    int couleur = CYAN;
+    EcrireMessageErr(couleur, "\rDébut du handler de supression");
+    for (int i = 0; i < nbThread; i++) {
+        if (pthread_cancel(pthread[i]) != 0)
+            EcrireMessageErr(RED, "Impossible de cancel le thread numero[" + to_string(i) + "]");
+        else
+            EcrireMessageErr(couleur, "pthread_cancel(pthread[" + to_string(i) + "]) réussie");
+    }
+    EcrireMessageErr(couleur, "Fin du handler de supression");
 }
 
 void supressionThread(void *parms) {
     int couleur = YELLOW;
-    ErrorLock(couleur, "Supression Thread");
-    int *i = static_cast<int *>(pthread_getspecific(keyNumThread));
-    ErrorLock(couleur, "getSpecific");
+    int *i = static_cast<int *>(pthread_getspecific(keyNumThread)), num = *i;
+    ErrorLock(couleur, string("Supression Thread") + to_string(num));
     pthread_setspecific(keyNumThread, nullptr);
-    ErrorLock(couleur, "setSpecific");
     delete i;
-    ErrorLock(couleur, "delete");
-    pthread_exit(0);
+    ErrorLock(couleur, string("Fin supression Thread") + to_string(num));
 }
 
 void traitementConnexion(int *num) {
@@ -132,7 +93,7 @@ void traitementConnexion(int *num) {
         EcrireMessageErrThread("Fin de l'execution de ce thread");
         return;
     }
-    if (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, nullptr) != 0) {
+    if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, nullptr) != 0) {
         EcrireMessageErrThread("Impossible de mettre en place le canceltype");
         EcrireMessageErrThread("Fin de l'execution de ce thread");
         return;
@@ -144,10 +105,15 @@ void traitementConnexion(int *num) {
             while (s == nullptr) {
                 struct timespec temps;
                 temps.tv_nsec = 0;
-                temps.tv_sec = 1;
-                if (pthread_cond_timedwait(&condConnexion, &mutexConnexion, &temps) == -1 && errno == ETIMEDOUT)
-                    pthread_testcancel();
-                else
+                temps.tv_sec = 1000;
+                int ret;
+                if ((ret = pthread_cond_timedwait(&condConnexion, &mutexConnexion, &temps)) != 0) {
+                    if (ret == ETIMEDOUT) {
+                        //EcrireMessageErrThread(GREEN, "TIMEOUT");
+                        pthread_testcancel();
+                    } else
+                        throw Exception(EXCEPTION() + string("pthread_cond_timedwait: ") + strerror(ret));
+                } else
                     s = connexion;
             }
             pthread_mutex_unlock(&mutexConnexion);
@@ -230,7 +196,7 @@ void traitementConnexion(int *num) {
                 }
             }
         }
-    pthread_cleanup_pop(1);
+    pthread_cleanup_pop(0);
     ErrorLock(YELLOW, "Fin execution thread[" + to_string(*num) + "]");
 }
 
@@ -246,4 +212,43 @@ void InitialisationLog() {
     for (int i = 0; i < 100; i++)
         log << "-";
     log << endl;
+}
+
+bool userExist(const string &user, const string &password) {
+    string message;
+    pthread_mutex_lock(&mutexUserDB);
+    ifstream userFile(Parametres.userDB);
+    do {
+        message = readLine(userFile);
+        vector<string> splits;
+        splits = split(message, Parametres.CSVSeparator);
+        if (splits[0] == user && splits[1] == password) {
+            userFile.close();
+            pthread_mutex_unlock(&mutexUserDB);
+            return true;
+        }
+    } while (!userFile.eof());
+    userFile.close();
+    pthread_mutex_unlock(&mutexUserDB);
+    return false;
+}
+
+bool ticketExist(const vector<string> &ticket) {
+    string message;
+    pthread_mutex_lock(&mutexTicketDB);
+    ifstream ticketFile(Parametres.ticketDB);
+    vector<string> retour;
+    do {
+        message = readLine(ticketFile);
+        retour = split(message, Parametres.CSVSeparator);
+        if (retour[0] == ticket[0] && retour[1] == ticket[1]) {
+            ticketFile.close();
+            pthread_mutex_unlock(&mutexTicketDB);
+            return true;
+        }
+    } while (!ticketFile.eof());
+    ticketFile.close();
+    pthread_mutex_unlock(&mutexTicketDB);
+    retour.clear();
+    return false;
 }
