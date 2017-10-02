@@ -21,5 +21,7 @@ struct __Params {
     char TramesSeparator = -1;
     std::string userDB = "";
     std::string ticketDB = "";
+    double poidsMain = 0.0;
+    double poidsValise = 0.0;
 };
 #endif //SERVEUR_STRUCTS_H
