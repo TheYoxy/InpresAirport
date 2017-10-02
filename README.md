@@ -10,7 +10,7 @@ Application | Semaine | Pondération
 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80
 7: Communications réseaux C/C++ - Java | Examen de laboratoire de janvier 2018 | 20
 #### Fonctions utiles:
-##### TCP
+> ##### TCP
 - ###### Client:
     - socket
     - connect
@@ -27,7 +27,7 @@ Application | Semaine | Pondération
     - close
     
 *Pour les send et recv l'ordre n'a pas d'importance, on peut appeler l'un avant l'autre ou vice-versa. Ils sont par ailleurs facultatifs.*
-##### UDP
+> ##### UDP
 - ###### Client
     - socket
     - sendto
@@ -39,7 +39,16 @@ Application | Semaine | Pondération
     - recvfrom
     - sendto
     - close
-    
+
+	
+- Il faut écrire les bagages dans des fichiers csv mais, dans la programmation, de manière telle à ce que l'on puisse facilement remplacer cette écriture dans un fichier par un envoi sur le réseau vers Serveur_bagages. Les fonctions correspondantes sont donc, +/-, *"
+- Pour le diagramme, il suffit de montrer une séquence d'échanges pour le traitement complet d'un client passager par un employé qui s'est fait reconnaître. Donc, oui, cela commence comme ça, mais il reste à faire ...
+- Tableau de commandes : une colonne reprend les états possible du thread serveur (attente, login fait, passager reconnu) - une colonne reprend en regard les commandes que l'on peut recevoir dans cet état en regard (ex: dans l'état *"login_fait"*, seule la commande **CHECK_TICKET** est recevable - donc, les autres sont refusées) - une colonne avec la sémantique de ces commandes
+
+
+----------
+
+
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
 Dossier attendu: 
@@ -123,8 +132,15 @@ On évitera la construction de flux réseaux d'entrée et de sortie, `NetworkStr
     sep-csv= | ;
     pwd-master= | tusaisquetuesbeautoi
     pwd-admin= | jeaclachralf..
-    ---
+    --- | ---
+    
+
+
+----------
+
+
 ## 2. Les accès aux bases de données
+
 ### 2.1 La base de données BD_AIRPORT
 Dossier attendu: 
 -  Schéma relationnel de BD_AIRPORT.
@@ -155,6 +171,12 @@ Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi cons
     Intervenants | Profs,Etudiants
 
     Rien n'interdit de lancer simultanément plusieurs instances de cette applications : attention donc aux accès concurrents.
+    
+
+
+----------
+
+
 ## 3. Le serveur Serveur_Bagages 
 Nous allons ici nous préoccuper de l'implémentation du modèle client-serveur pour le serveur **Serveur_Bagages** (Clients: *Application_Bagages* et *Serveur_CheckIn*)
 ### 3.1 Serveur_Bagages
