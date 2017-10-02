@@ -78,7 +78,7 @@ void Socket::SendTo(const char *message, size_t size, const ipv4 &addr, unsigned
 }
 
 void Socket::RecvFrom(char *message, size_t size) {
-    struct sockaddr_in *s = (struct sockaddr_in *) malloc(sizeof(struct sockaddr_in));
+    struct sockaddr_in *s = new struct sockaddr_in;
     memset(s, 0, sizeof(struct sockaddr_in));
     memset(message, 0, size);
     unsigned int sizesock = sizeof(struct sockaddr_in);
@@ -106,9 +106,6 @@ void Socket::Send(const std::string message) {
 #endif
         if (send(descripteur, message.data(), message.length(), 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
-#ifdef Debug
-        Error(BLUE, std::string("\tSend string: Message envoyé"));
-#endif
         Type flag = ACK;
         if (recv(descripteur, &flag, 1, 0) == -1)
             throw Exception(
