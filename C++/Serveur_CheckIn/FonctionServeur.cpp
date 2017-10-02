@@ -61,8 +61,9 @@ void HandlerSignal(int sig) {
 
 void supressionThread(void *parms) {
     int couleur = YELLOW;
-    int *i = static_cast<int *>(pthread_getspecific(keyNumThread)), num = *i;
+    int *i = static_cast<int *>(pthread_getspecific(keyNumThread));
 #ifdef TRACE
+    int num = *i;
     ErrorLock(couleur, string("Supression Thread") + to_string(num));
 #endif
     pthread_setspecific(keyNumThread, nullptr);
@@ -178,7 +179,7 @@ void traitementConnexion(int *num) {
                             if (log) {
                                 double poidsTot = 0.0, poidsExces = 0.0;
                                 //Le split doit être utilisé sur un index en base 2
-                                fstream bagages("Bagages.csv", ios::app | ios::out);
+                                fstream bagages(Parametres.bagageDB, ios::app | ios::out);
                                 if (bagages.)
                                 vsplit = split(sMessage.message, Parametres.TramesSeparator);
                                 bagages << vsplit[0] << " " << vsplit[1];

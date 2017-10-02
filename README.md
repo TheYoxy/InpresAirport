@@ -63,7 +63,7 @@ bagages.
 Le serveur est un serveur multithread C/Unix en modèle **pool de threads**. Il est chargé
 de répondre aux requêtes provenant de **Application_CheckIn (C/C++)** utilisée par les agents
 des compagnies aériennes qui assurent l'accueil des passagers pour les différents vols
-programmés. Le serveur attend ce type de requête sur le PORT_CHCK. Il utilise le protocole
+programmés. Le serveur attend ce type de requête sur le *PORT_CHCK*. Il utilise le protocole
 applicatif (basé TCP) **CIMP** (CheckIn Management Protocol).
 
 ### 1.2 La gestion des bagages : accès à Serveur_Bagages

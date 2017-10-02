@@ -2,6 +2,7 @@
 
 using namespace std;
 SParametres Parametres;
+
 struct sockaddr_in *CreationSockStruct(const ipv4 &addr, unsigned short port) {
     struct sockaddr_in *retour = new struct sockaddr_in;
     memset(retour, 0, sizeof(struct sockaddr_in));
@@ -52,6 +53,8 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.userDB = vector[1];
         } else if (!vector[0].compare("ticketDB")) {
             Parametres.ticketDB = vector[1];
+        } else if (!vector[0].compare("bagageDB")) {
+            Parametres.bagageDB = vector[1];
         } else if (!vector[0].compare("PoidsValise")) {
             Parametres.poidsValise = stod(vector[1]);
         } else if (!vector[0].compare("PoidsMain")) {
