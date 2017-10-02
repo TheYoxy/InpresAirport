@@ -176,16 +176,26 @@ void traitementConnexion(int *num) {
                             break;
                         case CHECK_LUGGAGE:
                             if (log) {
-                                double poidstot = 0.0, poidsExces = 0.0;
+                                double poidsTot = 0.0, poidsExces = 0.0;
+                                //Le split doit être utilisé sur un index en base 2
+                                fstream bagages("Bagages.csv", ios::app | ios::out);
+                                if (bagages.)
                                 vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                for (int i = 0; vsplit[i] != ""; i += 2) {
-                                    poidstot += stod(vsplit[i]);
-                                    if (stod(vsplit[i]) > 20.0)
-                                        poidsExces += (stod(vsplit[i]) - 20.0);
+                                bagages << vsplit[0] << " " << vsplit[1];
+                                for (int i = 2; i < vsplit.size(); i += 2) {
+                                    Error(RED, string("Valeurs: ") + vsplit[i] + "|" + vsplit[i + 1]);
+                                    double max = (vsplit[i][0] == 'V' || vsplit[i][0] == 'v' ? Parametres.poidsValise
+                                                                                             : Parametres.poidsMain);
+                                    double poids = stod(vsplit[i + 1]);
+                                    poidsTot += poids;
+                                    poidsExces += (poids - max);
+                                    bagages << " " << vsplit[i] << " " << vsplit[i + 1];
                                 }
-                                s->Send(getMessage(CHECK_LUGGAGE, to_string(poidsExces) + Parametres.TramesSeparator +
-                                                                  to_string(poidstot)));
-
+                                if (poidsExces < 0)
+                                    poidsExces = 0;
+                                bagages.close();
+                                s->Send(getMessage(CHECK_LUGGAGE, to_string(poidsTot) + Parametres.TramesSeparator +
+                                                                  to_string(poidsExces)));
                             }
                             break;
                         case PAYMENT_DONE:
@@ -224,13 +234,12 @@ void traitementConnexion(int *num) {
 
 void InitialisationLog() {
     time_t t = time(NULL);
-    struct tm debut = *localtime(&t);
+    struct tm *debut = localtime(&t);
     for (int i = 0; i < 100; i++)
         log << "=";
     log << endl;
     log << "Date de compilation: " << __DATE__ << endl;
-    log << "Date d'execution: " << debut.tm_mday + 1 << "/" << debut.tm_mon << "/" << debut.tm_year << " à "
-        << debut.tm_hour << ":" << debut.tm_min << ":" << debut.tm_sec << endl;
+    log << put_time(debut, "Date d'execution: %d-%m-%Y %H-%M-%S") << endl;
     for (int i = 0; i < 100; i++)
         log << "-";
     log << endl;

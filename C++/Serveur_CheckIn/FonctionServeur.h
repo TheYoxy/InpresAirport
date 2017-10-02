@@ -5,6 +5,7 @@
 #include "../Librairie/SocketServeur.h"
 #include <fstream>
 #include <signal.h>
+#include <iomanip>
 
 #define ErrorLock(couleur, message) pthread_mutex_lock(&mutexEcran);\
  Error(couleur,message);\
