@@ -155,7 +155,7 @@ void traitementConnexion(int *num) {
 #endif
                     vector<string> vsplit;
                     switch (sMessage.type) {
-                        case LOGIN_OFFICER: {
+                        case LOGIN: {
                             vsplit = split(sMessage.message, Parametres.TramesSeparator);
                             bool ue = userExist(vsplit[0], vsplit[1]);
                             s->Send(getMessage(ue ? ACCEPT : REFUSE, string("")));
@@ -165,7 +165,7 @@ void traitementConnexion(int *num) {
                             }
                         }
                             break;
-                        case LOGOUT_OFFICER:
+                        case LOGOUT:
                             log = false;
                             EcrireMessageOutThread(sMessage.message + " a terminé sa session.");
                             break;
@@ -175,7 +175,7 @@ void traitementConnexion(int *num) {
                                 s->Send(getMessage(ticketExist(vsplit) ? ACCEPT : REFUSE, string("")));
                             }
                             break;
-                        case CHECK_LUGGAGE:
+                        case ADD_LUGGAGE:
                             if (log) {
                                 double poidsTot = 0.0, poidsExces = 0.0;
                                 //Le split doit être utilisé sur un index en base 2
@@ -195,13 +195,8 @@ void traitementConnexion(int *num) {
                                 if (poidsExces < 0)
                                     poidsExces = 0;
                                 bagages.close();
-                                s->Send(getMessage(CHECK_LUGGAGE, to_string(poidsTot) + Parametres.TramesSeparator +
+                                s->Send(getMessage(ADD_LUGGAGE, to_string(poidsTot) + Parametres.TramesSeparator +
                                                                   to_string(poidsExces)));
-                            }
-                            break;
-                        case PAYMENT_DONE:
-                            if (log) {
-                                s->Send(getMessage(ACCEPT, ""));
                             }
                             break;
                             //Unique point de sortie d'un socket passif du serveur
