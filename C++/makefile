@@ -13,10 +13,10 @@ CLID=Application_CheckIn
 all:	Serveur_Check Application_Check
 
 Serveur_Check:	$(OBJ) $(SERVD)/main.o $(SERVD)/FonctionServeur.o
-	@$(CC) -o $@ $^ -lpthread -D_REENTRANT
+	@$(CC) -o $@ $^ $(CFLAG) -lpthread -D_REENTRANT
 
 Application_Check:	$(OBJ) $(CLID)/main.o
-	@$(CC) -o $@ $^
+	@$(CC) -o $@ $^ $(CFLAG)
 
 $(EXEC):	$(OBJ)
 	@echo "Compilation Application"
@@ -24,20 +24,20 @@ $(EXEC):	$(OBJ)
 	@echo "Réussie"
 
 $(SERVD)/main.o:	$(SERVD)/main.cpp
-	$(CC) -o $@ -c $(SERVD)/main.cpp $(CFLAG) -lpthread
+	$(CC) -o $@ -c $^ $(CFLAG) -lpthread
 
 $(SERVD)/FonctionServeur.o:	$(SERVD)/FonctionServeur.cpp $(SERVD)/FonctionServeur.h
-	$(CC) -o $@ -c $(SERVD)/FonctionServeur.cpp $(SERVD)/FonctionServeur.h $(CFLAG)
+	$(CC) -o $@ -c $^ $(CFLAG)
 
 $(CLID)/main.o:	$(CLID)/main.cpp
-	$(CC) -o $@ -c $(CLID)/main.cpp $(CFLAG)
+	$(CC) -o $@ -c $^ $(CFLAG)
 
 $(OBJDIR)/%.o: %.cpp %.h
-	$(CC) -o $@ -c %.cpp %.h $(CFLAG)
+	$(CC) -o $@ -c $^ $(CFLAG)
 
 clean:
 	@echo ".o Effacés"
-	@rm -rf $(OBJDIR)/*.o
+	@rm -rf $(OBJDIR)/Librairie/*.o
 
 mrproper:	clean
 	@echo "Supression de l'executable"

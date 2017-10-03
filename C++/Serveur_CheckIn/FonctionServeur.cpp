@@ -182,7 +182,7 @@ void traitementConnexion(int *num) {
                                 fstream bagages(Parametres.bagageDB, ios::app | ios::out);
                                 vsplit = split(sMessage.message, Parametres.TramesSeparator);
                                 bagages << vsplit[0] << " " << vsplit[1];
-                                for (int i = 2; i < vsplit.size(); i += 2) {
+                                for (int i = 2; i < (int)vsplit.size(); i += 2) {
                                     Error(RED, string("Valeurs: ") + vsplit[i] + "|" + vsplit[i + 1]);
                                     double max = (vsplit[i][0] == 'V' || vsplit[i][0] == 'v' ? Parametres.poidsValise
                                                                                              : Parametres.poidsMain);
@@ -244,6 +244,7 @@ bool userExist(const string &user, const string &password) {
     string message;
     pthread_mutex_lock(&mutexUserDB);
     ifstream userFile(Parametres.userDB);
+    if (!userFile.is_open()) throw Exception(EXCEPTION() + "Fichier " + Parametres.userDB + " inexistant");
     do {
         message = readLine(userFile);
         vector<string> splits;
@@ -263,6 +264,7 @@ bool ticketExist(const vector<string> &ticket) {
     string message;
     pthread_mutex_lock(&mutexTicketDB);
     ifstream ticketFile(Parametres.ticketDB);
+    if (!ticketFile.is_open()) throw Exception(EXCEPTION() + "Fichier " + Parametres.ticketDB + " inexistant");
     vector<string> retour;
     do {
         message = readLine(ticketFile);

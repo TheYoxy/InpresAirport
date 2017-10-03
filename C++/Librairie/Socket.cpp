@@ -67,6 +67,7 @@ Socket &Socket::operator=(const Socket &socket) {
     this->socketOut->sin_addr = socket.socketOut->sin_addr;
     this->socketOut->sin_port = socket.socketOut->sin_port;
     this->socketOut->sin_family = socket.socketOut->sin_family;
+    return *this;
 }
 
 /**************************************************************/
@@ -97,8 +98,6 @@ void Socket::Send(const char *message) {
 }
 
 void Socket::Send(const std::string message) {
-    bool stop = false;
-    while (!stop) {
 #ifdef Debug
         Error(BLUE, std::string("\tSend string: Type: ") + std::to_string((Type) message[0]) + "("
                 << typeName((Type) message[0]) + ")");
@@ -106,14 +105,6 @@ void Socket::Send(const std::string message) {
 #endif
         if (send(descripteur, message.data(), message.length(), 0) == -1)
             throw Exception(EXCEPTION() + "Impossible d'envoyer le message " + strerror(errno));
-        Type flag = ACK;
-        if (recv(descripteur, &flag, 1, 0) == -1)
-            throw Exception(
-                    EXCEPTION() + "Impossible de recevoir l'accusé de réception du message: " + strerror(errno));
-        if (flag == ACK) {
-            stop = true;
-        }
-    }
 }
 
 int Socket::Recv(char *message, int size) {
@@ -121,15 +112,6 @@ int Socket::Recv(char *message, int size) {
     char *msg = new char[size];
     if ((taille = (int) (recv(descripteur, msg, (size_t) size, 0))) == -1)
         throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));
-    try {
-        SendAck();
-#ifdef Debug
-        Error(GREEN, "\tRecv char* taille: ACK envoyé");
-#endif
-    }
-    catch (Exception e) {
-        throw e;
-    }
     strcpy(message, msg);
     return taille;
 }
@@ -165,25 +147,12 @@ int Socket::Recv(std::string &message) {
             taille++;
         }
     }
-    try {
 #ifdef Debug
-        Error(GREEN, std::string("\tRecv string: Type: ") + std::to_string((Type) message[0]) + "("
-                << typeName((Type) message[0]) + ")");
-        Error(GREEN, std::string("\tRecv string: Message: ") + message.substr(1));
+    Error(GREEN, std::string("\tRecv string: Type: ") + std::to_string((Type) message[0]) + "("
+            << typeName((Type) message[0]) + ")");
+    Error(GREEN, std::string("\tRecv string: Message: ") + message.substr(1));
 #endif
-        SendAck();
-        //std::cout << "\tRecv string: ACK envoyé" << std::endl;
-    }
-    catch (Exception e) {
-        throw e;
-    }
     return taille;
-}
-
-void Socket::SendAck() {
-    Type flag = ACK;
-    if (send(descripteur, &flag, 1, 0) == -1)
-        throw Exception(EXCEPTION() + "Impossible d'envoyer l'accusé de réception" + strerror(errno));
 }
 
 /**************************************************************/

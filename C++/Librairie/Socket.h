@@ -58,8 +58,6 @@ public:
 
     int Recv(std::string &message);
 
-    void SendAck();
-
 
     std::string toString();
 
