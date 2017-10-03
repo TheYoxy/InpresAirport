@@ -180,7 +180,6 @@ void traitementConnexion(int *num) {
                                 double poidsTot = 0.0, poidsExces = 0.0;
                                 //Le split doit être utilisé sur un index en base 2
                                 fstream bagages(Parametres.bagageDB, ios::app | ios::out);
-                                if (bagages.)
                                 vsplit = split(sMessage.message, Parametres.TramesSeparator);
                                 bagages << vsplit[0] << " " << vsplit[1];
                                 for (int i = 2; i < vsplit.size(); i += 2) {
