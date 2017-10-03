@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 bool Login(const string &login, const string &mdp) {
     //Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
     bool retour = false;
-    string message = getMessage(LOGIN_OFFICER, login + Parametres.TramesSeparator + mdp);
+    string message = getMessage(LOGIN, login + Parametres.TramesSeparator + mdp);
     cout << "Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")" << endl;
     SoCl->Send(message);
     message.clear();
@@ -140,7 +140,7 @@ bool Login(const string &login, const string &mdp) {
 void Logout(string login) {
     //Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
     try {
-        SoCl->Send(getMessage(LOGOUT_OFFICER, login));
+        SoCl->Send(getMessage(LOGOUT, login));
         cout << "Logout reussi" << endl;
     }
     catch (Exception e) {
@@ -245,7 +245,7 @@ void Encodage_Bagages() {
     } while (!fin);
 
     message.pop_back();
-    SoCl->Send(getMessage(CHECK_LUGGAGE, message));
+    SoCl->Send(getMessage(ADD_LUGGAGE, message));
     message.clear();
 
     try {
