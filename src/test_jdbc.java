@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package inpresairport;
+import database.utilities.*;
 
 /**
  *
@@ -11,6 +11,8 @@ package inpresairport;
  */
 public class test_jdbc extends javax.swing.JFrame {
 
+    public MySQLDB mysqldConn;
+    public OracleDB oracleConn;
     /**
      * Creates new form test_jdbc
      */
@@ -124,11 +126,23 @@ public class test_jdbc extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void MysqlJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MysqlJMIActionPerformed
-        // TODO add your handling code here:
+        try {
+            mysqldConn = new MySQLDB();
+        }
+        catch(Exception e)
+        {
+
+        }
     }//GEN-LAST:event_MysqlJMIActionPerformed
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
-        // TODO add your handling code here:
+        try {
+            oracleConn = new OracleDB();
+        }
+        catch(Exception e)
+        {
+
+        }
     }//GEN-LAST:event_OracleJMIActionPerformed
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
