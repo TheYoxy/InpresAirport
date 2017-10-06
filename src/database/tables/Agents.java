@@ -2,27 +2,27 @@ package database.tables;
 
 public class Agents {
 
-    private String _nom;
-    private String _prenom;
-    private String _poste;
+    private String Nom;
+    private String Prenom;
+    private String Poste;
 
     public Agents(){
-        _nom = "";
-        _prenom = "";
-        _poste = "";
+        this.Nom = "";
+        this.Prenom = "";
+        this.Poste = "";
     }
 
     public Agents(String nom, String prenom, String poste) {
-        _nom = nom;
-        _prenom = prenom;
-        _poste = poste;
+        this.Nom = nom;
+        this.Prenom = prenom;
+        this.Poste = poste;
     }
 
-    public String get_nom() {
-        return _nom;
+    public String getNom() {
+        return this.Nom;
     }
 
-    public String get_prenom() { return _prenom; }
+    public String getPrenom() { return this.Prenom; }
 
-    public String get_poste() { return _poste; }
+    public String getPoste() { return this.Poste; }
 }

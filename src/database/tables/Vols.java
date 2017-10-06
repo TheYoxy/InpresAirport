@@ -2,45 +2,45 @@ package database.tables;
 
 public class Vols {
 
-    private String _destination;
-    private String _heureArrivee;
-    private String _heureDepart;
-    private String _heureArriveeDest;
-    private String _modeleAvion;
+    private String Destination;
+    private String HeureArrivée;
+    private String HeureDépart;
+    private String HeureArrivéeDestination;
+    private String AvionUtilisé;
 
     public Vols(){
-        _destination = "";
-        _heureArrivee = "";
-        _heureDepart = "";
-        _heureArriveeDest = "";
-        _modeleAvion = "";
+        this.Destination = "";
+        this.HeureArrivée = "";
+        this.HeureDépart = "";
+        this.HeureArrivéeDestination = "";
+        this.AvionUtilisé = "";
     }
 
     public Vols(String dest, String hArr, String hdep, String hArrDest, String modAvion) {
-        _destination = dest;
-        _heureArrivee = hArr;
-        _heureDepart = hdep;
-        _heureArriveeDest = hArrDest;
-        _modeleAvion = modAvion;
+        this.Destination = dest;
+        this.HeureArrivée = hArr;
+        this.HeureDépart = hdep;
+        this.HeureArrivéeDestination = hArrDest;
+        this.AvionUtilisé = modAvion;
     }
 
-    public String get_Dest() {
-        return _destination;
+    public String getDestination() {
+        return this.Destination;
     }
 
-    public String get_HeureArrivee() {
-        return _heureArrivee;
+    public String getHeureArrivée() {
+        return this.HeureArrivée;
     }
 
-    public String get_heureDepart() {
-        return _heureDepart;
+    public String getHeureDépart() {
+        return this.HeureDépart;
     }
 
-    public String get_heureArriveeDest() {
-        return _heureArriveeDest;
+    public String getHeureArrivéeDestination() {
+        return this.HeureArrivéeDestination;
     }
 
-    public String get_modeleAvion() {
-        return _modeleAvion;
+    public String getAvionUtilisé() {
+        return this.AvionUtilisé;
     }
 }

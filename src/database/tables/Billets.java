@@ -2,33 +2,33 @@ package database.tables;
 
 public class Billets {
 
-    private String _numBillet;
-    private String _numVol;
+    private String NumBillet;
+    private String NumVol;
 
     public Billets(){
-        _numBillet = "";
-        _numVol = "";
+        this.NumBillet = "";
+        this.NumVol = "";
     }
 
-    public Billets(String numB, String numV) {
-        _numBillet = numB;
-        _numVol = numV;
+    public Billets(String numBillet, String numVol) {
+        this.NumBillet = numBillet;
+        this.NumVol = numVol;
     }
 
     public String getNumBillet() {
-        return _numBillet;
+        return this.NumBillet;
     }
 
     public void setNumBillet(String value) {
-        _numBillet = value;
+        this.NumBillet = value;
     }
 
     public String getNumVol() {
-        return _numVol;
+        return this.NumVol;
     }
 
     public void setNumVol(String value) {
-        _numVol = value;
+        this.NumVol = value;
     }
 
 }
