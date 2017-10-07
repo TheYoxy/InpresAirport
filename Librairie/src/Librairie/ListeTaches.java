@@ -4,12 +4,16 @@ import Librairie.Interfaces.Tache;
 
 import java.util.LinkedList;
 
+/**
+ * Objet servant de queue pour les tâches que le serveur doit traiter
+ */
 public class ListeTaches implements Tache {
     private LinkedList<Runnable> listTaches;
-    public ListeTaches()
-    {
+
+    public ListeTaches() {
         listTaches = new LinkedList<>();
     }
+
     @Override
     public synchronized Runnable getTache() throws InterruptedException {
         System.out.println("getTache avant wait");
