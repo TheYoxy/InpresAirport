@@ -192,5 +192,67 @@ Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir ave
 
 *Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362- WACHARVILROM-22082017-0070-008.*
 
-L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.
+L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.\
+Exemple: 
+---
+VOL 714 WALABIES-AIRLINES - Sydney 5h30\
+VOL 362 POWDER-AIRLINES - Peshawar 6h30\
+VOL 152 AIR FRANCE CANAILLE - Paris 7h20
+---
+
 Un double-clic sur un item de la liste fait appraître dans une boîte de dialogue un tableau reprenant les bages enregistrés pour ce vol (Données provenant du fichier associé pour les 3 premières colonnes, initislisée avec les valeurs par défaut "N" ou "NEANT" selon le cas).
+Exemple:
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+...|
+362-WACHARVILROM-22082017-0070-001|27.3kg|VALISE|N|N|N|NEANT
+...|
+362-WACHARVILROM-22082017-0070-008|19.95kg|PAS VALISE|N|N|N|NEANT
+...|
+
+Le bagagiste, au fur et à mesure de ses activités, va interagir sur ce tableau. Chacune de ses
+actions va générer une commande spécifique du protocole **LUGAP**, commande envoyée au
+serveur *Serveur_Bagages* sur le port **PORT_BAGAGES**.
+
+`**Sur base de l'exemple suivant, il vous appartient de définir les commandes du protocole LUGAP (et donc de leur donner un nom) et de choisir la manière de les implémenter (objets, chaînes de caractères, etc).**`
+
+Exemple:
+---
+>1. Le bagagiste à réceptionné un bagage: 
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+362-WACHARVILROM-22082017-0070-001|27.3kg|VALISE|**O**|N|N|NEANT
+
+>2. Le bagagiste à réceptionné un 2ème bagage:
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+362-WACHARVILROM-22082017-0070-008|19.95kg|PAS VALISE|**O**|N|N|NEANT
+
+>3. Le bagagiste a alerté un agent des douanes pour un bagage:
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+362-WACHARVILROM-22082017-0070-008|19.95kg|PAS VALISE|**O**|N|**O**|Pas mauvais :)
+
+>4. Le bagagiste a réalisé le chargement en soute d'un bagage:
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+362-WACHARVILROM-22082017-0070-001|27.3kg|VALISE|**O**|**O**|N|NEANT
+
+>Le bagagiste ne peut refermer cette boîte de dialogue que si tous la bagages du vol on été chargés en soute **OU** refusés au chargement (*R* dans chargé en soute):
+
+Identifiant | Poids | Type | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques
+--- | --- | --- | --- | --- | --- | ---
+362-WACHARVILROM-22082017-0070-007|17.95kg|PAS VALISE|**O**|**R**|O|*poudre à lessiver de la marque "SchnoufSuper"???*
+
+>5. Quand cette boîte se referme, le bagagiste est automatiquement déconnecté du serveur.
+
+##4 Programmation Web Java classique
+Dossier attendu: 
+1. Diagramme de classes UML des classes de l'application Web.
+1. 
+###4.1 L'application Web_Applic_Billets
