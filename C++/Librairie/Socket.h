@@ -10,6 +10,7 @@
 #define BLUE 34
 #define MAGENTA 35
 #define CYAN 36
+
 #define WHITE 37
 #define Error(couleur, message) std::cerr << "\033[" << couleur << "m" << message << "\033[" << INIT << "m" << std::endl
 
