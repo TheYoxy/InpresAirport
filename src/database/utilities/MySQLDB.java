@@ -10,11 +10,29 @@ public class MySQLDB {
     public Connection con;
     public Statement instruction;
 
-    public MySQLDB() throws Exception {
-        String dbname = "";
+    public MySQLDB()throws SQLException {
+        /*String dbname = "";
 
         Class sqldriver = Class.forName("com.mysql.jdbc.driver");
         con = DriverManager.getConnection("jdbc:odbc:" + dbname, "", "");
+        instruction = con.createStatement();*/
+
+        String url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
+        String user = "root";
+        String passwd = "@@lopi47";
+        System.out.println("-------- Test de connection mysql ------");
+        try {
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Driver trouve !");
+        con = DriverManager.getConnection(url, user, passwd);
+        if (con != null)
+            System.out.println("Connexion etablie");
+        else
+            System.out.println("Impossible d'établir la connexion!");
+        System.out.println("----------------------------------------------");
         instruction = con.createStatement();
     }
 
@@ -23,13 +41,13 @@ public class MySQLDB {
             ResultSet res = instruction.executeQuery("select * from Billets");
             System.out.println("Envoi de l'instruction...");
         } catch (SQLException e){
-
+            System.out.println( e.getMessage());
         }
     }
 
     public List<Billets> get_Billets()
     {
-        List<Billets> billets = new ArrayList<Billets>();
+        List<Billets> billets = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery("select * from Billets");
             while(res.next())
@@ -45,12 +63,12 @@ public class MySQLDB {
 
     public List<Vols> get_Vols()
     {
-        List<Vols> vols = new ArrayList<Vols>();
+        List<Vols> vols = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery("select * from Vols");
             while(res.next())
             {
-                vols.add(new Vols(res.getString(1), (res.getDate(2)).toString(), (res.getDate(3)).toString(), (res.getDate(4)).toString(),res.getString(5)));
+                vols.add(new Vols(res.getString(1), res.getString(2), (res.getDate(3)).toString(), (res.getDate(4)).toString(), (res.getDate(5)).toString(),res.getString(6)));
             }
         }
         catch(SQLException e) {
@@ -61,12 +79,12 @@ public class MySQLDB {
 
     public List<Bagages> get_Bagages()
     {
-        List<Bagages> bagages = new ArrayList<Bagages>();
+        List<Bagages> bagages = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery("select * from Vols");
             while(res.next())
             {
-                bagages.add(new Bagages(res.getDouble(1), res.getBoolean(2)));
+                bagages.add(new Bagages(res.getString(1),res.getDouble(2), res.getBoolean(3)));
             }
         }
         catch(SQLException e) {
@@ -74,10 +92,26 @@ public class MySQLDB {
         }
         return bagages;
     }
+    
+    public List<Agents> get_Agents()
+    {
+        List<Agents> agents = new ArrayList();
+        try{
+            ResultSet res = instruction.executeQuery("select * from Agents");
+            while(res.next())
+            {
+                agents.add(new Agents(res.getString(1), res.getString(2), res.getString(3)));
+            }
+        }
+        catch(SQLException e) {
+            //exception due au resultset
+        }
+        return agents;
+    }
 
     public List<Billets> get_any_Billets(String requete)
     {
-        List<Billets> billets = new ArrayList<Billets>();
+        List<Billets> billets = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery(requete);
             while(res.next())
@@ -93,12 +127,12 @@ public class MySQLDB {
 
     public List<Vols> get_any_Vols(String requete)
     {
-        List<Vols> vols = new ArrayList<Vols>();
+        List<Vols> vols = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery(requete);
             while(res.next())
             {
-                vols.add(new Vols(res.getString(1), (res.getDate(2)).toString(), (res.getDate(3)).toString(), (res.getDate(4)).toString(),res.getString(5)));
+                vols.add(new Vols(res.getString(1), res.getString(2), (res.getDate(3)).toString(), (res.getDate(4)).toString(), (res.getDate(5)).toString(),res.getString(6)));
             }
         }
         catch(SQLException e) {
@@ -109,39 +143,17 @@ public class MySQLDB {
 
     public List<Bagages> get_any_Bagages(String requete) {
 
-        List<Bagages> bagages = new ArrayList<Bagages>();
+        List<Bagages> bagages = new ArrayList();
         try{
             ResultSet res = instruction.executeQuery(requete);
             while(res.next())
             {
-                bagages.add(new Bagages(res.getDouble(1), res.getBoolean(2)));
+                bagages.add(new Bagages(res.getString(1),res.getDouble(2), res.getBoolean(3)));
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println( e.getMessage());
         }
         return bagages;
     }
-
-    /*public static Connection ConnexionMySql() throws SQLException {
-        String url = "jdbc:mysql://localhost/Athletisme?useSSL=false";
-        String user = "floryan";
-        String passwd = "";
-        System.out.println("-------- Mysql JDBC Connection Testing ------");
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-            return null;
-        }
-        System.out.println("Driver found !");
-        Connection connection;
-        connection = DriverManager.getConnection(url, user, passwd);
-        if (connection != null)
-            System.out.println("You made it, take the control of your database now!");
-        else
-            System.out.println("Failed to make connection!");
-        System.out.println("----------------------------------------------");
-        return connection;
-    }*/
 }
