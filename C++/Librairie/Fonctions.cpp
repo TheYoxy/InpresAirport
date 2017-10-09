@@ -59,6 +59,8 @@ void lectureFichierParams(const char *nomFichier) {
             Parametres.poidsValise = stod(vector[1]);
         } else if (!vector[0].compare("PoidsMain")) {
             Parametres.poidsMain = stod(vector[1]);
+        } else if (!vector[0].compare("PayementExces")) {
+            Parametres.PayementExces = stod(vector[1]);
         } else
             cout << "Paramètre : \"" << vector[0] << "\" inconnu" << endl;
         if (fin != -1 && debut != -1 && Parametres.PortRange == nullptr) {

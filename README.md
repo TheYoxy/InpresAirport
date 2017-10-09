@@ -134,8 +134,6 @@ On évitera la construction de flux réseaux d'entrée et de sortie, `NetworkStr
     pwd-admin= | jeaclachralf..
     --- | ---
     
-
-
 ----------
 
 
@@ -163,7 +161,7 @@ On demande donc de construire un groupe de telles classes (package *database.uti
 On souhaite pourvoir accéder, au minimum, à des bases relationnelles de type *MySql* ou *Oracle*.
 Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi construite proposera une interface graphique de base permettant:
 - Soit de se connecter à la base *MySql* DB_AIRPORT pour y réaliser des requêtes élémentaires de type `select * from ... where...`,`select count(*) from` et `update ... set ... where ...` avec l'affichage des résultats (requêtes adaptées à la table visée - pas de tentatives de généricité à ce stade).
-- Soit de se connecter ) une base BD_JOURNALDEBORD, qui est une base Oracle à deux tables: 
+- Soit de se connecter à une base BD_JOURNALDEBORD, qui est une base Oracle à deux tables: 
 
     Table|Description
     --- | ---
@@ -190,7 +188,7 @@ Le serveur attends ses requêtes sur deux ports différents:
 ### 3.2 Application_Bagages
 Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir avec eux, le serveur utilise le *protocole applicatif* (basé TCP) **LUGAP** (**LUG**gage h**A**ndling **P**rotocol), dont les commnades sont à définir pour satisfaire au scénario exemple suivant:
 
-*Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362- WACHARVILROM-22082017-0070-008.*
+*Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362-WACHARVILROM-22082017-0070-008.*
 
 L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.\
 Exemple: 
