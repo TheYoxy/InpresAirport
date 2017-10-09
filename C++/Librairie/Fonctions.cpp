@@ -133,6 +133,10 @@ std::string typeName(const Type &t) {
             return std::string("ADD_LUGGAGE");
         case TOO_MUCH_CONNECTIONS:
             return std::string("TOO_MUCH_CONNECTIONS");
+        case NO_SELECTED_TICKET:
+            return std::string("NO_SELECTED_TICKET");
+        case PAYEMENT_DONE:
+            return std::string("PAYEMENT_DONE");
         default:
             return std::string("INCONNU");
     }
