@@ -1,9 +1,13 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import database.tables.*;
 import database.utilities.*;
+import java.util.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -13,6 +17,10 @@ public class test_jdbc extends javax.swing.JFrame {
 
     public MySQLDB mysqldConn;
     public OracleDB oracleConn;
+    public List<Billets> listebillets = new ArrayList();
+    public List<Vols> listevols = new ArrayList();
+    public List<Bagages> listebagages = new ArrayList();
+    public List<Agents> listeagents = new ArrayList();
     /**
      * Creates new form test_jdbc
      */
@@ -34,6 +42,9 @@ public class test_jdbc extends javax.swing.JFrame {
         envoiRqtButton = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         resultatJTable = new javax.swing.JTable();
+        afficherTableButton = new javax.swing.JButton();
+        tableLabel = new javax.swing.JLabel();
+        listeTableComboBox = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         ConnexionJM = new javax.swing.JMenu();
         MysqlJMI = new javax.swing.JMenuItem();
@@ -66,6 +77,17 @@ public class test_jdbc extends javax.swing.JFrame {
             }
         ));
         jScrollPane1.setViewportView(resultatJTable);
+
+        afficherTableButton.setText("Afficher");
+        afficherTableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                afficherTableButtonActionPerformed(evt);
+            }
+        });
+
+        tableLabel.setText("Afficher table : ");
+
+        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         ConnexionJM.setText("Connexion");
 
@@ -100,12 +122,18 @@ public class test_jdbc extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(requeteTextField)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(requeteLabel)
                             .addComponent(envoiRqtButton)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 5, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(tableLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(afficherTableButton)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -117,8 +145,13 @@ public class test_jdbc extends javax.swing.JFrame {
                 .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envoiRqtButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableLabel)
+                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(afficherTableButton))
+                .addGap(60, 60, 60)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -130,9 +163,12 @@ public class test_jdbc extends javax.swing.JFrame {
             mysqldConn = new MySQLDB();
         }
         catch(Exception e)
-        {
-
-        }
+        {}
+        listeTableComboBox.removeAllItems();
+        listeTableComboBox.addItem("Billets");
+        listeTableComboBox.addItem("Vols");
+        listeTableComboBox.addItem("Bagages");
+        listeTableComboBox.addItem("Agents");
     }//GEN-LAST:event_MysqlJMIActionPerformed
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
@@ -148,6 +184,57 @@ public class test_jdbc extends javax.swing.JFrame {
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
+
+    private void afficherTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_afficherTableButtonActionPerformed
+
+        if("Billets".equals(listeTableComboBox.getSelectedItem().toString()) )
+        {
+            listebillets = mysqldConn.get_Billets();
+            DefaultTableModel model = new DefaultTableModel();
+            resultatJTable.setModel(model);
+            model.setColumnIdentifiers(new String[] {"numero billet", "numero vol"});
+            // Populate the JTable (TableModel) with data from ArrayList
+            listebillets.forEach((b) -> {
+                model.addRow(new String[] {b.getNumBillet() , b.getNumVol() });
+            });
+        }
+        
+        if("Vols".equals(listeTableComboBox.getSelectedItem().toString()) )
+        {
+            listevols = mysqldConn.get_Vols();
+            DefaultTableModel model = new DefaultTableModel();
+            resultatJTable.setModel(model);
+            model.setColumnIdentifiers(new String[] {"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
+            // Populate the JTable (TableModel) with data from ArrayList
+            listevols.forEach((v) -> {
+                model.addRow(new String[] {v.getNumVol() , v.getDestination(), v.getHeureArrivée(), v.getHeureDépart(), v.getHeureArrivéeDestination(), v.getAvionUtilisé() });
+            });
+        }
+        
+        if("Bagages".equals(listeTableComboBox.getSelectedItem().toString()) )
+        {
+            listebagages = mysqldConn.get_Bagages();
+            DefaultTableModel model = new DefaultTableModel();
+            resultatJTable.setModel(model);
+            model.setColumnIdentifiers(new String[] {"numero bagage", "poids", "valise"});
+            // Populate the JTable (TableModel) with data from ArrayList
+            listebagages.forEach((b) -> {
+                model.addRow(new String[] {b.getNumBagage() , b.getPoids().toString(), b.isValise() });
+            });
+        }
+                
+        if("Agents".equals(listeTableComboBox.getSelectedItem().toString()) )
+        {
+            listeagents = mysqldConn.get_Agents();
+            DefaultTableModel model = new DefaultTableModel();
+            resultatJTable.setModel(model);
+            model.setColumnIdentifiers(new String[] {"nom", "prenom", "poste"});
+            // Populate the JTable (TableModel) with data from ArrayList
+            listeagents.forEach((a) -> {
+                model.addRow(new String[] {a.getNom(), a.getPrenom(), a.getPoste() });
+            });
+        }
+    }//GEN-LAST:event_afficherTableButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -189,11 +276,14 @@ public class test_jdbc extends javax.swing.JFrame {
     private javax.swing.JMenu ConnexionJM;
     private javax.swing.JMenuItem MysqlJMI;
     private javax.swing.JMenuItem OracleJMI;
+    private javax.swing.JButton afficherTableButton;
     private javax.swing.JToggleButton envoiRqtButton;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> listeTableComboBox;
     private javax.swing.JLabel requeteLabel;
     private javax.swing.JTextField requeteTextField;
     private javax.swing.JTable resultatJTable;
+    private javax.swing.JLabel tableLabel;
     // End of variables declaration//GEN-END:variables
 }

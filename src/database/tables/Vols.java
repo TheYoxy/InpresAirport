@@ -2,6 +2,7 @@ package database.tables;
 
 public class Vols {
 
+    private String NumVol;
     private String Destination;
     private String HeureArrivée;
     private String HeureDépart;
@@ -9,6 +10,7 @@ public class Vols {
     private String AvionUtilisé;
 
     public Vols(){
+        this.NumVol = "";
         this.Destination = "";
         this.HeureArrivée = "";
         this.HeureDépart = "";
@@ -16,7 +18,8 @@ public class Vols {
         this.AvionUtilisé = "";
     }
 
-    public Vols(String dest, String hArr, String hdep, String hArrDest, String modAvion) {
+    public Vols(String numvol, String dest, String hArr, String hdep, String hArrDest, String modAvion) {
+        this.NumVol = numvol;
         this.Destination = dest;
         this.HeureArrivée = hArr;
         this.HeureDépart = hdep;
@@ -24,6 +27,10 @@ public class Vols {
         this.AvionUtilisé = modAvion;
     }
 
+    public String getNumVol() {
+        return this.NumVol;
+    }
+    
     public String getDestination() {
         return this.Destination;
     }
