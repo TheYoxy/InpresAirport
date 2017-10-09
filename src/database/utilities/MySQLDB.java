@@ -11,10 +11,11 @@ public class MySQLDB {
 
     public Connection con;
     public Statement instruction;
-    public FilesOperations file = new FilesOperations("mysql");
+    public FilesOperations file = new FilesOperations();
 
     public MySQLDB()throws SQLException {
 
+        file.load_Properties("mysql");
         String url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
         String user = file.getUsername();
         String passwd = file.getPassword();
@@ -25,11 +26,12 @@ public class MySQLDB {
             e.printStackTrace();
         }
         System.out.println("Driver trouve !");
-        con = DriverManager.getConnection(url, user, passwd);
-        if (con != null)
-            System.out.println("Connexion etablie");
-        else
+        try {
+            con = DriverManager.getConnection(url, user, passwd);
+        }catch (SQLException e) {
             System.out.println("Impossible d'établir la connexion!");
+            throw e;
+        }
         System.out.println("----------------------------------------------");
         instruction = con.createStatement();
     }

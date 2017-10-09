@@ -15,12 +15,15 @@ public class FilesOperations {
 
     private String _dbtype;
 
-    public FilesOperations(String dbtype){
+    public FilesOperations(){
+
+    }
+    public void load_Properties(String dbtype){
+
+        properties = new Properties();
+
         if(dbtype.equalsIgnoreCase("mysql") || dbtype.equalsIgnoreCase("oracle"))
             _dbtype = dbtype;
-    }
-    public void load_Properties(){
-        properties = new Properties();
 
         try {
             properties.load(new FileInputStream(PROPERTIES));
@@ -38,7 +41,7 @@ public class FilesOperations {
     }
 
     public String getPassword(){
-        if(_dbtype.equalsIgnoreCase("oracle"))
+        if(_dbtype.equalsIgnoreCase("mysql"))
             return properties.getProperty("passwordSQL");
         else
             return properties.getProperty("passwordOracle");

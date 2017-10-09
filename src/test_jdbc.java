@@ -6,6 +6,8 @@
  */
 import database.tables.*;
 import database.utilities.*;
+
+import java.sql.SQLException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -160,15 +162,14 @@ public class test_jdbc extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void MysqlJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MysqlJMIActionPerformed
+
         try {
             mysqldConn = new MySQLDB();
-            if(mysqldConn != null)
-                JOptionPane.showMessageDialog(this,"Client connecté.","Mysql connection",JOptionPane.INFORMATION_MESSAGE);
-            else
-                JOptionPane.showMessageDialog(this,"Impossible de se connecter","Mysql connection error ",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Client connecté.","Mysql connection",JOptionPane.INFORMATION_MESSAGE);
         }
-        catch(Exception e) {
+        catch(SQLException e) {
             System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this,"Impossible de se connecter :"+e,"Mysql connection error ",JOptionPane.ERROR_MESSAGE);
         }
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Billets");
@@ -180,13 +181,11 @@ public class test_jdbc extends javax.swing.JFrame {
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
         try {
             oracleConn = new OracleDB();
-            if(oracleConn != null)
-                JOptionPane.showMessageDialog(this,"Client connecté.","Oracle connection",JOptionPane.INFORMATION_MESSAGE);
-            else
-                JOptionPane.showMessageDialog(this,"Impossible de se connecter","Oracle connection error ",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Client connecté.","Oracle connection",JOptionPane.INFORMATION_MESSAGE);
         }
         catch(Exception e) {
             System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(this,"Impossible de se connecter :"+e,"Oracle connection error ",JOptionPane.ERROR_MESSAGE);
         }
         requeteLabel.setText("Requete Oracle :");
         listeTableComboBox.removeAllItems();
