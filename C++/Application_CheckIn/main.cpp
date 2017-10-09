@@ -2,6 +2,7 @@
 #include <iostream>
 #include <netdb.h>
 #include <limits>
+#include <tgmath.h>
 #include "../Librairie/SocketClient.h"
 #include "../Librairie/ConnexionException.h"
 
@@ -27,7 +28,14 @@ int main(int argc, char *argv[]) {
         Error(RED, "./Client [nom-de-la-machine-serveur]");
         return -1;
     }
+#ifdef Debug
     lectureFichierParams("../config.conf");
+#endif
+
+#ifndef Debug
+    lectureFichierParams("config.conf");
+#endif
+
     string login, password, ip;
 
     struct hostent *host = gethostbyname(argv[1]);
@@ -73,6 +81,7 @@ int main(int argc, char *argv[]) {
                 cout << "2. Ajouter des bagages" << endl;
                 cout << "0. Quitter" << endl;
                 cin >> choix;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 switch (choix) {
                     case 0:
 #ifndef Debug
@@ -81,6 +90,7 @@ int main(int argc, char *argv[]) {
                         cout << "1. Se déconnecter de l'application" << endl;
                         cout << "0. Quitter l'application" << endl;
                         cin >> choix;
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
                         if (choix == 0)
                             boucle = false;
                         menu = false;
@@ -113,7 +123,7 @@ int main(int argc, char *argv[]) {
 
 
 bool Login(const string &login, const string &mdp) {
-    //Envoie chaine de caractère au serv avec log + pass et requete LOGIN_OFFICER
+    //Envoie chaine de caractère au serv avec logStream + pass et requete LOGIN_OFFICER
     bool retour = false;
     string message = getMessage(LOGIN, login + Parametres.TramesSeparator + mdp);
     cout << "Type: " << (Type) message[0] << "(" << typeName((Type) message[0]) << ")" << endl;
@@ -138,7 +148,7 @@ bool Login(const string &login, const string &mdp) {
 }
 
 void Logout(string login) {
-    //Envoie chaine de caractère au serv avec log et requete LOGOUT_OFFICER
+    //Envoie chaine de caractère au serv avec logStream et requete LOGOUT_OFFICER
     try {
         SoCl->Send(getMessage(LOGOUT, login));
         cout << "Logout reussi" << endl;
@@ -193,74 +203,104 @@ void Check_ticket() {
     //Attend reponse pour encoder bagages
 }
 
-void Encodage_Bagages() {
-    string message, numVol, numBillet;
-    bool fin = false;
+SMessage Check_Ticket_Return() {
+    string numBillet, numVol, nbPersonnes, valise, poids, paye;
+    Type flag = CHECK_TICKET;
+    string message;
+
+    //envoie chaine de caractère au serv avec requete CHECK_TICKET
+    cout << "Application CHECK IN" << endl << "--------------------" << endl;
     cout << "Numero de vol: ";
     cin >> numVol;
     cout << "Numero du billet: ";
     cin >> numBillet;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    SoCl->Send(getMessage(CHECK_TICKET, numVol + Parametres.TramesSeparator + numBillet));
+    cout << "Nombre de personnes: ";
+    cin >> nbPersonnes;
 #ifndef Debug
-    cout << CLEAN;
+    cout << CLEAN << endl;
 #endif
-    SoCl->Recv(message);
-    if (getStructMessageFromString(message).type != ACCEPT) {
-        cout << "Billet inexistant" << endl;
-        return;
-    }
+    SoCl->Send(getMessage(flag, numBillet +
+                                Parametres.TramesSeparator +
+                                numVol +
+                                Parametres.TramesSeparator +
+                                nbPersonnes));
     message.clear();
-    message += numVol + Parametres.TramesSeparator + numBillet + Parametres.TramesSeparator;
-    //BOUCLE GLOBALE
+    try {
+        SoCl->Recv(message);
+        return getStructMessageFromString(message);
+    }
+    catch (Exception e) {
+        cerr << e.getMessage() << endl;
+    }
+    return getStructMessageFromString(getMessage(REFUSE, ""));
+}
+
+void Encodage_Bagages() {
+    string message = "", numVol, numBillet;
+    bool fin = false;
     do {
         double poids;
         string valise = "";
         //BOUCLE DE BLINDAGE
         do {
             cout << "Valise(V) ou Bagage à main(B) ?"
-                 << (message == numVol + Parametres.TramesSeparator + numBillet + Parametres.TramesSeparator ? ""
-                                                                                                             : "\t Enter pour valider: ");
-//            cin >> valise;
+                 << (message == "" ? "" : "\t Enter pour valider: ");
             getline(cin, valise);
             //Condition pour éviter de n'encoder aucune valise
-            if (valise == "" &&
-                message != numVol + Parametres.TramesSeparator + numBillet + Parametres.TramesSeparator) {
+            if (valise == "" && message != "") {
                 fin = true;
             } else if (valise != "v" && valise != "b" && valise != "V" && valise != "B") {
 #ifndef Debug
                 cout << CLEAN;
 #endif
-                cout << "Entrée incorrecte, veuillez entrer une entrée correcte" << endl;
+                cout << endl << "Entrée incorrecte, veuillez entrer une entrée correcte" << endl;
             }
         } while (valise != "v" && valise != "b" && valise != "V" && valise != "B" && !fin);
-        if (!fin){
+
+        if (!fin) {
             cout << (valise == "v" || valise == "V" ? "Poids de la valise: " : "Poids du sac: ");
             cin >> poids;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             message += valise + Parametres.TramesSeparator + to_string(poids) +
                        Parametres.TramesSeparator;
-
         }
     } while (!fin);
-
     message.pop_back();
-    SoCl->Send(getMessage(ADD_LUGGAGE, message));
-    message.clear();
-
     try {
-        SoCl->Recv(message);
-        SMessage sMessage = getStructMessageFromString(message);
+        SMessage sMessage;
+        bool boucle;
+        do {
+            boucle = false;
+            SoCl->Send(getMessage(ADD_LUGGAGE, message));
+            string temp;
+            SoCl->Recv(temp);
+            sMessage = getStructMessageFromString(temp);
+            if (sMessage.type == NO_SELECTED_TICKET) {
+                SMessage retour;
+                do {
+                    retour = Check_Ticket_Return();
+                } while (retour.type == REFUSE);
+                boucle = true;
+            }
+        } while (boucle);
         vector<string> splits;
-        splits = split(message,
-                       Parametres.TramesSeparator); //Serveur renvoie poids total + excédent poids + plus supplément payé
-        cout << "Poids total : " << splits[0] << "kg" << endl;
-        cout << "Excédent poids : " << splits[1] << "kg" << endl;
-
-//        cout << "Supplément à payer : " << splits[2] << "Euro" << endl;
-//        cout << "Paiement effectué (O/N) : ";
-//        Error(RED, "La suite n'a pas encore été implémentée");
-
+        splits = split(sMessage.message, Parametres.TramesSeparator);
+        //Serveur renvoie poids total + excédent poids + plus supplément payé
+        char pay;
+        cout << "Poids total        : " << round(stod(splits[0]) * 100) / 100 << " kg" << endl;
+        cout << "Excédent poids     : " << round(stod(splits[1]) * 100) / 100 << " kg" << endl;
+        cout << "Supplément à payer : " << round(stod(splits[2]) * 100) / 100 << " €" << endl;
+        do {
+            cout << "Paiement effectué (O/N) : ";
+            cin >> pay;
+            if (pay == 'O') {
+                sMessage.type = PAYEMENT_DONE;
+                SoCl->Send(getStringFromStructMessage(sMessage));
+            } else if (pay == 'N')
+                cout << "Veuillez enregistrer le payement" << endl;
+            else
+                cout << "Entrée incorrecte" << endl;
+        } while (pay != 'O');
     }
     catch (Exception e) {
         cerr << e.getMessage() << endl;

@@ -24,5 +24,6 @@ struct __Params {
     std::string bagageDB = "";
     double poidsMain = 0.0;
     double poidsValise = 0.0;
+    double PayementExces = 0.0;
 };
 #endif //SERVEUR_STRUCTS_H

@@ -24,7 +24,7 @@ void EcrireMessageOutThread(const string &message) {
 void EcrireMessageErr(int couleur, const string &message) {
     ErrorLock(couleur, message);
     pthread_mutex_lock(&mutexLog);
-    log << "cerr> " << message << endl;
+    logStream << "cerr> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
@@ -37,7 +37,7 @@ void EcrireMessageOut(const string &message) {
     cout << message << endl;
     pthread_mutex_unlock(&mutexEcran);
     pthread_mutex_lock(&mutexLog);
-    log << "cout> " << message << endl;
+    logStream << "cout> " << message << endl;
     pthread_mutex_unlock(&mutexLog);
 }
 
@@ -142,6 +142,8 @@ void traitementConnexion(int *num) {
             EcrireMessageOutThread(s->toString() + " est connecté.");
             bool stop = false;
             bool log = false;
+            vector<string> ticket;
+            string bagages;
             while (!stop) {
                 try {
                     string message = "";
@@ -167,35 +169,46 @@ void traitementConnexion(int *num) {
                             break;
                         case LOGOUT:
                             log = false;
+                            ticket.clear();
+                            bagages.clear();
                             EcrireMessageOutThread(sMessage.message + " a terminé sa session.");
                             break;
                         case CHECK_TICKET:
                             if (log) {
                                 vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                s->Send(getMessage(ticketExist(vsplit) ? ACCEPT : REFUSE, string("")));
+                                Type reponse = ticketExist(vsplit) ? ACCEPT : REFUSE;
+                                s->Send(getMessage(reponse, string("")));
+                                if (reponse == ACCEPT)
+                                    ticket = vsplit;
                             }
                             break;
                         case ADD_LUGGAGE:
-                            if (log) {
-                                double poidsTot = 0.0, poidsExces = 0.0;
-                                //Le split doit être utilisé sur un index en base 2
-                                fstream bagages(Parametres.bagageDB, ios::app | ios::out);
-                                vsplit = split(sMessage.message, Parametres.TramesSeparator);
-                                bagages << vsplit[0] << " " << vsplit[1];
-                                for (int i = 2; i < (int)vsplit.size(); i += 2) {
-                                    Error(RED, string("Valeurs: ") + vsplit[i] + "|" + vsplit[i + 1]);
-                                    double max = (vsplit[i][0] == 'V' || vsplit[i][0] == 'v' ? Parametres.poidsValise
-                                                                                             : Parametres.poidsMain);
-                                    double poids = stod(vsplit[i + 1]);
-                                    poidsTot += poids;
-                                    poidsExces += (poids - max);
-                                    bagages << " " << vsplit[i] << " " << vsplit[i + 1];
-                                }
-                                if (poidsExces < 0)
-                                    poidsExces = 0;
-                                bagages.close();
+                            //Si un ticket est en utilisation
+                            if (log && ticket.size() > 0) {
+                                double poidsTot, poidsExces;
+                                addLuggage(ticket, sMessage, &poidsTot, &poidsExces);
+
+                                EcrireMessageOutThread("Poids total  : " + to_string(round(poidsTot * 100) / 100));
+                                EcrireMessageOutThread("Poids en trop: " + to_string(round(poidsExces * 100) / 100));
+                                EcrireMessageOutThread("Supplément à payer: " + to_string(
+                                        round(poidsExces * Parametres.PayementExces * 100) / 100));
+
                                 s->Send(getMessage(ADD_LUGGAGE, to_string(poidsTot) + Parametres.TramesSeparator +
-                                                                  to_string(poidsExces)));
+                                                                to_string(poidsExces) + Parametres.TramesSeparator +
+                                                                to_string(poidsExces * Parametres.PayementExces)));
+                                bagages = sMessage.message;
+                            } else if (ticket.size() == 0) {
+                                s->Send(getMessage(NO_SELECTED_TICKET, ""));
+                                bagages.clear();
+                                ticket.clear();
+                            }
+                            break;
+                        case PAYEMENT_DONE:
+                            //Si un ticket est en utilisation
+                            if (log && ticket.size() > 0) {
+                                payement(ticket, bagages);
+                                ticket.clear();
+                                bagages.clear();
                             }
                             break;
                             //Unique point de sortie d'un socket passif du serveur
@@ -221,23 +234,72 @@ void traitementConnexion(int *num) {
                 } catch (Exception e) {
                     EcrireMessageErrThread(e.getMessage());
                 }
+#ifdef Debug
+                ErrorLock(RED, "\tTicket utilisé: ");
+                if (ticket.size() >= 2) {
+                    ErrorLock(RED, "\t\tVol: " + ticket[0] + "\n\t\tNuméro de billet: " + ticket[1]);
+                } else {
+                    ErrorLock(RED, "\t\tAucun vol sélectionné");
+                }
+#endif
             }
         }
     pthread_cleanup_pop(0);
     ErrorLock(YELLOW, "Fin execution thread[" + to_string(*num) + "]");
 }
 
+void addLuggage(const vector<string> &ticket, const SMessage &sMessage, double *poidsTot, double *poidsExces) {
+    if (poidsTot == nullptr) throw Exception(EXCEPTION() + "poidsTot is null");
+    if (poidsExces == nullptr) throw Exception(EXCEPTION() + "poidsExces is null");
+    //Le split doit être utilisé sur un index en base 2
+    vector<string> vsplit = split(sMessage.message, Parametres.TramesSeparator);
+    for (int i = 0; i < (int) vsplit.size(); i += 2) {
+//        Error(RED, string("Valeurs: ") + vsplit[i] + "|" + vsplit[i + 1]);
+        double max = (vsplit[i][0] == 'V' || vsplit[i][0] == 'v' ? Parametres.poidsValise
+                                                                 : Parametres.poidsMain);
+        double poids = stod(vsplit[i + 1]);
+        *poidsTot += poids;
+        *poidsExces += (poids - max);
+        if (*poidsExces < 0)
+            *poidsExces = 0;
+    }
+}
+
+void payement(const vector<string> &ticket, const string &message) {
+    ErrorLock(RED, "payement");
+    time_t t = time(NULL);
+    struct tm *debut = localtime(&t);
+    string filename = "";
+    string varname = "";
+    varname += ticket[0] + "_" + ticket[1] + "_";
+    varname += to_string(debut->tm_mday) + to_string(1 + debut->tm_mon) + to_string(1970 + debut->tm_year);
+    filename += varname + ".csv";
+    varname += "_";
+    ofstream bagages(filename, ios::trunc);
+    vector<string> vsplit = split(message, Parametres.TramesSeparator);
+    int i, j;
+    for (i = 0, j = 0; i < (int) vsplit.size(); i += 2, j++) {
+//        Error(RED, string("Valeurs: ") + vsplit[i] + "|" + vsplit[i + 1]);
+        string numero = varname + (j < 100 ? ((j < 10) ? "00" + to_string(j) : "0" + to_string(j)) : to_string(j));
+        bagages << numero << Parametres.CSVSeparator
+                << (vsplit[i][0] == 'V' || vsplit[i][0] == 'v' ? "Valise" : "Bagage à main")
+                << Parametres.CSVSeparator << vsplit[i + 1] << endl;
+    }
+    bagages.close();
+    EcrireMessageOutThread(std::string("Fichier ") + filename + " crée");
+}
+
 void InitialisationLog() {
     time_t t = time(NULL);
     struct tm *debut = localtime(&t);
     for (int i = 0; i < 100; i++)
-        log << "=";
-    log << endl;
-    log << "Date de compilation: " << __DATE__ << endl;
-    log << put_time(debut, "Date d'execution: %d-%m-%Y %H-%M-%S") << endl;
+        logStream << "=";
+    logStream << endl;
+    logStream << "Date de compilation: " << __DATE__ << endl;
+    logStream << put_time(debut, "Date d'execution: %d-%m-%Y %H-%M-%S") << endl;
     for (int i = 0; i < 100; i++)
-        log << "-";
-    log << endl;
+        logStream << "-";
+    logStream << endl;
 }
 
 bool userExist(const string &user, const string &password) {

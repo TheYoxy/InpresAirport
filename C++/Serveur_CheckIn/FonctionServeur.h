@@ -6,6 +6,7 @@
 #include <fstream>
 #include <signal.h>
 #include <iomanip>
+#include <cmath>
 
 #define ErrorLock(couleur, message) pthread_mutex_lock(&mutexEcran);\
  Error(couleur,message);\
@@ -13,7 +14,7 @@
 
 extern int maxSocketNbr;
 extern int clients;
-extern std::ofstream log;
+extern std::ofstream logStream;
 extern SParametres Parametres;
 
 //Mutex externe bloquant le nombre de clients
@@ -41,6 +42,10 @@ extern pthread_key_t keySocketThread;
 extern SocketServeur *socketPrincipal;
 
 void HandlerSignal(int sig);
+
+void addLuggage(const std::vector<std::string> &ticket, const SMessage &sMessage, double *poidsTot, double *poidsExces);
+
+void payement(const std::vector<std::string> &ticket, const std::string &message);
 
 void InitialisationLog();
 
