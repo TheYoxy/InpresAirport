@@ -1,13 +1,19 @@
 package database.utilities;
 
+import Tools.FilesOperations;
+
 import java.sql.*;
 
 public class OracleDB {
 
-    public static Connection ConnexionOracle() throws SQLException {
+    public Connection con;
+    public Statement instruction;
+    public FilesOperations file = new FilesOperations("oracle");
+
+    public Connection ConnexionOracle() throws SQLException {
         String url = "jdbc:oracle:thin:@localhost:1521:xe";
-        String user = "floryan";
-        String passwd = "";
+        String user = file.getUsername();
+        String passwd = file.getPassword();
 
         System.out.println("-------- Oracle JDBC Connection Testing ------");
         try {

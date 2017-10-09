@@ -7,6 +7,7 @@
 import database.tables.*;
 import database.utilities.*;
 import java.util.*;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -161,9 +162,14 @@ public class test_jdbc extends javax.swing.JFrame {
     private void MysqlJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MysqlJMIActionPerformed
         try {
             mysqldConn = new MySQLDB();
+            if(mysqldConn != null)
+                JOptionPane.showMessageDialog(this,"Client connecté.","Mysql connection",JOptionPane.INFORMATION_MESSAGE);
+            else
+                JOptionPane.showMessageDialog(this,"Impossible de se connecter","Mysql connection error ",JOptionPane.ERROR_MESSAGE);
         }
-        catch(Exception e)
-        {}
+        catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Billets");
         listeTableComboBox.addItem("Vols");
@@ -174,11 +180,18 @@ public class test_jdbc extends javax.swing.JFrame {
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
         try {
             oracleConn = new OracleDB();
+            if(oracleConn != null)
+                JOptionPane.showMessageDialog(this,"Client connecté.","Oracle connection",JOptionPane.INFORMATION_MESSAGE);
+            else
+                JOptionPane.showMessageDialog(this,"Impossible de se connecter","Oracle connection error ",JOptionPane.ERROR_MESSAGE);
         }
-        catch(Exception e)
-        {
-
+        catch(Exception e) {
+            System.out.println(e.getMessage());
         }
+        requeteLabel.setText("Requete Oracle :");
+        listeTableComboBox.removeAllItems();
+        listeTableComboBox.addItem("Activités");
+        listeTableComboBox.addItem("Intervenants");
     }//GEN-LAST:event_OracleJMIActionPerformed
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed

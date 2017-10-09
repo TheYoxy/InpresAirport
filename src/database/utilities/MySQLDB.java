@@ -1,25 +1,23 @@
 package database.utilities;
 
 import database.tables.*;
+import Tools.FilesOperations;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class MySQLDB {
 
     public Connection con;
     public Statement instruction;
+    public FilesOperations file = new FilesOperations("mysql");
 
     public MySQLDB()throws SQLException {
-        /*String dbname = "";
-
-        Class sqldriver = Class.forName("com.mysql.jdbc.driver");
-        con = DriverManager.getConnection("jdbc:odbc:" + dbname, "", "");
-        instruction = con.createStatement();*/
 
         String url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
-        String user = "root";
-        String passwd = "@@lopi47";
+        String user = file.getUsername();
+        String passwd = file.getPassword();
         System.out.println("-------- Test de connection mysql ------");
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -56,7 +54,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return billets;
     }
@@ -72,7 +70,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return vols;
     }
@@ -88,7 +86,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return bagages;
     }
@@ -104,7 +102,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return agents;
     }
@@ -120,7 +118,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return billets;
     }
@@ -136,7 +134,7 @@ public class MySQLDB {
             }
         }
         catch(SQLException e) {
-            //exception due au resultset
+            System.out.println(e.getMessage());
         }
         return vols;
     }
