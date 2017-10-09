@@ -1,34 +1,83 @@
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import database.tables.*;
-import database.utilities.*;
 
-import java.sql.SQLException;
-import java.util.*;
+import database.tables.*;
+import database.utilities.MySQLDB;
+import database.utilities.OracleDB;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- *
  * @author Nicolas
  */
 public class test_jdbc extends javax.swing.JFrame {
 
-    public MySQLDB mysqldConn;
-    public OracleDB oracleConn;
-    public List<Billets> listebillets = new ArrayList();
-    public List<Vols> listevols = new ArrayList();
-    public List<Bagages> listebagages = new ArrayList();
-    public List<Agents> listeagents = new ArrayList();
+    private MySQLDB mysqldConn;
+    private OracleDB oracleConn;
+    private LinkedList<Activites> listeactivites = new LinkedList<>();
+    private LinkedList<Intervenant> listeIntervenants = new LinkedList<>();
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu AboutJM;
+    private javax.swing.JMenu ConnexionJM;
+    private javax.swing.JMenuItem MysqlJMI;
+    private javax.swing.JMenuItem OracleJMI;
+    private javax.swing.JButton afficherTableButton;
+    private javax.swing.JToggleButton envoiRqtButton;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> listeTableComboBox;
+    private javax.swing.JLabel requeteLabel;
+    private javax.swing.JTextField requeteTextField;
+    private javax.swing.JTable resultatJTable;
+    private javax.swing.JLabel tableLabel;
+
     /**
      * Creates new form test_jdbc
      */
     public test_jdbc() {
         initComponents();
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new test_jdbc().setVisible(true);
+            }
+        });
     }
 
     /**
@@ -69,15 +118,15 @@ public class test_jdbc extends javax.swing.JFrame {
         });
 
         resultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         jScrollPane1.setViewportView(resultatJTable);
 
@@ -90,7 +139,7 @@ public class test_jdbc extends javax.swing.JFrame {
 
         tableLabel.setText("Afficher table : ");
 
-        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
 
         ConnexionJM.setText("Connexion");
 
@@ -120,42 +169,42 @@ public class test_jdbc extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(requeteTextField)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(requeteLabel)
-                            .addComponent(envoiRqtButton)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(tableLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(afficherTableButton)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(requeteTextField)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(requeteLabel)
+                                                        .addComponent(envoiRqtButton)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(tableLabel)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(afficherTableButton)))
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(requeteLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(envoiRqtButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tableLabel)
-                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(afficherTableButton))
-                .addGap(60, 60, 60)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(requeteLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(envoiRqtButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tableLabel)
+                                        .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(afficherTableButton))
+                                .addGap(60, 60, 60)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -165,11 +214,10 @@ public class test_jdbc extends javax.swing.JFrame {
 
         try {
             mysqldConn = new MySQLDB();
-            JOptionPane.showMessageDialog(this,"Client connecté.","Mysql connection",JOptionPane.INFORMATION_MESSAGE);
-        }
-        catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(this,"Impossible de se connecter :"+e,"Mysql connection error ",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Mysql connection error ", JOptionPane.ERROR_MESSAGE);
         }
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Billets");
@@ -181,11 +229,10 @@ public class test_jdbc extends javax.swing.JFrame {
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
         try {
             oracleConn = new OracleDB();
-            JOptionPane.showMessageDialog(this,"Client connecté.","Oracle connection",JOptionPane.INFORMATION_MESSAGE);
-        }
-        catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(this,"Impossible de se connecter :"+e,"Oracle connection error ",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
         }
         requeteLabel.setText("Requete Oracle :");
         listeTableComboBox.removeAllItems();
@@ -198,104 +245,44 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
 
     private void afficherTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_afficherTableButtonActionPerformed
-
-        if("Billets".equals(listeTableComboBox.getSelectedItem().toString()) )
-        {
-            listebillets = mysqldConn.get_Billets();
-            DefaultTableModel model = new DefaultTableModel();
-            resultatJTable.setModel(model);
-            model.setColumnIdentifiers(new String[] {"numero billet", "numero vol"});
-            // Populate the JTable (TableModel) with data from ArrayList
-            listebillets.forEach((b) -> {
-                model.addRow(new String[] {b.getNumBillet() , b.getNumVol() });
-            });
+        final DefaultTableModel model = new DefaultTableModel();
+        switch (listeTableComboBox.getSelectedItem().toString()) {
+            case "Billets":
+                List<Billets> listebillets = mysqldConn.get_Billets();
+                model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                break;
+            case "Vols":
+                List<Vols> listevols = mysqldConn.get_Vols();
+                resultatJTable.setModel(model);
+                model.setColumnIdentifiers(new String[]{"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
+                listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivée(), v.getHeureDépart(), v.getHeureArrivéeDestination(), v.getAvionUtilisé()}));
+                break;
+            case "Bagages":
+                List<Bagages> listebagages = mysqldConn.get_Bagages();
+                model.setColumnIdentifiers(new String[]{"numero bagage", "poids", "valise"});
+                listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
+                break;
+            case "Agents":
+                List<Agents> listeagents = mysqldConn.get_Agents();
+                model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                break;
+            case "Activités":
+                List<Activites> listA = oracleConn.get_Activites();
+                model.setColumnIdentifiers(new String[]{"Cours", "Type", "Date", "Description", "Reference"});
+                listA.forEach((a) -> model.addRow(new String[]{a.get_cours(), a.get_type(), a.get_date(), a.get_description(), a.get_reference()}));
+                break;
+            case "Intervenants":
+                List<Intervenant> listI = oracleConn.get_Intervenant();
+                model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Status"});
+                listI.forEach((a) -> model.addRow(new String[]{a.get_nom(), a.get_prenom(), a.get_statut()}));
+                break;
+            default:
+                System.err.println(listeTableComboBox.getSelectedItem().toString() + " inconnu");
+                break;
         }
-        
-        if("Vols".equals(listeTableComboBox.getSelectedItem().toString()) )
-        {
-            listevols = mysqldConn.get_Vols();
-            DefaultTableModel model = new DefaultTableModel();
-            resultatJTable.setModel(model);
-            model.setColumnIdentifiers(new String[] {"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
-            // Populate the JTable (TableModel) with data from ArrayList
-            listevols.forEach((v) -> {
-                model.addRow(new String[] {v.getNumVol() , v.getDestination(), v.getHeureArrivée(), v.getHeureDépart(), v.getHeureArrivéeDestination(), v.getAvionUtilisé() });
-            });
-        }
-        
-        if("Bagages".equals(listeTableComboBox.getSelectedItem().toString()) )
-        {
-            listebagages = mysqldConn.get_Bagages();
-            DefaultTableModel model = new DefaultTableModel();
-            resultatJTable.setModel(model);
-            model.setColumnIdentifiers(new String[] {"numero bagage", "poids", "valise"});
-            // Populate the JTable (TableModel) with data from ArrayList
-            listebagages.forEach((b) -> {
-                model.addRow(new String[] {b.getNumBagage() , b.getPoids().toString(), b.isValise() });
-            });
-        }
-                
-        if("Agents".equals(listeTableComboBox.getSelectedItem().toString()) )
-        {
-            listeagents = mysqldConn.get_Agents();
-            DefaultTableModel model = new DefaultTableModel();
-            resultatJTable.setModel(model);
-            model.setColumnIdentifiers(new String[] {"nom", "prenom", "poste"});
-            // Populate the JTable (TableModel) with data from ArrayList
-            listeagents.forEach((a) -> {
-                model.addRow(new String[] {a.getNom(), a.getPrenom(), a.getPoste() });
-            });
-        }
+        resultatJTable.setModel(model);
     }//GEN-LAST:event_afficherTableButtonActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new test_jdbc().setVisible(true);
-            }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu AboutJM;
-    private javax.swing.JMenu ConnexionJM;
-    private javax.swing.JMenuItem MysqlJMI;
-    private javax.swing.JMenuItem OracleJMI;
-    private javax.swing.JButton afficherTableButton;
-    private javax.swing.JToggleButton envoiRqtButton;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> listeTableComboBox;
-    private javax.swing.JLabel requeteLabel;
-    private javax.swing.JTextField requeteTextField;
-    private javax.swing.JTable resultatJTable;
-    private javax.swing.JLabel tableLabel;
     // End of variables declaration//GEN-END:variables
 }
