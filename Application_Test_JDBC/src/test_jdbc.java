@@ -18,8 +18,8 @@ import java.util.LinkedList;
  */
 public class test_jdbc extends javax.swing.JFrame {
 
-    private MySQLDB mysqldConn;
-    private OracleDB oracleConn;
+    private MySQLDB MySQLBd;
+    private OracleDB OracleBd;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu AboutJM;
     private javax.swing.JMenu ConnexionJM;
@@ -40,6 +40,13 @@ public class test_jdbc extends javax.swing.JFrame {
      */
     public test_jdbc() {
         initComponents();
+        requeteTextField.setText("");
+        listeTableComboBox.setEnabled(false);
+        afficherTableButton.setEnabled(false);
+        requeteTextField.setEnabled(false);
+        envoiRqtButton.setEnabled(false);
+        resultatJTable.setEnabled(false);
+        resultatJTable.setModel(new DefaultTableModel());
     }
 
     /**
@@ -200,12 +207,29 @@ public class test_jdbc extends javax.swing.JFrame {
     private void MysqlJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MysqlJMIActionPerformed
 
         try {
-            mysqldConn = new MySQLDB();
-            JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
+            MySQLBd = new MySQLDB();
         } catch (SQLException e) {
+            MySQLBd = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Mysql connection error ", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        mysql = true;
+        JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
+
+        if (!listeTableComboBox.isEnabled())
+            listeTableComboBox.setEnabled(true);
+        if (!afficherTableButton.isEnabled())
+            afficherTableButton.setEnabled(true);
+        if (!requeteTextField.isEnabled())
+            requeteTextField.setEnabled(true);
+        if (!envoiRqtButton.isEnabled())
+            envoiRqtButton.setEnabled(true);
+        if (!resultatJTable.isEnabled())
+            resultatJTable.setEnabled(true);
+
+        requeteLabel.setText("Requete Mysql:");
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Billets");
         listeTableComboBox.addItem("Vols");
@@ -215,12 +239,27 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
         try {
-            oracleConn = new OracleDB();
-            JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
+            OracleBd = new OracleDB();
         } catch (Exception e) {
+            OracleBd = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e.getMessage(), "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+        oracle = true;
+        JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
+
+        if (!listeTableComboBox.isEnabled())
+            listeTableComboBox.setEnabled(true);
+        if (!afficherTableButton.isEnabled())
+            afficherTableButton.setEnabled(true);
+        if (!requeteTextField.isEnabled())
+            requeteTextField.setEnabled(true);
+        if (!envoiRqtButton.isEnabled())
+            envoiRqtButton.setEnabled(true);
+        if (!resultatJTable.isEnabled())
+            resultatJTable.setEnabled(true);
+
         requeteLabel.setText("Requete Oracle :");
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Activités");
@@ -233,37 +272,42 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
 
     private void afficherTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_afficherTableButtonActionPerformed
-        final DefaultTableModel model = new DefaultTableModel();
+        final DefaultTableModel model = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         if (listeTableComboBox.getSelectedItem() != null)
             switch (listeTableComboBox.getSelectedItem().toString()) {
                 case "Billets":
-                    LinkedList<Billets> listebillets = mysqldConn.get_Billets();
+                    LinkedList<Billets> listebillets = MySQLBd.get_Billets();
                     model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
                     listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
                     break;
                 case "Vols":
-                    LinkedList<Vols> listevols = mysqldConn.get_Vols();
+                    LinkedList<Vols> listevols = MySQLBd.get_Vols();
                     resultatJTable.setModel(model);
                     model.setColumnIdentifiers(new String[]{"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
                     listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivee(), v.getHeureDepart(), v.getHeureArriveeDestination(), v.getAvionUtilise()}));
                     break;
                 case "Bagages":
-                    LinkedList<Bagages> listebagages = mysqldConn.get_Bagages();
+                    LinkedList<Bagages> listebagages = MySQLBd.get_Bagages();
                     model.setColumnIdentifiers(new String[]{"numero bagage", "poids", "valise"});
                     listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
                     break;
                 case "Agents":
-                    LinkedList<Agents> listeagents = mysqldConn.get_Agents();
+                    LinkedList<Agents> listeagents = MySQLBd.get_Agents();
                     model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
                     listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
                     break;
                 case "Activités":
-                    LinkedList<Activites> listA = oracleConn.get_Activites();
+                    LinkedList<Activites> listA = OracleBd.get_Activites();
                     model.setColumnIdentifiers(new String[]{"Cours", "Type", "Date", "Description", "Reference"});
                     listA.forEach((a) -> model.addRow(new String[]{a.getCours(), a.getType(), a.getDate(), a.getDescription(), a.getReference()}));
                     break;
                 case "Intervenants":
-                    LinkedList<Intervenant> listI = oracleConn.get_Intervenant();
+                    LinkedList<Intervenant> listI = OracleBd.get_Intervenant();
                     model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Status"});
                     listI.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getStatus()}));
                     break;
