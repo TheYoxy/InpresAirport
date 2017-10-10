@@ -1,29 +1,38 @@
-create table Billets (
-	numBillet VARCHAR(40) NOT NULL,
-	numVol VARCHAR(10) NOT NULL,
-	PRIMARY KEY (numBillet)
-);
+CREATE TABLE Avion (
+  id     INT AUTO_INCREMENT PRIMARY KEY,
+  modele VARCHAR(100),
+  vol    BOOLEAN
+)
+  ENGINE = INNODB;
 
-create table Vols (
-	numVol VARCHAR(15) NOT NULL,
-	destination VARCHAR(30),
-	heureArrivee datetime,
-	heureDepart datetime NOT NULL,
-	heureArriveeDest datetime NOT NULL,
-	modeleAvion VARCHAR(20),
-	PRIMARY KEY (numVol)
-);
+CREATE TABLE Bagages (
+  numBagage VARCHAR(15) PRIMARY KEY,
+  poids     FLOAT,
+  valise    BOOLEAN,
+  numBillet VARCHAR(40) REFERENCES Billets (numBillet)
+)
+  ENGINE = INNODB;
 
-create table Bagages (
-	numBagage VARCHAR(15) NOT NULL,
-	poids float,
-	valise boolean,
-	PRIMARY KEY (numBagage)
-);
+CREATE TABLE Vols (
+  numVol           VARCHAR(15) PRIMARY KEY,
+  destination      VARCHAR(30),
+  heureArrivee     DATETIME,
+  heureDepart      DATETIME NOT NULL,
+  heureArriveeDest DATETIME NOT NULL,
+  idAvion          INT REFERENCES Avion (id)
+)
+  ENGINE = INNODB;
 
-create table Agents (
-	nom VARCHAR(25) NOT NULL,
-	prenom VARCHAR(25) NOT NULL,
-	poste VARCHAR(25) NOT NULL,
-	PRIMARY KEY (nom, prenom)
-);
+CREATE TABLE Billets (
+  numBillet VARCHAR(40) PRIMARY KEY,
+  numVol    VARCHAR(10) NOT NULL REFERENCES Vols (numVol)
+)
+  ENGINE = INNODB;
+
+CREATE TABLE Agents (
+  nom    VARCHAR(25) NOT NULL,
+  prenom VARCHAR(25) NOT NULL,
+  poste  VARCHAR(25) NOT NULL,
+  PRIMARY KEY (nom, prenom)
+)
+  ENGINE = INNODB;
