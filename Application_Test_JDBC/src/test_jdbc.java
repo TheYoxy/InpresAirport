@@ -248,7 +248,7 @@ public class test_jdbc extends javax.swing.JFrame {
                 mysqldConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
-            MySQLBd = null;
+            mysqldConn = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Mysql connection error ", JOptionPane.ERROR_MESSAGE);
             return;
@@ -292,7 +292,7 @@ public class test_jdbc extends javax.swing.JFrame {
                 oracleConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            OracleBd = null;
+            oracleConn = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e.getMessage(), "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
             return;
@@ -372,13 +372,13 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_afficherTableButtonActionPerformed
 
     private void ajouterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajouterButtonActionPerformed
-        if(listeTable2ComboBox.getSelectedItem().toString() == "Agents")
-        {
-            if(vueAgent == null)
-                vueAgent = new ajoutAgent(mysqldConn);
-            else
-                vueAgent.setVisible(true);
-        }
+        if (listeTable2ComboBox.getSelectedItem() != null)
+            if (listeTable2ComboBox.getSelectedItem().toString().equals("Agents")) {
+                if (vueAgent == null)
+                    vueAgent = new ajoutAgent(mysqldConn);
+                else
+                    vueAgent.setVisible(true);
+            }
     }//GEN-LAST:event_ajouterButtonActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
