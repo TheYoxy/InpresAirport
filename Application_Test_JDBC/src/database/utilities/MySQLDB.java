@@ -76,7 +76,7 @@ public class MySQLDB {
         return billets;
     }
 
-    public LinkedList<Billets> get_AnyBillets(String requete) {
+    public LinkedList<Billets> get_AnyBillets(String requete) throws SQLException{
         LinkedList<Billets> billets = new LinkedList<>();
         try {
             ResultSet res = instruction.executeQuery(requete);
@@ -85,11 +85,12 @@ public class MySQLDB {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            throw e;
         }
         return billets;
     }
 
-    public LinkedList<Agents> get_AnyAgents(String requete) {
+    public LinkedList<Agents> get_AnyAgents(String requete) throws SQLException{
         LinkedList<Agents> agents = new LinkedList<>();
         try {
             ResultSet res = instruction.executeQuery(requete);
@@ -98,6 +99,7 @@ public class MySQLDB {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            throw e;
         }
         return agents;
     }

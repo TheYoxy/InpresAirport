@@ -274,14 +274,26 @@ public class test_jdbc extends javax.swing.JFrame {
         if (listeTableComboBox.getSelectedItem() != null)
             switch (listeTableComboBox.getSelectedItem().toString()) {
                 case "Billets":
-                    LinkedList<Billets> listebillets = mysqldConn.get_AnyBillets(requeteTextField.getText());
-                    model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
-                    listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                    LinkedList<Billets> listebillets = null;
+                    try {
+                        listebillets = mysqldConn.get_AnyBillets(requeteTextField.getText());
+                        model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                        listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Erreur :" + e.getMessage(), "Mysql error ", JOptionPane.ERROR_MESSAGE);
+                    }
                     break;
                 case "Agents":
-                    LinkedList<Agents> listeagents = mysqldConn.get_AnyAgents(requeteTextField.getText());
-                    model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
-                    listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    LinkedList<Agents> listeagents = null;
+                    try {
+                        listeagents = mysqldConn.get_AnyAgents(requeteTextField.getText());
+                        model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                        listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Erreur :" + e.getMessage(), "Mysql error ", JOptionPane.ERROR_MESSAGE);
+                    }
                     break;
             }
         resultatJTable.setModel(model);
