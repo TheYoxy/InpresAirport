@@ -6,10 +6,7 @@ import java.util.Properties;
 
 public class FilesOperations {
 
-    /**
-     *
-     */
-    public final static String PROPERTIES = "C:\\Users\\Nicolas\\IdeaProjects\\InpresAirport\\Application_Test_JDBC\\config.properties";
+    public final static String PROPERTIES = "config.properties";
 
     private static Properties properties;
 
