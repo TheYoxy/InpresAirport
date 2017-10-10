@@ -14,6 +14,10 @@ public class OracleDB {
     private Connection con;
     private Statement instruction;
 
+    private String url ="";
+    private String user ="";
+    private String passwd ="";
+
     public OracleDB() throws SQLException {
 
         FilesOperations.load_Properties("oracle");
@@ -35,6 +39,24 @@ public class OracleDB {
             throw e;
         }
         instruction = con.createStatement();
+    }
+
+    public void Connect() throws SQLException{
+        try {
+            con = DriverManager.getConnection(url, user, passwd);
+        } catch (SQLException e) {
+            System.out.println("Impossible d'établir la connexion!");
+            throw e;
+        }
+        instruction = con.createStatement();
+    }
+
+    public void Close(){
+        try {
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public ResultSet executeQuery(String query) throws SQLException {

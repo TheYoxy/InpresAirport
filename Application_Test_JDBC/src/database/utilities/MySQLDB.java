@@ -14,12 +14,16 @@ public class MySQLDB {
     private Connection con;
     private Statement instruction;
 
+    private String url ="";
+    private String user ="";
+    private String passwd ="";
+
     public MySQLDB() throws SQLException {
 
         FilesOperations.load_Properties("mysql");
-        String url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
-        String user = FilesOperations.getUsername();
-        String passwd = FilesOperations.getPassword();
+        url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
+        user = FilesOperations.getUsername();
+        passwd = FilesOperations.getPassword();
         System.out.println("-------- Test de connection mysql ------");
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -35,6 +39,24 @@ public class MySQLDB {
         }
         System.out.println("----------------------------------------------");
         instruction = con.createStatement();
+    }
+
+    public void Connect() throws SQLException{
+        try {
+            con = DriverManager.getConnection(url, user, passwd);
+        } catch (SQLException e) {
+            System.out.println("Impossible d'établir la connexion!");
+            throw e;
+        }
+        instruction = con.createStatement();
+    }
+
+    public void Close(){
+        try {
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public ResultSet executeQuery(String query) throws SQLException {
@@ -91,6 +113,26 @@ public class MySQLDB {
             System.out.println(e.getMessage());
         }
         return agents;
+    }
+
+    public void add_Agent(Agents agent) {
+        try {
+            String query = " insert into Agents (nom, prenom, poste)"
+                    + " values ('"+agent.getNom()+"','" + agent.getPrenom() + "','" + agent.getPoste()+ "')";
+            instruction.executeUpdate(query);
+        }catch(SQLException e){
+            System.out.println();
+        }
+    }
+
+    public void update_Agent(Agents agent) throws SQLException{
+        try{
+            String query = "update Agents set poste ='"+ agent.getPoste() + "' where prenom ='"+agent.getPrenom()+"' and nom ='"+agent.getNom()+"'";
+            instruction.executeUpdate(query);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+            throw e;
+        }
     }
 
 }
