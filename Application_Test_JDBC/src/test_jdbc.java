@@ -12,7 +12,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Nicolas
@@ -21,8 +20,6 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private MySQLDB mysqldConn;
     private OracleDB oracleConn;
-    private LinkedList<Activites> listeactivites = new LinkedList<>();
-    private LinkedList<Intervenant> listeIntervenants = new LinkedList<>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu AboutJM;
     private javax.swing.JMenu ConnexionJM;
@@ -61,23 +58,13 @@ public class test_jdbc extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(test_jdbc.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new test_jdbc().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new test_jdbc().setVisible(true));
     }
 
     /**
@@ -232,7 +219,7 @@ public class test_jdbc extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e.getMessage(), "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
         }
         requeteLabel.setText("Requete Oracle :");
         listeTableComboBox.removeAllItems();
@@ -241,47 +228,51 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_OracleJMIActionPerformed
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
-        // TODO add your handling code here:
+
+
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
 
     private void afficherTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_afficherTableButtonActionPerformed
         final DefaultTableModel model = new DefaultTableModel();
-        switch (listeTableComboBox.getSelectedItem().toString()) {
-            case "Billets":
-                List<Billets> listebillets = mysqldConn.get_Billets();
-                model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
-                listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
-                break;
-            case "Vols":
-                List<Vols> listevols = mysqldConn.get_Vols();
-                resultatJTable.setModel(model);
-                model.setColumnIdentifiers(new String[]{"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
-                listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivée(), v.getHeureDépart(), v.getHeureArrivéeDestination(), v.getAvionUtilisé()}));
-                break;
-            case "Bagages":
-                List<Bagages> listebagages = mysqldConn.get_Bagages();
-                model.setColumnIdentifiers(new String[]{"numero bagage", "poids", "valise"});
-                listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
-                break;
-            case "Agents":
-                List<Agents> listeagents = mysqldConn.get_Agents();
-                model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
-                listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
-                break;
-            case "Activités":
-                List<Activites> listA = oracleConn.get_Activites();
-                model.setColumnIdentifiers(new String[]{"Cours", "Type", "Date", "Description", "Reference"});
-                listA.forEach((a) -> model.addRow(new String[]{a.get_cours(), a.get_type(), a.get_date(), a.get_description(), a.get_reference()}));
-                break;
-            case "Intervenants":
-                List<Intervenant> listI = oracleConn.get_Intervenant();
-                model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Status"});
-                listI.forEach((a) -> model.addRow(new String[]{a.get_nom(), a.get_prenom(), a.get_statut()}));
-                break;
-            default:
-                System.err.println(listeTableComboBox.getSelectedItem().toString() + " inconnu");
-                break;
-        }
+        if (listeTableComboBox.getSelectedItem() != null)
+            switch (listeTableComboBox.getSelectedItem().toString()) {
+                case "Billets":
+                    LinkedList<Billets> listebillets = mysqldConn.get_Billets();
+                    model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                    listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                    break;
+                case "Vols":
+                    LinkedList<Vols> listevols = mysqldConn.get_Vols();
+                    resultatJTable.setModel(model);
+                    model.setColumnIdentifiers(new String[]{"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
+                    listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivee(), v.getHeureDepart(), v.getHeureArriveeDestination(), v.getAvionUtilise()}));
+                    break;
+                case "Bagages":
+                    LinkedList<Bagages> listebagages = mysqldConn.get_Bagages();
+                    model.setColumnIdentifiers(new String[]{"numero bagage", "poids", "valise"});
+                    listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
+                    break;
+                case "Agents":
+                    LinkedList<Agents> listeagents = mysqldConn.get_Agents();
+                    model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                    listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    break;
+                case "Activités":
+                    LinkedList<Activites> listA = oracleConn.get_Activites();
+                    model.setColumnIdentifiers(new String[]{"Cours", "Type", "Date", "Description", "Reference"});
+                    listA.forEach((a) -> model.addRow(new String[]{a.getCours(), a.getType(), a.getDate(), a.getDescription(), a.getReference()}));
+                    break;
+                case "Intervenants":
+                    LinkedList<Intervenant> listI = oracleConn.get_Intervenant();
+                    model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Status"});
+                    listI.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getStatus()}));
+                    break;
+                default:
+                    System.err.println(listeTableComboBox.getSelectedItem().toString() + " inconnu");
+                    break;
+            }
+        else
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un élément", "Selection error", JOptionPane.ERROR_MESSAGE);
         resultatJTable.setModel(model);
     }//GEN-LAST:event_afficherTableButtonActionPerformed
     // End of variables declaration//GEN-END:variables

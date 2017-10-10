@@ -7,21 +7,19 @@ import database.tables.Intervenant;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 public class OracleDB {
 
     public Connection con;
     public Statement instruction;
-    public FilesOperations file = new FilesOperations();
 
     public OracleDB() throws SQLException {
 
-        file.load_Properties("oracle");
+        FilesOperations.load_Properties("oracle");
         String url = "jdbc:oracle:thin:@//localhost:1521/orcl";
-        String user = file.getUsername();
-        String passwd = file.getPassword();
+        String user = FilesOperations.getUsername();
+        String passwd = FilesOperations.getPassword();
 
         System.out.println("-------- Test de connexion Oracle ------");
         try {
@@ -29,19 +27,24 @@ public class OracleDB {
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
-        System.out.println("Oracle JDBC Driver Registered!");
+        System.out.println("Oracle JDBC Driver instancié");
         try {
             con = DriverManager.getConnection(url, user, passwd);
         } catch (SQLException e) {
+            System.out.println("Impossible d'établir la connexion");
             throw e;
         }
         instruction = con.createStatement();
     }
 
-    public List<Activites> get_Activites() {
-        List<Activites> activites = new ArrayList();
+    public ResultSet executeQuery(String query) throws SQLException {
+        return con.isClosed() ? null : instruction.executeQuery(query);
+    }
+
+    public LinkedList<Activites> get_Activites() {
+        LinkedList<Activites> activites = new LinkedList<>();
         try {
-            ResultSet res = instruction.executeQuery("select * from activites");
+            ResultSet res = instruction.executeQuery("SELECT * FROM activites");
             while (res.next()) {
                 DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
                 String str = df.format(res.getDate("DATEP"));
@@ -53,10 +56,10 @@ public class OracleDB {
         return activites;
     }
 
-    public List<Intervenant> get_Intervenant() {
-        List<Intervenant> intervenant = new ArrayList<>();
+    public LinkedList<Intervenant> get_Intervenant() {
+        LinkedList<Intervenant> intervenant = new LinkedList<>();
         try {
-            ResultSet res = instruction.executeQuery("select * from intervenant");
+            ResultSet res = instruction.executeQuery("SELECT * FROM intervenant");
             while (res.next()) {
                 intervenant.add(new Intervenant(res.getString(1), res.getString(2), res.getString(3)));
             }

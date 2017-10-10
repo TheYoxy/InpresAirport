@@ -2,36 +2,44 @@ package database.tables;
 
 public class Activites {
 
-        private String _cours;
-        private String _type;
-        private String _date;
-        private String _description;
-        private String _reference;
+    private String Cours;
+    private String Type;
+    private String Date;
+    private String Description;
+    private String Reference;
 
-        public Activites(){
-            _cours = "";
-            _type = "";
-            _date = "";
-        }
+    public Activites() {
+        Cours = "";
+        Type = "";
+        Date = "";
+    }
 
-        public Activites(String cours, String type, String date, String desc, String ref) {
-            _cours = cours;
-            _type = type;
-            _date = date;
-            _description = desc;
-            _reference = ref;
-        }
+    public Activites(String cours, String type, String date, String desc, String ref) {
+        Cours = cours;
+        Type = type;
+        Date = date;
+        Description = desc;
+        Reference = ref;
+    }
 
-        public String get_cours() {
-            return _cours;
-        }
+    public String getCours() {
+        return Cours;
+    }
 
-        public String get_type() { return _type; }
+    public String getType() {
+        return Type;
+    }
 
-        public String get_date() { return _date; }
+    public String getDate() {
+        return Date;
+    }
 
-        public String get_description() { return _description; }
+    public String getDescription() {
+        return Description;
+    }
 
-        public String get_reference() { return _reference; }
+    public String getReference() {
+        return Reference;
+    }
 }
 

@@ -5,7 +5,7 @@ public class Billets {
     private String NumBillet;
     private String NumVol;
 
-    public Billets(){
+    public Billets() {
         this.NumBillet = "";
         this.NumVol = "";
     }

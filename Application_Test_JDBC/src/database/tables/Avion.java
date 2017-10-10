@@ -2,7 +2,7 @@ package database.tables;
 
 public class Avion {
     private String Modele;
-    private boolean vol;
+    private boolean Vol;
 
     public String getModele() {
         return Modele;
@@ -13,9 +13,10 @@ public class Avion {
     }
 
     public boolean isVol() {
-        return vol;
+        return Vol;
     }
+
     public void setVol(boolean vol) {
-        this.vol = vol;
+        this.Vol = vol;
     }
 }

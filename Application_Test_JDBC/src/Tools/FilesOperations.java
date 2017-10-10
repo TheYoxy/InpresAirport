@@ -1,8 +1,8 @@
 package Tools;
 
-import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 public class FilesOperations {
 
@@ -13,17 +13,14 @@ public class FilesOperations {
 
     private static Properties properties;
 
-    private String _dbtype;
+    private static String DbType;
 
-    public FilesOperations(){
-
-    }
-    public void load_Properties(String dbtype){
+    public static void load_Properties(String dbtype) {
 
         properties = new Properties();
 
-        if(dbtype.equalsIgnoreCase("mysql") || dbtype.equalsIgnoreCase("oracle"))
-            _dbtype = dbtype;
+        if (dbtype.equalsIgnoreCase("mysql") || dbtype.equalsIgnoreCase("oracle"))
+            DbType = dbtype;
 
         try {
             properties.load(new FileInputStream(PROPERTIES));
@@ -33,15 +30,15 @@ public class FilesOperations {
         }
     }
 
-    public String getUsername(){
-        if(_dbtype.equalsIgnoreCase("mysql"))
+    public static String getUsername() {
+        if (DbType.equalsIgnoreCase("mysql"))
             return properties.getProperty("usernameSQL");
         else
             return properties.getProperty("usernameOracle");
     }
 
-    public String getPassword(){
-        if(_dbtype.equalsIgnoreCase("mysql"))
+    public static String getPassword() {
+        if (DbType.equalsIgnoreCase("mysql"))
             return properties.getProperty("passwordSQL");
         else
             return properties.getProperty("passwordOracle");

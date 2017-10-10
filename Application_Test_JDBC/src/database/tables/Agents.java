@@ -6,7 +6,7 @@ public class Agents {
     private String Prenom;
     private String Poste;
 
-    public Agents(){
+    public Agents() {
         this.Nom = "";
         this.Prenom = "";
         this.Poste = "";
@@ -22,7 +22,11 @@ public class Agents {
         return this.Nom;
     }
 
-    public String getPrenom() { return this.Prenom; }
+    public String getPrenom() {
+        return this.Prenom;
+    }
 
-    public String getPoste() { return this.Poste; }
+    public String getPoste() {
+        return this.Poste;
+    }
 }

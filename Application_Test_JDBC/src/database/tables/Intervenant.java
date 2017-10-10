@@ -1,27 +1,31 @@
 package database.tables;
 
 public class Intervenant {
-    private String _nom;
-    private String _prenom;
-    private String _statut;
+    private String Nom;
+    private String Prenom;
+    private String Status;
 
-    public Intervenant(){
-        _nom = "";
-        _prenom = "";
-        _statut = "";
+    public Intervenant() {
+        Nom = "";
+        Prenom = "";
+        Status = "";
     }
 
     public Intervenant(String nom, String prenom, String statut) {
-        _nom = nom;
-        _prenom = prenom;
-        _statut = statut;
+        Nom = nom;
+        Prenom = prenom;
+        Status = statut;
     }
 
-    public String get_nom() {
-        return _nom;
+    public String getNom() {
+        return Nom;
     }
 
-    public String get_prenom() { return _prenom; }
+    public String getPrenom() {
+        return Prenom;
+    }
 
-    public String get_statut() { return _statut; }
+    public String getStatus() {
+        return Status;
+    }
 }
