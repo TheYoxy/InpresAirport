@@ -18,7 +18,7 @@ public class MySQLDB {
     public MySQLDB() throws SQLException {
 
         FilesOperations.load_Properties("mysql");
-        url = "jdbc:mysql://192.168.1.17/bd_airport?useSSL=false";
+        url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
         user = FilesOperations.getUsername();
         passwd = FilesOperations.getPassword();
         System.out.println("-------- Test de connection mysql ------");
