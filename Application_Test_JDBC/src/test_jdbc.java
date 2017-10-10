@@ -20,33 +20,12 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private MySQLDB MySQLBd;
     private OracleDB OracleBd;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu AboutJM;
-    private javax.swing.JMenu ConnexionJM;
-    private javax.swing.JMenuItem MysqlJMI;
-    private javax.swing.JMenuItem OracleJMI;
-    private javax.swing.JButton afficherTableButton;
-    private javax.swing.JToggleButton envoiRqtButton;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> listeTableComboBox;
-    private javax.swing.JLabel requeteLabel;
-    private javax.swing.JTextField requeteTextField;
-    private javax.swing.JTable resultatJTable;
-    private javax.swing.JLabel tableLabel;
 
     /**
      * Creates new form test_jdbc
      */
     public test_jdbc() {
         initComponents();
-        requeteTextField.setText("");
-        listeTableComboBox.setEnabled(false);
-        afficherTableButton.setEnabled(false);
-        requeteTextField.setEnabled(false);
-        envoiRqtButton.setEnabled(false);
-        resultatJTable.setEnabled(false);
-        resultatJTable.setModel(new DefaultTableModel());
     }
 
     /**
@@ -73,6 +52,22 @@ public class test_jdbc extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new test_jdbc().setVisible(true));
     }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu AboutJM;
+    private javax.swing.JMenu ConnexionJM;
+    private javax.swing.JMenuItem MysqlJMI;
+    private javax.swing.JMenuItem OracleJMI;
+    private javax.swing.JButton afficherTableButton;
+    private javax.swing.JToggleButton envoiRqtButton;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> listeTableComboBox;
+    private javax.swing.JLabel requeteLabel;
+    private javax.swing.JTextField requeteTextField;
+    private javax.swing.JTable resultatJTable;
+    private javax.swing.JLabel tableLabel;
+    // End of variables declaration//GEN-END:variables
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -132,8 +127,6 @@ public class test_jdbc extends javax.swing.JFrame {
         });
 
         tableLabel.setText("Afficher table : ");
-
-        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
 
         ConnexionJM.setText("Connexion");
 
@@ -215,7 +208,6 @@ public class test_jdbc extends javax.swing.JFrame {
             return;
         }
 
-        mysql = true;
         JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
 
         if (!listeTableComboBox.isEnabled())
@@ -246,7 +238,6 @@ public class test_jdbc extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e.getMessage(), "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        oracle = true;
         JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
 
         if (!listeTableComboBox.isEnabled())
@@ -319,5 +310,4 @@ public class test_jdbc extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un élément", "Selection error", JOptionPane.ERROR_MESSAGE);
         resultatJTable.setModel(model);
     }//GEN-LAST:event_afficherTableButtonActionPerformed
-    // End of variables declaration//GEN-END:variables
 }
