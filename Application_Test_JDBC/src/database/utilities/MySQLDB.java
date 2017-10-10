@@ -76,6 +76,34 @@ public class MySQLDB {
         return billets;
     }
 
+    public LinkedList<Billets> get_AnyBillets(String requete) throws SQLException{
+        LinkedList<Billets> billets = new LinkedList<>();
+        try {
+            ResultSet res = instruction.executeQuery(requete);
+            while (res.next()) {
+                billets.add(new Billets(res.getString("numBillet"), res.getString("numVol")));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+        return billets;
+    }
+
+    public LinkedList<Agents> get_AnyAgents(String requete) throws SQLException{
+        LinkedList<Agents> agents = new LinkedList<>();
+        try {
+            ResultSet res = instruction.executeQuery(requete);
+            while (res.next()) {
+                agents.add(new Agents(res.getString(1), res.getString(2), res.getString(3)));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw e;
+        }
+        return agents;
+    }
+
     public LinkedList<Vols> get_Vols() {
         LinkedList<Vols> vols = new LinkedList<>();
         try {

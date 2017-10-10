@@ -10,6 +10,7 @@ import database.utilities.OracleDB;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -74,8 +75,6 @@ public class test_jdbc extends javax.swing.JFrame {
         tableLabel = new javax.swing.JLabel();
         listeTableComboBox = new javax.swing.JComboBox<>();
         updateButton = new javax.swing.JButton();
-        addElmntLabel = new javax.swing.JLabel();
-        listeTable2ComboBox = new javax.swing.JComboBox<>();
         ajouterButton = new javax.swing.JButton();
         modifLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -123,7 +122,7 @@ public class test_jdbc extends javax.swing.JFrame {
             }
         });
 
-        tableLabel.setText("Afficher table : ");
+        tableLabel.setText("Selectionnez la table sur laquelle vous voulez travailler :");
 
         listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
 
@@ -134,16 +133,14 @@ public class test_jdbc extends javax.swing.JFrame {
             }
         });
 
-        addElmntLabel.setText("Ajouter nouvel élément :");
-
-        listeTable2ComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
-
         ajouterButton.setText("Ajouter");
         ajouterButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ajouterButtonActionPerformed(evt);
             }
         });
+
+        modifLabel.setText("Modification :");
 
         ConnexionJM.setText("Connexion");
 
@@ -177,59 +174,51 @@ public class test_jdbc extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(requeteTextField)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(updateButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(afficherTableButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ajouterButton))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(requeteLabel)
-                            .addComponent(envoiRqtButton)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(modifLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(envoiRqtButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(addElmntLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(tableLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(tableLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(afficherTableButton))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(ajouterButton))))
-                            .addComponent(modifLabel))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(requeteTextField)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(updateButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
+                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(5, 5, 5)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableLabel)
+                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(afficherTableButton)
+                    .addComponent(ajouterButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(requeteLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envoiRqtButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tableLabel)
-                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(afficherTableButton))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addElmntLabel)
-                    .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ajouterButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(modifLabel)
-                .addGap(30, 30, 30)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(updateButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -248,36 +237,14 @@ public class test_jdbc extends javax.swing.JFrame {
                 mysqldConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
-            mysqldConn = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e, "Mysql connection error ", JOptionPane.ERROR_MESSAGE);
-            return;
         }
-
-        JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
-
-        if (!listeTableComboBox.isEnabled())
-            listeTableComboBox.setEnabled(true);
-        if (!afficherTableButton.isEnabled())
-            afficherTableButton.setEnabled(true);
-        if (!requeteTextField.isEnabled())
-            requeteTextField.setEnabled(true);
-        if (!envoiRqtButton.isEnabled())
-            envoiRqtButton.setEnabled(true);
-        if (!resultatJTable.isEnabled())
-            resultatJTable.setEnabled(true);
-
-        requeteLabel.setText("Requete Mysql:");
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Billets");
         listeTableComboBox.addItem("Vols");
         listeTableComboBox.addItem("Bagages");
         listeTableComboBox.addItem("Agents");
-        listeTable2ComboBox.removeAllItems();
-        listeTable2ComboBox.addItem("Billets");
-        listeTable2ComboBox.addItem("Vols");
-        listeTable2ComboBox.addItem("Bagages");
-        listeTable2ComboBox.addItem("Agents");
     }//GEN-LAST:event_MysqlJMIActionPerformed
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
@@ -292,24 +259,9 @@ public class test_jdbc extends javax.swing.JFrame {
                 oracleConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
-            oracleConn = null;
             System.out.println(e.getMessage());
             JOptionPane.showMessageDialog(this, "Impossible de se connecter :" + e.getMessage(), "Oracle connection error ", JOptionPane.ERROR_MESSAGE);
-            return;
         }
-        JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
-
-        if (!listeTableComboBox.isEnabled())
-            listeTableComboBox.setEnabled(true);
-        if (!afficherTableButton.isEnabled())
-            afficherTableButton.setEnabled(true);
-        if (!requeteTextField.isEnabled())
-            requeteTextField.setEnabled(true);
-        if (!envoiRqtButton.isEnabled())
-            envoiRqtButton.setEnabled(true);
-        if (!resultatJTable.isEnabled())
-            resultatJTable.setEnabled(true);
-
         requeteLabel.setText("Requete Oracle :");
         listeTableComboBox.removeAllItems();
         listeTableComboBox.addItem("Activités");
@@ -318,16 +270,38 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
 
+        final DefaultTableModel model = new DefaultTableModel();
+        if (listeTableComboBox.getSelectedItem() != null)
+            switch (listeTableComboBox.getSelectedItem().toString()) {
+                case "Billets":
+                    LinkedList<Billets> listebillets = null;
+                    try {
+                        listebillets = mysqldConn.get_AnyBillets(requeteTextField.getText());
+                        model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                        listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Erreur :" + e.getMessage(), "Mysql error ", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+                case "Agents":
+                    LinkedList<Agents> listeagents = null;
+                    try {
+                        listeagents = mysqldConn.get_AnyAgents(requeteTextField.getText());
+                        model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                        listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(this, "Erreur :" + e.getMessage(), "Mysql error ", JOptionPane.ERROR_MESSAGE);
+                    }
+                    break;
+            }
+        resultatJTable.setModel(model);
 
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
 
     private void afficherTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_afficherTableButtonActionPerformed
-        final DefaultTableModel model = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        final DefaultTableModel model = new DefaultTableModel();
         if (listeTableComboBox.getSelectedItem() != null)
             switch (listeTableComboBox.getSelectedItem().toString()) {
                 case "Billets":
@@ -372,13 +346,13 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_afficherTableButtonActionPerformed
 
     private void ajouterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajouterButtonActionPerformed
-        if (listeTable2ComboBox.getSelectedItem() != null)
-            if (listeTable2ComboBox.getSelectedItem().toString().equals("Agents")) {
-                if (vueAgent == null)
-                    vueAgent = new ajoutAgent(mysqldConn);
-                else
-                    vueAgent.setVisible(true);
-            }
+        if(listeTableComboBox.getSelectedItem().toString() == "Agents")
+        {
+            if(vueAgent == null)
+                vueAgent = new ajoutAgent(mysqldConn);
+            else
+                vueAgent.setVisible(true);
+        }
     }//GEN-LAST:event_ajouterButtonActionPerformed
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
@@ -400,20 +374,18 @@ public class test_jdbc extends javax.swing.JFrame {
         row = resultatJTable.rowAtPoint(evt.getPoint());
         col = resultatJTable.columnAtPoint(evt.getPoint());
     }//GEN-LAST:event_resultatJTableMouseClicked
-    // End of variables declaration
+    // End of variables declaration                   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu AboutJM;
     private javax.swing.JMenu ConnexionJM;
     private javax.swing.JMenuItem MysqlJMI;
     private javax.swing.JMenuItem OracleJMI;
-    private javax.swing.JLabel addElmntLabel;
     private javax.swing.JButton afficherTableButton;
     private javax.swing.JButton ajouterButton;
     private javax.swing.JToggleButton envoiRqtButton;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> listeTable2ComboBox;
     private javax.swing.JComboBox<String> listeTableComboBox;
     private javax.swing.JLabel modifLabel;
     private javax.swing.JLabel requeteLabel;
