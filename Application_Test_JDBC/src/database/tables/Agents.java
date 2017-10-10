@@ -29,4 +29,10 @@ public class Agents {
     public String getPoste() {
         return this.Poste;
     }
+
+    public void setNom(String nom) { Nom = nom;}
+
+    public void setPrenom(String prenom) { Prenom = prenom;}
+
+    public void setPoste(String poste) { Poste = poste;}
 }

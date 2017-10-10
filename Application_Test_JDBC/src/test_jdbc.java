@@ -10,6 +10,7 @@ import database.utilities.OracleDB;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -74,8 +75,6 @@ public class test_jdbc extends javax.swing.JFrame {
         tableLabel = new javax.swing.JLabel();
         listeTableComboBox = new javax.swing.JComboBox<>();
         updateButton = new javax.swing.JButton();
-        addElmntLabel = new javax.swing.JLabel();
-        listeTable2ComboBox = new javax.swing.JComboBox<>();
         ajouterButton = new javax.swing.JButton();
         modifLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -123,7 +122,7 @@ public class test_jdbc extends javax.swing.JFrame {
             }
         });
 
-        tableLabel.setText("Afficher table : ");
+        tableLabel.setText("Selectionnez la table sur laquelle vous voulez travailler :");
 
         listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
 
@@ -134,16 +133,14 @@ public class test_jdbc extends javax.swing.JFrame {
             }
         });
 
-        addElmntLabel.setText("Ajouter nouvel élément :");
-
-        listeTable2ComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
-
         ajouterButton.setText("Ajouter");
         ajouterButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ajouterButtonActionPerformed(evt);
             }
         });
+
+        modifLabel.setText("Modification :");
 
         ConnexionJM.setText("Connexion");
 
@@ -177,59 +174,51 @@ public class test_jdbc extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(requeteTextField)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(updateButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(afficherTableButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ajouterButton))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(requeteLabel)
-                            .addComponent(envoiRqtButton)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(modifLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(envoiRqtButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(addElmntLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(tableLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(tableLabel)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(afficherTableButton))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(ajouterButton))))
-                            .addComponent(modifLabel))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(requeteTextField)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(updateButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
+                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(5, 5, 5)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableLabel)
+                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(afficherTableButton)
+                    .addComponent(ajouterButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(requeteLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(envoiRqtButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tableLabel)
-                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(afficherTableButton))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addElmntLabel)
-                    .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ajouterButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addComponent(modifLabel)
-                .addGap(30, 30, 30)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(updateButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -256,11 +245,6 @@ public class test_jdbc extends javax.swing.JFrame {
         listeTableComboBox.addItem("Vols");
         listeTableComboBox.addItem("Bagages");
         listeTableComboBox.addItem("Agents");
-        listeTable2ComboBox.removeAllItems();
-        listeTable2ComboBox.addItem("Billets");
-        listeTable2ComboBox.addItem("Vols");
-        listeTable2ComboBox.addItem("Bagages");
-        listeTable2ComboBox.addItem("Agents");
     }//GEN-LAST:event_MysqlJMIActionPerformed
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
@@ -286,6 +270,21 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
 
+        final DefaultTableModel model = new DefaultTableModel();
+        if (listeTableComboBox.getSelectedItem() != null)
+            switch (listeTableComboBox.getSelectedItem().toString()) {
+                case "Billets":
+                    LinkedList<Billets> listebillets = mysqldConn.get_AnyBillets(requeteTextField.getText());
+                    model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                    listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
+                    break;
+                case "Agents":
+                    LinkedList<Agents> listeagents = mysqldConn.get_AnyAgents(requeteTextField.getText());
+                    model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                    listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    break;
+            }
+        resultatJTable.setModel(model);
 
     }//GEN-LAST:event_envoiRqtButtonActionPerformed
 
@@ -335,7 +334,7 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_afficherTableButtonActionPerformed
 
     private void ajouterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajouterButtonActionPerformed
-        if(listeTable2ComboBox.getSelectedItem().toString() == "Agents")
+        if(listeTableComboBox.getSelectedItem().toString() == "Agents")
         {
             if(vueAgent == null)
                 vueAgent = new ajoutAgent(mysqldConn);
@@ -370,13 +369,11 @@ public class test_jdbc extends javax.swing.JFrame {
     private javax.swing.JMenu ConnexionJM;
     private javax.swing.JMenuItem MysqlJMI;
     private javax.swing.JMenuItem OracleJMI;
-    private javax.swing.JLabel addElmntLabel;
     private javax.swing.JButton afficherTableButton;
     private javax.swing.JButton ajouterButton;
     private javax.swing.JToggleButton envoiRqtButton;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> listeTable2ComboBox;
     private javax.swing.JComboBox<String> listeTableComboBox;
     private javax.swing.JLabel modifLabel;
     private javax.swing.JLabel requeteLabel;
