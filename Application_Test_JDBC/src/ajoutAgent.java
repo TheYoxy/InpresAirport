@@ -3,6 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import database.tables.Agents;
+import database.utilities.MySQLDB;
 
 /**
  *
@@ -10,11 +12,18 @@
  */
 public class ajoutAgent extends javax.swing.JFrame {
 
+    MySQLDB db;
+
     /**
      * Creates new form ajoutAgent
      */
     public ajoutAgent() {
         initComponents();
+    }
+
+    public ajoutAgent(MySQLDB database) {
+        initComponents();
+        db = database;
     }
 
     /**
@@ -49,6 +58,11 @@ public class ajoutAgent extends javax.swing.JFrame {
         nomTextField.setText("nom");
 
         ajoutButton.setText("Ajouter");
+        ajoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ajoutButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -58,25 +72,23 @@ public class ajoutAgent extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(nomLabel)
-                                    .addComponent(prenomLabel))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(nomTextField)
-                                    .addComponent(prenomTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(ajoutButton)
-                                .addGap(17, 17, 17)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nomLabel)
+                            .addComponent(prenomLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(nomTextField)
+                            .addComponent(prenomTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE))
                         .addGap(80, 80, 80))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(posteLabel)
                         .addGap(43, 43, 43)
                         .addComponent(posteComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(55, 55, 55))))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(98, 98, 98)
+                .addComponent(ajoutButton)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -100,6 +112,15 @@ public class ajoutAgent extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void ajoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajoutButtonActionPerformed
+        Agents temp = new Agents();
+        temp.setNom(nomTextField.getText());
+        temp.setPrenom((prenomTextField.getText()));
+        temp.setPoste(posteComboBox.getSelectedItem().toString());
+        db.add_Agent(temp);
+        this.setVisible(false);
+    }//GEN-LAST:event_ajoutButtonActionPerformed
 
     /**
      * @param args the command line arguments
