@@ -10,7 +10,6 @@ import database.utilities.OracleDB;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -245,6 +244,7 @@ public class test_jdbc extends javax.swing.JFrame {
         listeTableComboBox.addItem("Vols");
         listeTableComboBox.addItem("Bagages");
         listeTableComboBox.addItem("Agents");
+        listeTableComboBox.addItem("Avions");
     }//GEN-LAST:event_MysqlJMIActionPerformed
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
@@ -269,7 +269,6 @@ public class test_jdbc extends javax.swing.JFrame {
     }//GEN-LAST:event_OracleJMIActionPerformed
 
     private void envoiRqtButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoiRqtButtonActionPerformed
-
         final DefaultTableModel model = new DefaultTableModel();
         if (listeTableComboBox.getSelectedItem() != null)
             switch (listeTableComboBox.getSelectedItem().toString()) {
@@ -306,25 +305,29 @@ public class test_jdbc extends javax.swing.JFrame {
             switch (listeTableComboBox.getSelectedItem().toString()) {
                 case "Billets":
                     LinkedList<Billets> listebillets = mysqldConn.get_Billets();
-                    model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
+                    model.setColumnIdentifiers(new String[]{"Numero billet", "Numero vol"});
                     listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
                     break;
                 case "Vols":
                     LinkedList<Vols> listevols = mysqldConn.get_Vols();
                     resultatJTable.setModel(model);
-                    model.setColumnIdentifiers(new String[]{"numero vol", "destination", "heure Arrive", "heure Depart", "arrivee dest", "Avion"});
-                    listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivee(), v.getHeureDepart(), v.getHeureArriveeDestination(), v.getAvionUtilise()}));
+                    model.setColumnIdentifiers(new String[]{"Numero vol", "Destination", "Heure Arrive", "Heure Depart", "Heure Arrivee à la Destination", "Avion"});
+                    listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivee(), v.getHeureDepart(), v.getHeureArriveeDestination(), String.valueOf(v.getAvionUtilise())}));
                     break;
                 case "Bagages":
                     LinkedList<Bagages> listebagages = mysqldConn.get_Bagages();
-                    model.setColumnIdentifiers(new String[]{"numero bagage", "poids", "valise"});
+                    model.setColumnIdentifiers(new String[]{"Numero bagage", "Poids", "Valise"});
                     listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
                     break;
                 case "Agents":
                     modifLabel.setText("Pour modifier le poste double-cliquez sur la cellule et entrez la nouvelle valeur");
                     LinkedList<Agents> listeagents = mysqldConn.get_Agents();
-                    model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
+                    model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Poste"});
                     listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
+                    break;
+                case "Avions":
+                    LinkedList<Avion> listeAvion = mysqldConn.get_Avions();
+                    model.setColumnIdentifiers(new String[]{"Id", "Modele", "Vol"});
                     break;
                 case "Activités":
                     LinkedList<Activites> listA = oracleConn.get_Activites();
