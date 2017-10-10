@@ -1,10 +1,7 @@
 package database.utilities;
 
 import Tools.FilesOperations;
-import database.tables.Agents;
-import database.tables.Bagages;
-import database.tables.Billets;
-import database.tables.Vols;
+import database.tables.*;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -21,7 +18,7 @@ public class MySQLDB {
     public MySQLDB() throws SQLException {
 
         FilesOperations.load_Properties("mysql");
-        url = "jdbc:mysql://localhost/bd_airport?useSSL=false";
+        url = "jdbc:mysql://192.168.1.17/bd_airport?useSSL=false";
         user = FilesOperations.getUsername();
         passwd = FilesOperations.getPassword();
         System.out.println("-------- Test de connection mysql ------");
@@ -109,7 +106,7 @@ public class MySQLDB {
         try {
             ResultSet res = instruction.executeQuery("SELECT * FROM Vols");
             while (res.next()) {
-                vols.add(new Vols(res.getString(1), res.getString(2), (res.getDate(3)).toString(), (res.getDate(4)).toString(), (res.getDate(5)).toString(), res.getString(6)));
+                vols.add(new Vols(res.getString(1), res.getString(2), (res.getDate(3)).toString(), (res.getDate(4)).toString(), (res.getDate(5)).toString(), res.getInt(6)));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -143,6 +140,18 @@ public class MySQLDB {
         return agents;
     }
 
+    public LinkedList<Avion> get_Avions() {
+        LinkedList<Avion> retour = new LinkedList<>();
+        try {
+            ResultSet res = instruction.executeQuery("select * from Avion");
+            while (res.next()) {
+                retour.add(new Avion(res.getInt("id"), res.getString("modele"), res.getBoolean("vol")));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+        return retour;
+    }
     public void add_Agent(Agents agent) {
         try {
             String query = " insert into Agents (nom, prenom, poste)"

@@ -7,7 +7,7 @@ public class Vols {
     private String HeureArrivee;
     private String HeureDepart;
     private String HeureArriveeDestination;
-    private String AvionUtilise;
+    private int AvionUtilise;
 
     public Vols() {
         this.NumVol = "";
@@ -15,10 +15,10 @@ public class Vols {
         this.HeureArrivee = "";
         this.HeureDepart = "";
         this.HeureArriveeDestination = "";
-        this.AvionUtilise = "";
+        this.AvionUtilise = -1;
     }
 
-    public Vols(String numvol, String dest, String hArr, String hdep, String hArrDest, String modAvion) {
+    public Vols(String numvol, String dest, String hArr, String hdep, String hArrDest, int modAvion) {
         this.NumVol = numvol;
         this.Destination = dest;
         this.HeureArrivee = hArr;
@@ -47,7 +47,7 @@ public class Vols {
         return this.HeureArriveeDestination;
     }
 
-    public String getAvionUtilise() {
+    public int getAvionUtilise() {
         return this.AvionUtilise;
     }
 }
