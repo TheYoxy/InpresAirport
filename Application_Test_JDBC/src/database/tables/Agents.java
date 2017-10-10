@@ -22,11 +22,23 @@ public class Agents {
         return this.Nom;
     }
 
+    public void setNom(String nom) {
+        Nom = nom;
+    }
+
     public String getPrenom() {
         return this.Prenom;
     }
 
+    public void setPrenom(String prenom) {
+        Prenom = prenom;
+    }
+
     public String getPoste() {
         return this.Poste;
+    }
+
+    public void setPoste(String poste) {
+        Poste = poste;
     }
 }
