@@ -20,20 +20,6 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private MySQLDB mysqldConn;
     private OracleDB oracleConn;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu AboutJM;
-    private javax.swing.JMenu ConnexionJM;
-    private javax.swing.JMenuItem MysqlJMI;
-    private javax.swing.JMenuItem OracleJMI;
-    private javax.swing.JButton afficherTableButton;
-    private javax.swing.JToggleButton envoiRqtButton;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JComboBox<String> listeTableComboBox;
-    private javax.swing.JLabel requeteLabel;
-    private javax.swing.JTextField requeteTextField;
-    private javax.swing.JTable resultatJTable;
-    private javax.swing.JLabel tableLabel;
 
     /**
      * Creates new form test_jdbc
@@ -84,6 +70,10 @@ public class test_jdbc extends javax.swing.JFrame {
         afficherTableButton = new javax.swing.JButton();
         tableLabel = new javax.swing.JLabel();
         listeTableComboBox = new javax.swing.JComboBox<>();
+        updateButton = new javax.swing.JButton();
+        addElmntLabel = new javax.swing.JLabel();
+        listeTable2ComboBox = new javax.swing.JComboBox<>();
+        ajouterButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         ConnexionJM = new javax.swing.JMenu();
         MysqlJMI = new javax.swing.JMenuItem();
@@ -105,15 +95,15 @@ public class test_jdbc extends javax.swing.JFrame {
         });
 
         resultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
         ));
         jScrollPane1.setViewportView(resultatJTable);
 
@@ -126,7 +116,15 @@ public class test_jdbc extends javax.swing.JFrame {
 
         tableLabel.setText("Afficher table : ");
 
-        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+        listeTableComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
+
+        updateButton.setText("Modifier");
+
+        addElmntLabel.setText("Ajouter nouvel élément :");
+
+        listeTable2ComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Table" }));
+
+        ajouterButton.setText("Ajouter");
 
         ConnexionJM.setText("Connexion");
 
@@ -156,42 +154,60 @@ public class test_jdbc extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(requeteTextField)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(updateButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(requeteLabel)
+                            .addComponent(envoiRqtButton)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(addElmntLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(tableLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(requeteTextField)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(requeteLabel)
-                                                        .addComponent(envoiRqtButton)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(tableLabel)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(afficherTableButton)))
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(afficherTableButton))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(ajouterButton)))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(requeteLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(envoiRqtButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(tableLabel)
-                                        .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(afficherTableButton))
-                                .addGap(60, 60, 60)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(requeteLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(requeteTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(envoiRqtButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableLabel)
+                    .addComponent(listeTableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(afficherTableButton))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(addElmntLabel)
+                    .addComponent(listeTable2ComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ajouterButton))
+                .addGap(23, 23, 23)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(updateButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -275,5 +291,25 @@ public class test_jdbc extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un élément", "Selection error", JOptionPane.ERROR_MESSAGE);
         resultatJTable.setModel(model);
     }//GEN-LAST:event_afficherTableButtonActionPerformed
+    // End of variables declaration                   
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu AboutJM;
+    private javax.swing.JMenu ConnexionJM;
+    private javax.swing.JMenuItem MysqlJMI;
+    private javax.swing.JMenuItem OracleJMI;
+    private javax.swing.JLabel addElmntLabel;
+    private javax.swing.JButton afficherTableButton;
+    private javax.swing.JButton ajouterButton;
+    private javax.swing.JToggleButton envoiRqtButton;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JComboBox<String> listeTable2ComboBox;
+    private javax.swing.JComboBox<String> listeTableComboBox;
+    private javax.swing.JLabel requeteLabel;
+    private javax.swing.JTextField requeteTextField;
+    private javax.swing.JTable resultatJTable;
+    private javax.swing.JLabel tableLabel;
+    private javax.swing.JButton updateButton;
     // End of variables declaration//GEN-END:variables
 }
