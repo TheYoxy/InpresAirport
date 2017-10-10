@@ -11,8 +11,8 @@ import java.util.LinkedList;
 
 public class OracleDB {
 
-    public Connection con;
-    public Statement instruction;
+    private Connection con;
+    private Statement instruction;
 
     public OracleDB() throws SQLException {
 

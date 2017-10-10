@@ -11,8 +11,8 @@ import java.util.LinkedList;
 
 public class MySQLDB {
 
-    public Connection con;
-    public Statement instruction;
+    private Connection con;
+    private Statement instruction;
 
     public MySQLDB() throws SQLException {
 
