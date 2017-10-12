@@ -1,6 +1,6 @@
-package Librairie.ServeurClientLog.Threads;
+package ServeurClientLog.Threads;
 
-import Librairie.ServeurClientLog.Interfaces.Tache;
+import ServeurClientLog.Interfaces.Tache;
 
 public class ThreadEsclave extends Thread {
     private String Nom;

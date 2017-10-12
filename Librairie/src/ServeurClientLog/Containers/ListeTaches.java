@@ -1,6 +1,6 @@
-package Librairie.ServeurClientLog.Containers;
+package ServeurClientLog.Containers;
 
-import Librairie.ServeurClientLog.Interfaces.Tache;
+import ServeurClientLog.Interfaces.Tache;
 
 import java.util.LinkedList;
 

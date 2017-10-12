@@ -1,9 +1,9 @@
-package Librairie.ServeurClientLog.Threads;
+package ServeurClientLog.Threads;
 
-import Librairie.ServeurClientLog.Containers.FileSocket;
-import Librairie.ServeurClientLog.Containers.ListeTaches;
-import Librairie.ServeurClientLog.Interfaces.Requete;
-import Librairie.ServeurClientLog.Interfaces.Tache;
+import ServeurClientLog.Containers.FileSocket;
+import ServeurClientLog.Containers.ListeTaches;
+import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.Tache;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -51,6 +51,7 @@ public class ThreadClient extends Thread {
                     e.printStackTrace();
                 }
             }
+
             try {
                 Client.close();
             } catch (IOException e) {

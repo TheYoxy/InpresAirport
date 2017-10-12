@@ -1,6 +1,6 @@
-package Librairie.LUGAP;
+package LUGAP;
 
-import Librairie.ServeurClientLog.Interfaces.TypeRequete;
+import ServeurClientLog.Interfaces.TypeRequete;
 
 public enum TypeRequeteLUGAP implements TypeRequete {
     req1,

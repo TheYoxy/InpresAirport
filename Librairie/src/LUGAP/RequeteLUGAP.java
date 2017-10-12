@@ -1,6 +1,6 @@
-package Librairie.LUGAP;
+package LUGAP;
 
-import Librairie.ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.Requete;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

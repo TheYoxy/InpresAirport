@@ -1,7 +1,7 @@
-package Librairie.LUGAP;
+package LUGAP;
 
-import Librairie.ServeurClientLog.Interfaces.Reponse;
-import Librairie.ServeurClientLog.Interfaces.TypeReponse;
+import ServeurClientLog.Interfaces.Reponse;
+import ServeurClientLog.Interfaces.TypeReponse;
 
 import java.io.Serializable;
 

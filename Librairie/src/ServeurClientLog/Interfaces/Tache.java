@@ -1,4 +1,4 @@
-package Librairie.ServeurClientLog.Interfaces;
+package ServeurClientLog.Interfaces;
 
 import com.sun.istack.internal.NotNull;
 

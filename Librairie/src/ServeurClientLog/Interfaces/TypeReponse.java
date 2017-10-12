@@ -1,4 +1,4 @@
-package Librairie.ServeurClientLog.Interfaces;
+package ServeurClientLog.Interfaces;
 
 /**
  * Interface servant de flag

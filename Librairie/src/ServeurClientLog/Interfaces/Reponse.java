@@ -1,4 +1,4 @@
-package Librairie.ServeurClientLog.Interfaces;
+package ServeurClientLog.Interfaces;
 
 public interface Reponse {
     TypeReponse getCode();

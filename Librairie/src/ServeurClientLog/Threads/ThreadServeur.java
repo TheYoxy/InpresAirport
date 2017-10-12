@@ -1,6 +1,6 @@
-package Librairie.ServeurClientLog.Threads;
+package ServeurClientLog.Threads;
 
-import Librairie.ServeurClientLog.Containers.FileSocket;
+import ServeurClientLog.Containers.FileSocket;
 
 import java.io.IOException;
 import java.net.ServerSocket;
