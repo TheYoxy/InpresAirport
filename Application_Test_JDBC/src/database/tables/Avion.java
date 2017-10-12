@@ -1,13 +1,13 @@
 package database.tables;
 
 public class Avion {
-    private int id;
+    private int Id;
     private String Modele;
     private boolean Vol;
 
     public Avion(int id, String modele, boolean vol) {
 
-        this.id = id;
+        this.Id = id;
         Modele = modele;
         Vol = vol;
     }
@@ -18,11 +18,11 @@ public class Avion {
     }
 
     public int getId() {
-        return id;
+        return Id;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.Id = id;
     }
 
     public String getModele() {

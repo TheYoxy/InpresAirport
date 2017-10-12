@@ -12,7 +12,7 @@ import database.utilities.MySQLDB;
  */
 public class ajoutAgent extends javax.swing.JFrame {
 
-    MySQLDB db;
+    MySQLDB DbMysql;
 
     /**
      * Creates new form ajoutAgent
@@ -23,7 +23,7 @@ public class ajoutAgent extends javax.swing.JFrame {
 
     public ajoutAgent(MySQLDB database) {
         initComponents();
-        db = database;
+        DbMysql = database;
     }
 
     /**
@@ -118,7 +118,7 @@ public class ajoutAgent extends javax.swing.JFrame {
         temp.setNom(nomTextField.getText());
         temp.setPrenom((prenomTextField.getText()));
         temp.setPoste(posteComboBox.getSelectedItem().toString());
-        db.add_Agent(temp);
+        DbMysql.add_Agent(temp);
         this.setVisible(false);
     }//GEN-LAST:event_ajoutButtonActionPerformed
 
