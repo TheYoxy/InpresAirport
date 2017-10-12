@@ -1,6 +1,7 @@
 package ServeurClientLog.Threads;
 
 import ServeurClientLog.Containers.FileSocket;
+import Tools.Procedural;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,26 +13,28 @@ import java.net.Socket;
  */
 
 public class ThreadServeur extends Thread {
-    private final static int NB_THREADS = 5;
+    private final int NbThreads;
     private int Port;
     private FileSocket File;
     private ServerSocket SSocket = null;
 
-    public ThreadServeur(int p) {
-        Port = p;
-        File = new FileSocket();
+    public ThreadServeur(int port, int nb_threads) {
+        this.Port = port;
+        this.File = new FileSocket();
+        this.NbThreads = nb_threads;
     }
 
     @Override
     public void run() {
         try {
             SSocket = new ServerSocket(Port);
+            System.out.println("Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort());
         } catch (IOException e) {
             System.err.println("Erreur de port d'écoute ! ? [" + e + "]");
             System.exit(1);
         }
         // Démarrage du pool de threads
-        for (int i = 0; i < NB_THREADS; i++) {
+        for (int i = 0; i < NbThreads; i++) {
             ThreadClient tcl = new ThreadClient(File, "Thread du pool n°" + String.valueOf(i));
             tcl.start();
         }

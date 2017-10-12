@@ -30,6 +30,7 @@ public class ThreadClient extends Thread {
             try {
                 //Le thread attends le socket
                 Client = TachesAExecuter.getSocket();
+                System.out.println("Connexion de " + Client.getInetAddress() + ":" + Client.getPort());
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
             }
