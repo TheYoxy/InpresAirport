@@ -1,6 +1,6 @@
-package Librairie.LUGAP;
+package LUGAP;
 
-import Librairie.Interfaces.Requete;
+import ServeurClientLog.Interfaces.Requete;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -8,12 +8,11 @@ import java.io.Serializable;
 import java.net.Socket;
 
 public class RequeteLUGAP implements Requete, Serializable {
-    public static final int req1 = 0;
-    private int Type;
+    private TypeRequeteLUGAP Type;
     private String ChargeUtile;
     private Socket Socket;
 
-    public RequeteLUGAP(int t, String chu) {
+    public RequeteLUGAP(TypeRequeteLUGAP t, String chu) {
         this.Type = t;
         this.ChargeUtile = chu;
     }
@@ -29,7 +28,7 @@ public class RequeteLUGAP implements Requete, Serializable {
             case req1:
                 retour = () -> {
                     System.out.println("Envoi à " + s.getInetAddress().toString() + ":" + s.getPort());
-                    ReponseLUGAP repo = new ReponseLUGAP(ReponseLUGAP.OK, getChargeUtile());
+                    ReponseLUGAP repo = new ReponseLUGAP(TypeReponseLUGAP.OK, getChargeUtile());
                     ObjectOutputStream oos;
                     try {
                         oos = new ObjectOutputStream(s.getOutputStream());
@@ -41,7 +40,18 @@ public class RequeteLUGAP implements Requete, Serializable {
                     }
                 };
                 break;
+            case Login:
+                break;
+            case Logout:
+                break;
+            case Disconnect:
+                break;
         }
         return retour;
+    }
+
+    @Override
+    public boolean isDisconnect() {
+        return this.Type == TypeRequeteLUGAP.Disconnect;
     }
 }

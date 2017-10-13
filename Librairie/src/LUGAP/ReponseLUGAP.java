@@ -1,16 +1,15 @@
-package Librairie.LUGAP;
+package LUGAP;
 
-import Librairie.Interfaces.Reponse;
+import ServeurClientLog.Interfaces.Reponse;
+import ServeurClientLog.Interfaces.TypeReponse;
 
 import java.io.Serializable;
 
 public class ReponseLUGAP implements Reponse, Serializable {
-    public static final int OK = 0;
-    public static final int NOT_OK = 1;
-    private int Reponse;
+    private TypeReponseLUGAP Reponse;
     private String ChargeUtile;
 
-    public ReponseLUGAP(int reponse, String chargeUtile) {
+    public ReponseLUGAP(TypeReponseLUGAP reponse, String chargeUtile) {
         this.Reponse = reponse;
         this.ChargeUtile = chargeUtile;
     }
@@ -20,7 +19,7 @@ public class ReponseLUGAP implements Reponse, Serializable {
     }
 
     @Override
-    public int getCode() {
-        return Reponse;
+    public TypeReponse getCode() {
+        return this.Reponse;
     }
 }

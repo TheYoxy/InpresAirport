@@ -19,11 +19,11 @@ import java.util.LinkedList;
  */
 public class test_jdbc extends javax.swing.JFrame {
 
-    private MySQLDB mysqldConn = null;
-    private OracleDB oracleConn = null;
-    private ajoutAgent vueAgent = null;
-    private int row;
-    private int col;
+    private MySQLDB MysqldConn = null;
+    private OracleDB OracleConn = null;
+    private ajoutAgent VueAgent = null;
+    private int Row;
+    private int Col;
 
     /**
      * Creates new form test_jdbc
@@ -227,14 +227,14 @@ public class test_jdbc extends javax.swing.JFrame {
     private void MysqlJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MysqlJMIActionPerformed
 
         try {
-            if(oracleConn != null) {
-                oracleConn.Close();
+            if (OracleConn != null) {
+                OracleConn.Close();
                 JOptionPane.showMessageDialog(this, "Client oracle déconnecté.", "Oracle notification", JOptionPane.INFORMATION_MESSAGE);
             }
-            if(mysqldConn == null)
-                mysqldConn = new MySQLDB();
+            if (MysqldConn == null)
+                MysqldConn = new MySQLDB();
             else
-                mysqldConn.Connect();
+                MysqldConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Mysql connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -250,14 +250,14 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private void OracleJMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OracleJMIActionPerformed
         try {
-            if(mysqldConn != null) {
-                mysqldConn.Close();
+            if (MysqldConn != null) {
+                MysqldConn.Close();
                 JOptionPane.showMessageDialog(this, "Client mysql déconnecté.", "Mysql notification", JOptionPane.INFORMATION_MESSAGE);
             }
-            if(oracleConn == null)
-                oracleConn = new OracleDB();
+            if (OracleConn == null)
+                OracleConn = new OracleDB();
             else
-                oracleConn.Connect();
+                OracleConn.Connect();
             JOptionPane.showMessageDialog(this, "Client connecté.", "Oracle connection", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -276,7 +276,7 @@ public class test_jdbc extends javax.swing.JFrame {
                 case "Billets":
                     LinkedList<Billets> listebillets = null;
                     try {
-                        listebillets = mysqldConn.get_AnyBillets(requeteTextField.getText());
+                        listebillets = MysqldConn.get_AnyBillets(requeteTextField.getText());
                         model.setColumnIdentifiers(new String[]{"numero billet", "numero vol"});
                         listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
                     } catch (SQLException e) {
@@ -287,7 +287,7 @@ public class test_jdbc extends javax.swing.JFrame {
                 case "Agents":
                     LinkedList<Agents> listeagents = null;
                     try {
-                        listeagents = mysqldConn.get_AnyAgents(requeteTextField.getText());
+                        listeagents = MysqldConn.get_AnyAgents(requeteTextField.getText());
                         model.setColumnIdentifiers(new String[]{"nom", "prenom", "poste"});
                         listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
                     } catch (SQLException e) {
@@ -305,39 +305,39 @@ public class test_jdbc extends javax.swing.JFrame {
         if (listeTableComboBox.getSelectedItem() != null)
             switch (listeTableComboBox.getSelectedItem().toString()) {
                 case "Billets":
-                    LinkedList<Billets> listebillets = mysqldConn.get_Billets();
+                    LinkedList<Billets> listebillets = MysqldConn.get_Billets();
                     model.setColumnIdentifiers(new String[]{"Numero billet", "Numero vol"});
                     listebillets.forEach((b) -> model.addRow(new String[]{b.getNumBillet(), b.getNumVol()}));
                     break;
                 case "Vols":
-                    LinkedList<Vols> listevols = mysqldConn.get_Vols();
+                    LinkedList<Vols> listevols = MysqldConn.get_Vols();
                     resultatJTable.setModel(model);
                     model.setColumnIdentifiers(new String[]{"Numero vol", "Destination", "Heure Arrive", "Heure Depart", "Heure Arrivee à la Destination", "Avion"});
                     listevols.forEach((v) -> model.addRow(new String[]{v.getNumVol(), v.getDestination(), v.getHeureArrivee(), v.getHeureDepart(), v.getHeureArriveeDestination(), String.valueOf(v.getAvionUtilise())}));
                     break;
                 case "Bagages":
-                    LinkedList<Bagages> listebagages = mysqldConn.get_Bagages();
+                    LinkedList<Bagages> listebagages = MysqldConn.get_Bagages();
                     model.setColumnIdentifiers(new String[]{"Numero bagage", "Poids", "Valise"});
                     listebagages.forEach((b) -> model.addRow(new String[]{b.getNumBagage(), b.getPoids().toString(), b.isValise()}));
                     break;
                 case "Agents":
                     modifLabel.setText("Pour modifier le poste double-cliquez sur la cellule et entrez la nouvelle valeur");
-                    LinkedList<Agents> listeagents = mysqldConn.get_Agents();
+                    LinkedList<Agents> listeagents = MysqldConn.get_Agents();
                     model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Poste"});
                     listeagents.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getPoste()}));
                     break;
                 case "Avions":
-                    LinkedList<Avion> listeAvion = mysqldConn.get_Avions();
+                    LinkedList<Avion> listeAvion = MysqldConn.get_Avions();
                     model.setColumnIdentifiers(new String[]{"Id", "Modele", "Vol"});
                     listeAvion.forEach((a) -> model.addRow(new String[]{String.valueOf(a.getId()), a.getModele(), a.isVol() ? "check_OK" : "check_FAIL"}));
                     break;
                 case "Activités":
-                    LinkedList<Activites> listA = oracleConn.get_Activites();
+                    LinkedList<Activites> listA = OracleConn.get_Activites();
                     model.setColumnIdentifiers(new String[]{"Cours", "Type", "Date", "Description", "Reference"});
                     listA.forEach((a) -> model.addRow(new String[]{a.getCours(), a.getType(), a.getDate(), a.getDescription(), a.getReference()}));
                     break;
                 case "Intervenants":
-                    LinkedList<Intervenant> listI = oracleConn.get_Intervenant();
+                    LinkedList<Intervenant> listI = OracleConn.get_Intervenant();
                     model.setColumnIdentifiers(new String[]{"Nom", "Prenom", "Status"});
                     listI.forEach((a) -> model.addRow(new String[]{a.getNom(), a.getPrenom(), a.getStatus()}));
                     break;
@@ -353,10 +353,10 @@ public class test_jdbc extends javax.swing.JFrame {
     private void ajouterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ajouterButtonActionPerformed
         if(listeTableComboBox.getSelectedItem().toString() == "Agents")
         {
-            if(vueAgent == null)
-                vueAgent = new ajoutAgent(mysqldConn);
+            if (VueAgent == null)
+                VueAgent = new ajoutAgent(MysqldConn);
             else
-                vueAgent.setVisible(true);
+                VueAgent.setVisible(true);
         }
     }//GEN-LAST:event_ajouterButtonActionPerformed
 
@@ -365,12 +365,12 @@ public class test_jdbc extends javax.swing.JFrame {
         //TableModel d = resultatJTable.getModel();
 
 
-        temp.setNom((String) resultatJTable.getValueAt(row, 0));
-        temp.setPrenom((String) resultatJTable.getValueAt(row, 1));
-        temp.setPoste((String) resultatJTable.getValueAt(row, 2));
+        temp.setNom((String) resultatJTable.getValueAt(Row, 0));
+        temp.setPrenom((String) resultatJTable.getValueAt(Row, 1));
+        temp.setPoste((String) resultatJTable.getValueAt(Row, 2));
 
         try {
-            mysqldConn.update_Agent(temp);
+            MysqldConn.update_Agent(temp);
             JOptionPane.showMessageDialog(this, "Modification effectuée!", "Mysql notificatin", JOptionPane.INFORMATION_MESSAGE);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Probleme lors de la modification :" + e, "Mysql notification ", JOptionPane.ERROR_MESSAGE);
@@ -378,8 +378,8 @@ public class test_jdbc extends javax.swing.JFrame {
     }
 
     private void resultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultatJTableMouseClicked
-        row = resultatJTable.rowAtPoint(evt.getPoint());
-        col = resultatJTable.columnAtPoint(evt.getPoint());
+        Row = resultatJTable.rowAtPoint(evt.getPoint());
+        Col = resultatJTable.columnAtPoint(evt.getPoint());
     }//GEN-LAST:event_resultatJTableMouseClicked
     // End of variables declaration                   
 

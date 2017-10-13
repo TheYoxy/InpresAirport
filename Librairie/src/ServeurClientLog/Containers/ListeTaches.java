@@ -1,6 +1,6 @@
-package Librairie;
+package ServeurClientLog.Containers;
 
-import Librairie.Interfaces.Tache;
+import ServeurClientLog.Interfaces.Tache;
 
 import java.util.LinkedList;
 
@@ -8,28 +8,26 @@ import java.util.LinkedList;
  * Objet servant de queue pour les tâches que le serveur doit traiter
  */
 public class ListeTaches implements Tache {
-    private LinkedList<Runnable> listTaches;
+    private LinkedList<Runnable> ListTaches;
 
     public ListeTaches() {
-        listTaches = new LinkedList<>();
+        ListTaches = new LinkedList<>();
     }
 
     @Override
     public synchronized Runnable getTache() throws InterruptedException {
-        System.out.println("getTache avant wait");
         while (!existTache()) wait();
-        return listTaches.remove();
+        return ListTaches.remove();
     }
 
     @Override
     public synchronized boolean existTache() {
-        return !listTaches.isEmpty();
+        return !ListTaches.isEmpty();
     }
 
     @Override
-    public synchronized void recordTache(Runnable r) {
-        listTaches.addLast(r);
-        System.out.println("ListeTache: tache dans la file");
+    public synchronized void addTache(Runnable r) {
+        ListTaches.addLast(r);
         notify();
     }
 }
