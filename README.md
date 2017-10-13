@@ -2,8 +2,8 @@
 #### Délais de présentation
 | Application                              | Semaine                               | Pondération |
 | ---------------------------------------- | ------------------------------------- | ----------- |
-| 1: Client/Serveur multithread TCP en C/C++ | 2/10/2017                             | 20          |
-| 2: JDBC                                  | 9/10/2017                             | 10          |
+| 1: [Client/Serveur multithread TCP en C/C++](## 1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
+| 2: [JDBC]()                                  | 9/10/2017                             | 10          |
 | 3: Client serveur multithread TCP en Java | 23/10/2017                            | 20          |
 | 4: Programmation web java classique      | 20/11/2017                            | 20          |
 | 5: Client-serveur UDP en C/C++ et Java   | 4/12/2017                             | 10          |
@@ -50,7 +50,7 @@
 
 ## 1. Serveur_CheckIN et Application_CheckIn
 ### 1.1. L'enregistrement des passagers : client-serveur
-Dossier attendu: 
+Dossier attendu:
 - Tableau des commandes et diagramme du protocole CIMP - du type ci-contre.
 - Code *C*/*C++* du serveur Serveur_CheckIn.
 - Vues des trames échangées par un sniffer lors du début des opérations.
@@ -139,7 +139,7 @@ exemples - libre à vous d'en concevoir d'autres du même style) :
 ## 2. Les accès aux bases de données
 
 ### 2.1 La base de données BD_AIRPORT
-Dossier attendu: 
+Dossier attendu:
 -  Schéma relationnel de BD_AIRPORT.
 -  Diagramme de classe *UML* des classes de *database.utilities*.
 
@@ -160,7 +160,7 @@ On demande donc de construire un groupe de telles classes (package *database.uti
 On souhaite pourvoir accéder, au minimum, à des bases relationnelles de type *MySql* ou *Oracle*.
 Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi construite proposera une interface graphique de base permettant:
 - Soit de se connecter à la base *MySql* DB_AIRPORT pour y réaliser des requêtes élémentaires de type `select * from ... where...`,`select count(*) from` et `update ... set ... where ...` avec l'affichage des résultats (requêtes adaptées à la table visée - pas de tentatives de généricité à ce stade).
-- Soit de se connecter à une base BD_JOURNALDEBORD, qui est une base Oracle à deux tables: 
+- Soit de se connecter à une base BD_JOURNALDEBORD, qui est une base Oracle à deux tables:
 
     | Table        | Description                              |
     | ------------ | ---------------------------------------- |
@@ -173,14 +173,14 @@ Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi cons
 ----------
 
 
-## 3. Le serveur Serveur_Bagages 
+## 3. Le serveur Serveur_Bagages
 Nous allons ici nous préoccuper de l'implémentation du modèle client-serveur pour le serveur **Serveur_Bagages** (Clients: *Application_Bagages* et *Serveur_CheckIn*)
 ### 3.1 Serveur_Bagages
 Ce serveur est donc un serveur **multithread** *Java/Windows-Unix* (en modèle **pool de threads**) qui est chargé de gèrer tous les accès à la base de données **BD_AIRPORT** qui relèvent de la gestion des bagages (donc à l'exclusion des opérations portant sur les billets, qui relèvent de **Serveur_Billets**):
 - Soit par les bagaistes de diverse compagnies aériennes
 - Soit par les agents de la compagnie aérienne du checkIn, qui agissent par le serveur SerChk interposé.
 
-Le serveur attends ses requêtes sur deux ports différents: 
+Le serveur attends ses requêtes sur deux ports différents:
 - **PORT_BAGAGES** pour les bagagistes
 - **PORT_CHECKIN** pour les requêtes provenant de *Serveur_CheckIn*
 ### 3.2 Application_Bagages
@@ -189,7 +189,7 @@ Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir ave
 *Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362-WACHARVILROM-22082017-0070-008.*
 
 L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.\
-Exemple: 
+Exemple:
 ---
 VOL 714 WALABIES-AIRLINES - Sydney 5h30\
 VOL 362 POWDER-AIRLINES - Peshawar 6h30\
@@ -215,7 +215,7 @@ serveur *Serveur_Bagages* sur le port **PORT_BAGAGES**.
 
 Exemple:
 ---
->1. Le bagagiste à réceptionné un bagage: 
+>1. Le bagagiste à réceptionné un bagage:
 
 | Identifiant                        | Poids  | Type   | Réceptionné(O/N) | Chargé en soute (O/N) | Vérifié par la douane(O/N) | Remarques |
 | ---------------------------------- | ------ | ------ | ---------------- | --------------------- | -------------------------- | --------- |
@@ -248,7 +248,7 @@ Exemple:
 >5. Quand cette boîte se referme, le bagagiste est automatiquement déconnecté du serveur.
 
 ##4 Programmation Web Java classique
-Dossier attendu: 
+Dossier attendu:
 1. Diagramme de classes UML des classes de l'application Web.
 2. ​
 ###4.1 L'application Web_Applic_Billets
