@@ -19,4 +19,9 @@ public class Login implements Serializable {
     public String getPassword() {
         return Password;
     }
+
+    @Override
+    public String toString() {
+        return "Login: " + User + " | Password: " + Password;
+    }
 }
