@@ -1,9 +1,12 @@
 package Tools;
 
+import LUGAP.NetworkObject.Table;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
+import java.util.Vector;
 
 public class Bd {
     private static Bd MySql;
@@ -84,6 +87,34 @@ public class Bd {
             sb.deleteCharAt(sb.length() - 1);
             System.out.println(sb);
         }
+    }
+
+    public static Table toTable(ResultSet rs) throws SQLException {
+        Vector<String> title = new Vector<>();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+            title.add(rsmd.getColumnName(i));
+        }
+        Vector<Vector<String>> champs = new Vector<>();
+        rs.beforeFirst();
+        while (rs.next()) {
+            Vector<String> temp = new Vector<>();
+            for (int i = 1; i <= rsmd.getColumnCount(); i++)
+                try {
+                    //Sous MySql, n'importe quel type de données peut être directement converti en String
+                    temp.add(rs.getString(i));
+                } catch (SQLException e) {
+                    System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
+                }
+            champs.add(temp);
+        }
+        return new Table(title, champs);
+    }
+
+    public ResultSet SelectBagageVol(String numVol) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE numVol = ?");
+        s.setString(1, numVol);
+        return s.executeQuery();
     }
 
     public ResultSet Select(String table) throws SQLException {

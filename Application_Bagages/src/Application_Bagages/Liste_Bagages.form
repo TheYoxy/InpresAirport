@@ -2,7 +2,8 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
-    <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="alwaysOnTop" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -26,15 +27,15 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="538" max="32767" attributes="0"/>
+                  <Component id="ScrollPane1" pref="538" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="volLabel" min="-2" max="-2" attributes="0"/>
+                              <Component id="VolLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="volLabel2" min="-2" max="-2" attributes="0"/>
+                              <Component id="VolLabel2" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="bagagesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="BagagesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
@@ -48,39 +49,39 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="volLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="volLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="VolLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="VolLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-              <Component id="bagagesLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="BagagesLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="164" max="32767" attributes="0"/>
+              <Component id="ScrollPane1" pref="164" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="volLabel">
+    <Component class="javax.swing.JLabel" name="VolLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Vol :"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="bagagesLabel">
+    <Component class="javax.swing.JLabel" name="BagagesLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Bagages pour ce vol :"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="volLabel2">
+    <Component class="javax.swing.JLabel" name="VolLabel2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Nom du vol"/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+    <Container class="javax.swing.JScrollPane" name="ScrollPane1">
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTable" name="resultatJTable">
+        <Component class="javax.swing.JTable" name="ResultatJTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new javax.swing.table.DefaultTableModel(&#xa;    new Object [][] {&#xa;        {null, null, null, null, null, null, null},&#xa;        {null, null, null, null, null, null, null},&#xa;        {null, null, null, null, null, null, null},&#xa;        {null, null, null, null, null, null, null}&#xa;    },&#xa;    new String [] {&#xa;        &quot;Identifiant&quot;, &quot;Poids&quot;, &quot;Type&quot;, &quot;R&#xe9;ception&#xe9;(O/N)&quot;, &quot;Charg&#xe9; en soute (O/N)&quot;, &quot;V&#xe9;rifi&#xe9; par la douane (O/N)&quot;, &quot;Remarques&quot;&#xa;    }&#xa;)" type="code"/>
@@ -89,7 +90,7 @@
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="resultatJTableMouseClicked"/>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ResultatJTableMouseClicked"/>
           </Events>
         </Component>
       </SubComponents>
