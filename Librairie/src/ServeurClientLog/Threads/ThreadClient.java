@@ -30,9 +30,8 @@ public class ThreadClient extends Thread {
             try {
                 //Le thread attends le socket
                 Client = TachesAExecuter.getSocket();
-                System.out.println("Connexion de " + Client.getInetAddress() + ":" + Client.getPort());
             } catch (InterruptedException e) {
-                System.out.println(this.getName() + "> Interruption : " + e.getMessage());
+                System.out.println(this.getName() + "> Interruption : " + e.getMessage() + "\n");
             }
 
             boolean boucle = true;
@@ -47,16 +46,19 @@ public class ThreadClient extends Thread {
             while (boucle) {
                 try {
                     Requete req = (Requete) ois.readObject();
-                    Queue.addTache(req.createRunnable(Client));
+                    System.out.println("Ajout d'une requête à la file d'attente\n");
+                    boucle = !req.isDisconnect();
+                    if (boucle)
+                        Queue.addTache(req.createRunnable(Client));
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.out.println(e.getLocalizedMessage());
                 }
             }
 
             try {
                 Client.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getLocalizedMessage());
             }
         }
     }

@@ -28,11 +28,12 @@ public class ThreadServeur extends Thread {
     public void run() {
         try {
             SSocket = new ServerSocket(Port);
-            System.out.println("Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort());
+            System.out.println("Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
         } catch (IOException e) {
-            System.err.println("Erreur de port d'écoute ! ? [" + e + "]");
-            System.exit(1);
+            System.out.println("Erreur de port d'écoute ! ? [" + e + "]\n");
+            return;
         }
+
         // Démarrage du pool de threads
         for (int i = 0; i < NbThreads; i++) {
             ThreadClient tcl = new ThreadClient(File, "Thread du pool n°" + String.valueOf(i));
@@ -42,11 +43,11 @@ public class ThreadServeur extends Thread {
         while (!isInterrupted()) {
             try {
                 Socket cSocket = SSocket.accept();
-                System.out.println("Connexion de " + cSocket.getInetAddress().toString() + ":" + cSocket.getPort());
+                System.out.println("Connexion de " + cSocket.getInetAddress().toString() + ":" + cSocket.getPort() + '\n');
                 File.addSocket(cSocket);
             } catch (IOException e) {
-                System.err.println("Erreur d'accept ! ? [" + e.getMessage() + "]");
-                System.exit(1);
+                System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
+                return;
             }
         }
     }
