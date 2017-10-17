@@ -2,7 +2,7 @@
 #### Délais de présentation
 | Application                              | Semaine                               | Pondération |
 | ---------------------------------------- | ------------------------------------- | ----------- |
-| 1: [Client/Serveur multithread TCP en C/C++](## 1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
+| 1: [Client/Serveur multithread TCP en C/C++](#1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
 | 2: [JDBC]()                                  | 9/10/2017                             | 10          |
 | 3: Client serveur multithread TCP en Java | 23/10/2017                            | 20          |
 | 4: Programmation web java classique      | 20/11/2017                            | 20          |
