@@ -5,6 +5,8 @@
  */
 package Application_Bagages;
 
+import Tools.PropertiesReader;
+
 import javax.swing.*;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -28,7 +30,7 @@ public class Application_Bagage extends javax.swing.JFrame {
         Socket c = null;
         try {
             //TODO Lecture via fichier properties
-            c = new Socket(InetAddress.getByName("floryan-msi-portable"),26011);
+            c = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")),Integer.valueOf(PropertiesReader.getProperties("Port")));
         }
         catch (IOException e) {
             e.printStackTrace();
