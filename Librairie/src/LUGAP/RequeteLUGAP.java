@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -39,8 +38,8 @@ public class RequeteLUGAP implements Requete {
         MySql = new Bd(BdType.MySql);
     }
 
-    private void setBd(Connection connection) throws SQLException {
-        MySql = new Bd(connection);
+    private void setBd(Bd base) {
+        MySql = base;
     }
 
     @Override
@@ -52,24 +51,11 @@ public class RequeteLUGAP implements Requete {
             e.printStackTrace();
             return null;
         }
+        System.out.println(Thread.currentThread().getName() + "> Message de " + Procedural.StringIp(s) + ":" + s.getPort());
         switch (this.Type) {
-/*
-retour = () -> {
-    System.out.println("Envoi à " + Procedural.StringIp(s) + ":" + s.getPort());
-    ReponseLUGAP repo = new ReponseLUGAP(TypeReponseLUGAP.OK, getChargeUtile());
-    ObjectOutputStream oos;
-    try {
-        oos = new ObjectOutputStream(s.getOutputStream());
-        oos.writeObject(repo);
-        oos.flush();
-        System.out.println("Message envoyé");
-    } catch (IOException e) {
-        System.err.println("Erreur lors de l'envoi d'un message: " + e.getMessage());
-    }
-};*/
             case Login:
                 retour = () -> {
-                    System.out.println("Envoi à " + Procedural.StringIp(s) + ":" + s.getPort());
+                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête login de " + Procedural.StringIp(s) + ":" + s.getPort());
                     try {
                         ResultSet rs = MySql.Select("Login");
                         ResultSetMetaData rsmd = rs.getMetaData();
@@ -81,10 +67,10 @@ retour = () -> {
                                 password = i;
                         }
                         if (user == -1) {
-                            System.out.println("User introuvable");
+                            System.out.println(Thread.currentThread().getName() + "> User introuvable");
                             return;
                         } else if (password == -1) {
-                            System.out.println("Password introuvable");
+                            System.out.println(Thread.currentThread().getName() + "> Password introuvable");
                             return;
                         }
 
@@ -92,20 +78,23 @@ retour = () -> {
                         ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN, "");
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
+                                System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
                                 if (rs.getString(password).equals(((Login) Param).getPassword())) {
                                     reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "");
+                                    System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                     break;
                                 } else {
                                     reponse = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD, "");
+                                    System.out.println(Thread.currentThread().getName() + "> Mot de passe incorrect");
                                     break;
                                 }
                             }
                         }
                         oos.writeObject(reponse);
                     } catch (SQLException e) {
-                        System.out.println("SQLException: " + e.getLocalizedMessage());
+                        System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getLocalizedMessage());
                     } catch (IOException e) {
-                        System.out.println("IOException: " + e.getLocalizedMessage());
+                        System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getLocalizedMessage());
                     }
                 };
                 break;
