@@ -2,10 +2,10 @@
 #### Délais de présentation
 | Application                              | Semaine                               | Pondération |
 | ---------------------------------------- | ------------------------------------- | ----------- |
-| 1: [Client/Serveur multithread TCP en C/C++](# 1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
-| 2: [JDBC](# 2. Les accès aux bases de données)                                  | 9/10/2017                             | 10          |
-| 3: [Client serveur multithread TCP en Java](# 3. Le serveur Serveur_Bagages) | 23/10/2017                            | 20          |
-| 4: Programmation web java classique      | 20/11/2017                            | 20          |
+| 1: [Client/Serveur multithread TCP en C/C++](https://github.com/TheYoxy/InpresAirport#1-serveur_checkin-et-application_checkin) | 2/10/2017                             | 20          |
+| 2: [JDBC](https://github.com/TheYoxy/InpresAirport#2-les-accès-aux-bases-de-données)                                  | 9/10/2017                             | 10          |
+| 3: [Client serveur multithread TCP en Java](https://github.com/TheYoxy/InpresAirport#3-le-serveur-serveur_bagages) | 23/10/2017                            | 20          |
+| 4: [Programmation web java classique]()      | 20/11/2017                            | 20          |
 | 5: Client-serveur UDP en C/C++ et Java   | 4/12/2017                             | 10          |
 | 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80          |
 | 7: Communications réseaux C/C++ - Java   | Examen de laboratoire de janvier 2018 | 20          |
@@ -209,7 +209,8 @@ Le bagagiste, au fur et à mesure de ses activités, va interagir sur ce tableau
 actions va générer une commande spécifique du protocole **LUGAP**, commande envoyée au
 serveur *Serveur_Bagages* sur le port **PORT_BAGAGES**.
 
-`**Sur base de l'exemple suivant, il vous appartient de définir les commandes du protocole LUGAP (et donc de leur donner un nom) et de choisir la manière de les implémenter (objets, chaînes de caractères, etc).**`
+---
+**Sur base de l'exemple suivant, il vous appartient de définir les commandes du protocole LUGAP (et donc de leur donner un nom) et de choisir la manière de les implémenter (objets, chaînes de caractères, etc).**
 
 Exemple:
 ---
@@ -245,9 +246,9 @@ Exemple:
 
 >5. Quand cette boîte se referme, le bagagiste est automatiquement déconnecté du serveur.
 
-#4 Programmation Web Java classique
+# 4 Programmation Web Java classique
 Dossier attendu:
 1. Diagramme de classes UML des classes de l'application Web.
 2. ​
 
-##4.1 L'application Web_Applic_Billets
+## 4.1 L'application Web_Applic_Billets
