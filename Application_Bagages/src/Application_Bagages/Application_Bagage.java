@@ -5,24 +5,33 @@
  */
 package Application_Bagages;
 
+import Tools.Bd;
+import Tools.BdType;
 import Tools.PropertiesReader;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  *
  * @author Nicolas
  */
 public class Application_Bagage extends javax.swing.JFrame {
+    Bd MySql;
     Login Log;
     liste_Bagages ListeBag;
     Socket Serveur;
     /**
      * Creates new form Login
      */
+    public Application_Bagage()
+    {
+        initComponents();
+    }
+
     public Application_Bagage(boolean ouverture) {
         initComponents();
         this.setVisible(ouverture);
@@ -38,8 +47,21 @@ public class Application_Bagage extends javax.swing.JFrame {
             System.exit(-1);
         }
         this.setEnabled(true);
+
         Log = new Login(this,true,c);
         Log.setVisible(true);
+
+        try {
+            MySql = new Bd(BdType.MySql);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
     }
 
     /**
@@ -176,7 +198,7 @@ public class Application_Bagage extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Application_Bagage(true));
+        java.awt.EventQueue.invokeLater(() -> new Application_Bagage().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
