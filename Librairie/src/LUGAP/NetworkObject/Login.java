@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Login implements Serializable {
     private String User;
     private String Password;
+    //TODO Passage du password via le hash
 
     public Login(String user, String password) {
         this.User = user;
