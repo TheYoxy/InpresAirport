@@ -32,4 +32,9 @@ public class Procedural {
     public static String StringIp(ServerSocket s) {
         return StringIp(s.getInetAddress());
     }
+
+    @NotNull
+    public static String IpPort(@NotNull Socket s) {
+        return Procedural.StringIp(s) + ":" + s.getPort();
+    }
 }

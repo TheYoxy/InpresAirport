@@ -1,32 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Application_Bagages;
 
-import Tools.Bd;
-import Tools.BdType;
+import LUGAP.NetworkObject.Table;
+import LUGAP.ReponseLUGAP;
+import LUGAP.RequeteLUGAP;
+import LUGAP.TypeReponseLUGAP;
+import LUGAP.TypeRequeteLUGAP;
+import Tools.Procedural;
 import Tools.PropertiesReader;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.sql.SQLException;
 
-/**
- *
- * @author Nicolas
- */
 public class Application_Bagage extends javax.swing.JFrame {
-    Bd MySql;
-    Login Log;
-    liste_Bagages ListeBag;
-    Socket Serveur;
-    /**
-     * Creates new form Login
-     */
+    private Login Log = null;
+    private liste_Bagages ListeBag = null;
+    private Socket Serveur = null;
+    private ObjectInputStream Ois = null;
+    private ObjectOutputStream Oos = null;
     public Application_Bagage()
     {
         initComponents();
@@ -36,10 +31,9 @@ public class Application_Bagage extends javax.swing.JFrame {
         initComponents();
         this.setVisible(ouverture);
         this.setEnabled(false);
-        Socket c = null;
         try {
             //TODO Lecture via fichier properties
-            c = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")),Integer.valueOf(PropertiesReader.getProperties("Port")));
+            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")),Integer.valueOf(PropertiesReader.getProperties("Port")));
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -48,20 +42,39 @@ public class Application_Bagage extends javax.swing.JFrame {
         }
         this.setEnabled(true);
 
-        Log = new Login(this,true,c);
+        Log = new Login(this,true,Serveur);
         Log.setVisible(true);
-
+        Ois = Log.getOis();
+        Oos = Log.getOos();
+        ReponseLUGAP rep = null;
         try {
-            MySql = new Bd(BdType.MySql);
+            RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols,"", Procedural.IpPort(Serveur));
+            Oos.writeObject(req);
+
+            rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         }
+        if (rep.getCode() != TypeReponseLUGAP.OK)
+        {
+            JOptionPane.showMessageDialog(this,"Erreur lors de la réception du tableau","Exception",JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        Table t = (Table) rep.getParam();
+        DefaultTableModel dtm = new DefaultTableModel(t.getChamps(),t.getTete())
+        {
+            @Override
+            public boolean isCellEditable(int i, int i1) {
+                return false;
+            }
+        };
+        resultatJTable.setModel(dtm);
     }
 
     /**
@@ -168,7 +181,7 @@ public class Application_Bagage extends javax.swing.JFrame {
     private void resultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultatJTableMouseClicked
         int row = resultatJTable.rowAtPoint(evt.getPoint());
         int col = resultatJTable.columnAtPoint(evt.getPoint());
-        
+
         if (row >= 0 && col >= 0) {
             System.out.println("coucou");
             ListeBag = new liste_Bagages((String)resultatJTable.getValueAt(col, row));

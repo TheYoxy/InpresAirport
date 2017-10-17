@@ -16,13 +16,15 @@ public class TextAreaOutputStream extends OutputStream {
 
     @Override
     public void write(int i) throws IOException {
+        if (i == '\r')
+            return;
 
         if (i == '\n') {
             Input.add((byte) i);
             byte[] b = new byte[Input.size()];
             for (int j = 0; j < Input.size(); j++)
                 b[j] = Input.get(j);
-            final String text = new String(b, "UTF-8");
+            final String text = new String(b);
             SwingUtilities.invokeLater(() -> TextArea.append(text));
             Input.clear();
         } else {

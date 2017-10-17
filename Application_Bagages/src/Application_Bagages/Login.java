@@ -4,6 +4,7 @@ import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;
 import LUGAP.TypeRequeteLUGAP;
+import Tools.Procedural;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -16,9 +17,19 @@ import java.net.Socket;
  * @author floryan
  */
 public class Login extends javax.swing.JDialog {
-    private Socket Socket;
-    private boolean Connecter;
+    private Socket Socket = null;
+    private boolean Connecter = false;
+    private ObjectOutputStream Oos = null;
 
+    public ObjectOutputStream getOos() {
+        return Oos;
+    }
+
+    public ObjectInputStream getOis() {
+        return Ois;
+    }
+
+    private ObjectInputStream Ois = null;
     /**
      * Creates new form Login
      */
@@ -149,17 +160,17 @@ public class Login extends javax.swing.JDialog {
 
     private void ConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectionButtonActionPerformed
         LUGAP.NetworkObject.Login l = new LUGAP.NetworkObject.Login(LoginTF.getText(), new String(PasswordPF.getPassword()));
-        RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Login, l, "Test");
+        RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Login, "",l, Procedural.IpPort(Socket));
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(Socket.getOutputStream());
-            oos.writeObject(req);
+            Oos = new ObjectOutputStream(Socket.getOutputStream());
+            Oos.writeObject(req);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
         }
         ReponseLUGAP rep = null;
         try {
-            ObjectInputStream ois = new ObjectInputStream(Socket.getInputStream());
-            rep = (ReponseLUGAP) ois.readObject();
+            Ois = new ObjectInputStream(Socket.getInputStream());
+            rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException e) {
