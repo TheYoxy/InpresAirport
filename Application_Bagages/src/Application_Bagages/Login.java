@@ -1,21 +1,87 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Application_Bagages;
+
+import LUGAP.ReponseLUGAP;
+import LUGAP.RequeteLUGAP;
+import LUGAP.TypeReponseLUGAP;
+import LUGAP.TypeRequeteLUGAP;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 /**
  *
- * @author Nicolas
+ * @author floryan
  */
-public class Login extends javax.swing.JFrame {
+public class Login extends javax.swing.JDialog {
+    private Socket Socket;
+    private boolean Connecter;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ConnectionButton;
+    private javax.swing.JLabel LoginLabel;
+    private javax.swing.JTextField LoginTF;
+    private javax.swing.JLabel PasswordLabel;
+    private javax.swing.JPasswordField PasswordPF;
 
     /**
-     * Creates new form Application_Bagage
+     * Creates new form Login
      */
-    public Login() {
+    public Login(java.awt.Frame parent, boolean modal, Socket serveur) {
+        super(parent, modal);
         initComponents();
+        Socket = serveur;
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(() -> {
+            Login dialog = null;
+            try {
+                dialog = new Login(new JFrame(), true, new Socket("127.0.0.1", 26011));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            assert dialog != null;
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    System.exit(0);
+                }
+            });
+            dialog.setVisible(true);
+        });
+    }
+
+    public boolean isConnecter() {
+        return Connecter;
     }
 
     /**
@@ -27,98 +93,101 @@ public class Login extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        loginLabel = new javax.swing.JLabel();
-        loginTextField = new javax.swing.JTextField();
-        passwordLabel = new javax.swing.JLabel();
-        passwTextField = new javax.swing.JTextField();
-        connectionButton = new javax.swing.JButton();
+        ConnectionButton = new javax.swing.JButton();
+        LoginLabel = new javax.swing.JLabel();
+        LoginTF = new javax.swing.JTextField();
+        PasswordLabel = new javax.swing.JLabel();
+        PasswordPF = new javax.swing.JPasswordField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login");
+        setResizable(false);
+        setType(java.awt.Window.Type.UTILITY);
 
-        loginLabel.setText("Login :");
+        ConnectionButton.setText("Connect !");
+        ConnectionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ConnectionButtonActionPerformed(evt);
+            }
+        });
 
-        loginTextField.setText("username");
-        loginTextField.setToolTipText("");
+        LoginLabel.setText("Login :");
 
-        passwordLabel.setText("Password :");
+        LoginTF.setToolTipText("");
 
-        passwTextField.setText("password");
-
-        connectionButton.setText("Connect !");
+        PasswordLabel.setText("Password :");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(LoginTF)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(loginLabel)
-                            .addComponent(passwordLabel)
-                            .addComponent(passwTextField)
-                            .addComponent(loginTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(81, 81, 81)
-                        .addComponent(connectionButton)))
-                .addContainerGap(76, Short.MAX_VALUE))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(LoginLabel)
+                                    .addComponent(PasswordLabel)
+                                    .addComponent(ConnectionButton))
+                            .addGap(0, 91, Short.MAX_VALUE))
+                        .addComponent(PasswordPF))
+                    .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(loginLabel)
+                    .addComponent(LoginLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(loginTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(LoginTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(passwordLabel)
+                    .addComponent(PasswordLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(passwTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
-                .addComponent(connectionButton)
-                .addContainerGap())
+                    .addComponent(PasswordPF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(20, 20, 20)
+                    .addComponent(ConnectionButton)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    private void ConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectionButtonActionPerformed
+        LUGAP.NetworkObject.Login l = new LUGAP.NetworkObject.Login(LoginTF.getText(), new String(PasswordPF.getPassword()));
+        RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Login, l, "Test");
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | javax.swing.UnsupportedLookAndFeelException | IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            ObjectOutputStream oos = new ObjectOutputStream(Socket.getOutputStream());
+            oos.writeObject(req);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
         }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Login().setVisible(true);
+        ReponseLUGAP rep = null;
+        try {
+            ObjectInputStream ois = new ObjectInputStream(Socket.getInputStream());
+            rep = (ReponseLUGAP) ois.readObject();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (rep != null) {
+            TypeReponseLUGAP i = (TypeReponseLUGAP) rep.getCode();
+            System.out.println("Réponse: " + i);
+            switch (i) {
+                case UNKNOWN_LOGIN:
+                    JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case BAD_PASSWORD:
+                    JOptionPane.showMessageDialog(this, "Le mot de passe entré est incorrect", "Retour de connection", JOptionPane.WARNING_MESSAGE);
+                    break;
+                case LOG:
+                    JOptionPane.showMessageDialog(this, "Connecté", "Retour de connection", JOptionPane.INFORMATION_MESSAGE);
+                    this.setVisible(false);
+                    Connecter = true;
+                    break;
             }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton connectionButton;
-    private javax.swing.JLabel loginLabel;
-    private javax.swing.JTextField loginTextField;
-    private javax.swing.JTextField passwTextField;
-    private javax.swing.JLabel passwordLabel;
+        }
+    }//GEN-LAST:event_ConnectionButtonActionPerformed
     // End of variables declaration//GEN-END:variables
 }
