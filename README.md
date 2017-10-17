@@ -2,9 +2,9 @@
 #### Délais de présentation
 | Application                              | Semaine                               | Pondération |
 | ---------------------------------------- | ------------------------------------- | ----------- |
-| 1: [Client/Serveur multithread TCP en C/C++](#1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
-| 2: [JDBC]()                                  | 9/10/2017                             | 10          |
-| 3: Client serveur multithread TCP en Java | 23/10/2017                            | 20          |
+| 1: [Client/Serveur multithread TCP en C/C++](## 1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
+| 2: [JDBC](## 2. Les accès aux bases de données)                                  | 9/10/2017                             | 10          |
+| 3: [Client serveur multithread TCP en Java](## 3. Le serveur Serveur_Bagages) | 23/10/2017                            | 20          |
 | 4: Programmation web java classique      | 20/11/2017                            | 20          |
 | 5: Client-serveur UDP en C/C++ et Java   | 4/12/2017                             | 10          |
 | 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80          |
@@ -137,7 +137,6 @@ exemples - libre à vous d'en concevoir d'autres du même style) :
 
 
 ## 2. Les accès aux bases de données
-
 ### 2.1 La base de données BD_AIRPORT
 Dossier attendu:
 -  Schéma relationnel de BD_AIRPORT.
