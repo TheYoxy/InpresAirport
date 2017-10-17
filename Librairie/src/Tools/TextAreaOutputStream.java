@@ -3,29 +3,30 @@ package Tools;
 import javax.swing.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedList;
 
 public class TextAreaOutputStream extends OutputStream {
     private final JTextArea TextArea;
-    private final StringBuilder Sb;
+    private final LinkedList<Byte> Input;
 
     public TextAreaOutputStream(final JTextArea textArea) {
         this.TextArea = textArea;
-        this.Sb = new StringBuilder();
+        this.Input = new LinkedList<>();
     }
 
     @Override
     public void write(int i) throws IOException {
-        //TODO fix pour l'utf-16
-        if (i == '\r')
-            return;
 
         if (i == '\n') {
-            final String text = Sb.toString() + "\n";
+            Input.add((byte) i);
+            byte[] b = new byte[Input.size()];
+            for (int j = 0; j < Input.size(); j++)
+                b[j] = Input.get(j);
+            final String text = new String(b, "UTF-8");
             SwingUtilities.invokeLater(() -> TextArea.append(text));
-            Sb.setLength(0);
+            Input.clear();
         } else {
-            Sb.append((char) i);
+            Input.add((byte) i);
         }
     }
-
 }
