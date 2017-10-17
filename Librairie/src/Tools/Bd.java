@@ -6,18 +6,33 @@ import java.sql.*;
 import java.util.Properties;
 
 public class Bd {
+    private static Bd MySql;
+
+    static {
+        try {
+            MySql = new Bd(BdType.MySql);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
     private Connection Connection;
 
     public Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
     }
 
+    public static Bd getMySql() {
+        return MySql;
+    }
+
     public static void main(String[] argv) throws IOException, SQLException {
         Bd b = new Bd(BdType.MySql);
         AfficheResultSet(b.Select("Login"));
-
-        /*DatabaseMetaData dmd = b.Connection.getMetaData();
-        AfficheResultSet(dmd.getTables("bd_airport", null, "%", null));*/
     }
 
     public static Connection createConnection(BdType type) throws SQLException, IOException {
