@@ -9,6 +9,7 @@
 | 5: Client-serveur UDP en C/C++ et Java   | 4/12/2017                             | 10          |
 | 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80          |
 | 7: Communications réseaux C/C++ - Java   | Examen de laboratoire de janvier 2018 | 20          |
+---
 #### Fonctions utiles:
 > ##### TCP
 - ###### Client:
@@ -188,11 +189,11 @@ Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir ave
 
 L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.\
 Exemple:
----
-VOL 714 WALABIES-AIRLINES - Sydney 5h30\
+
+>VOL 714 WALABIES-AIRLINES - Sydney 5h30\
 VOL 362 POWDER-AIRLINES - Peshawar 6h30\
 VOL 152 AIR FRANCE CANAILLE - Paris 7h20
----
+
 
 Un double-clic sur un item de la liste fait appraître dans une boîte de dialogue un tableau reprenant les bages enregistrés pour ce vol (Données provenant du fichier associé pour les 3 premières colonnes, initislisée avec les valeurs par défaut "N" ou "NEANT" selon le cas).
 Exemple:
