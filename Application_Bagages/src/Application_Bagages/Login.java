@@ -18,12 +18,6 @@ import java.net.Socket;
 public class Login extends javax.swing.JDialog {
     private Socket Socket;
     private boolean Connecter;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ConnectionButton;
-    private javax.swing.JLabel LoginLabel;
-    private javax.swing.JTextField LoginTF;
-    private javax.swing.JLabel PasswordLabel;
-    private javax.swing.JPasswordField PasswordPF;
 
     /**
      * Creates new form Login
@@ -173,7 +167,6 @@ public class Login extends javax.swing.JDialog {
         }
         if (rep != null) {
             TypeReponseLUGAP i = (TypeReponseLUGAP) rep.getCode();
-            System.out.println("Réponse: " + i);
             switch (i) {
                 case UNKNOWN_LOGIN:
                     JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
@@ -189,5 +182,12 @@ public class Login extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_ConnectionButtonActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ConnectionButton;
+    private javax.swing.JLabel LoginLabel;
+    private javax.swing.JTextField LoginTF;
+    private javax.swing.JLabel PasswordLabel;
+    private javax.swing.JPasswordField PasswordPF;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,18 +5,39 @@
  */
 package Application_Bagages;
 
+import javax.swing.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+
 /**
  *
  * @author Nicolas
  */
 public class Application_Bagage extends javax.swing.JFrame {
-
-    liste_Bagages listeBag;
+    Login Log;
+    liste_Bagages ListeBag;
+    Socket Serveur;
     /**
      * Creates new form Login
      */
-    public Application_Bagage() {
+    public Application_Bagage(boolean ouverture) {
         initComponents();
+        this.setVisible(ouverture);
+        this.setEnabled(false);
+        Socket c = null;
+        try {
+            //TODO Lecture via fichier properties
+            c = new Socket(InetAddress.getByName("floryan-msi-portable"),26011);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        this.setEnabled(true);
+        Log = new Login(this,true,c);
+        Log.setVisible(true);
     }
 
     /**
@@ -126,8 +147,8 @@ public class Application_Bagage extends javax.swing.JFrame {
         
         if (row >= 0 && col >= 0) {
             System.out.println("coucou");
-            listeBag = new liste_Bagages((String)resultatJTable.getValueAt(col, row));
-            listeBag.setVisible(true);
+            ListeBag = new liste_Bagages((String)resultatJTable.getValueAt(col, row));
+            ListeBag.setVisible(true);
         }
     }//GEN-LAST:event_resultatJTableMouseClicked
 
@@ -147,26 +168,13 @@ public class Application_Bagage extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException ex) {
             java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Application_Bagage().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new Application_Bagage(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

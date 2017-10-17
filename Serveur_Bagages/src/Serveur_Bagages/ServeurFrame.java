@@ -9,11 +9,6 @@ import java.io.PrintStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
     private ThreadServeur Ts = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea ConsoleTA;
-    private javax.swing.JButton StartB;
-    private javax.swing.JRadioButton StateRB;
-    private javax.swing.JScrollPane jScrollPane1;
 
     /**
      * Creates new form ServeurFrame
@@ -130,5 +125,11 @@ public class ServeurFrame extends javax.swing.JFrame {
         StartB.setEnabled(false);
         StateRB.setSelected(true);
     }//GEN-LAST:event_StartBActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea ConsoleTA;
+    private javax.swing.JButton StartB;
+    private javax.swing.JRadioButton StateRB;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
