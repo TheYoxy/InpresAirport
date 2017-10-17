@@ -12,6 +12,14 @@ public class Bd {
         this.Connection = createConnection(type);
     }
 
+    public static void main(String[] argv) throws IOException, SQLException {
+        Bd b = new Bd(BdType.MySql);
+        AfficheResultSet(b.Select("Login"));
+
+        /*DatabaseMetaData dmd = b.Connection.getMetaData();
+        AfficheResultSet(dmd.getTables("bd_airport", null, "%", null));*/
+    }
+
     public static Connection createConnection(BdType type) throws SQLException, IOException {
         String name = "";
         String confFile = "";
@@ -46,8 +54,26 @@ public class Bd {
         return retour;
     }
 
+    public static void AfficheResultSet(ResultSet rs) throws SQLException {
+        ResultSetMetaData rsmf = rs.getMetaData();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= rsmf.getColumnCount(); i++) {
+            sb.append(rsmf.getColumnName(i)).append("|");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        System.out.println(sb);
+        while (rs.next()) {
+            sb = new StringBuilder();
+            for (int i = 1; i <= rsmf.getColumnCount(); i++)
+                sb.append(rs.getObject(i)).append("|");
+            sb.deleteCharAt(sb.length() - 1);
+            System.out.println(sb);
+        }
+    }
+
     public ResultSet Select(String table) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("select * from ?");
-        return ps.executeQuery();
+        Statement s = Connection.createStatement();
+        //La table doit être hard codée
+        return s.executeQuery("select * from " + table);
     }
 }
