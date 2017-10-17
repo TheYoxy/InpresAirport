@@ -1,23 +1,22 @@
 package LUGAP.NetworkObject;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import java.util.Vector;
 
-public class Table implements Serializable{
-    private LinkedList<String> Tete;
-    private LinkedList<LinkedList<String>> Champs;
+public class Table implements Serializable {
+    private Vector<String> Tete;
+    private Vector<Vector<String>> Champs;
 
-    public Table(LinkedList<String> tete, LinkedList<LinkedList<String>> champs) {
+    public Table(Vector<String> tete, Vector<Vector<String>> champs) {
         Tete = tete;
         Champs = champs;
     }
 
-    public LinkedList<String> getTete() {
+    public Vector<String> getTete() {
         return Tete;
     }
 
-    public LinkedList<LinkedList<String>> getChamps() {
+    public Vector<Vector<String>> getChamps() {
         return Champs;
     }
-
 }
