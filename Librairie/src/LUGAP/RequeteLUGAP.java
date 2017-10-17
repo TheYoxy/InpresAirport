@@ -119,6 +119,7 @@ public class RequeteLUGAP implements Requete {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_vols de " + From);
                     try {
                         ResultSet rs = MySql.Select("Vols");
+                        //TODO Fix sélection des vols d'une journée
                         Vector<String> title = new Vector<>();
                         ResultSetMetaData rsmd = rs.getMetaData();
                         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -140,6 +141,12 @@ public class RequeteLUGAP implements Requete {
                                         case Types.DATE:
                                             temp.add(rs.getDate(i).toString());
                                             break;
+                                        case Types.TIME:
+                                            temp.add(rs.getTime(i).toString());
+                                            break;
+                                        case Types.TIMESTAMP:
+                                            temp.add(rs.getTimestamp(i).toString());
+                                            break;
                                         case Types.NULL:
                                             temp.add("");
                                             break;
@@ -151,6 +158,7 @@ public class RequeteLUGAP implements Requete {
                                     System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
                                 }
                             }
+                            champs.add(temp);
                         }
                         Table t = new Table(title, champs);
                         ReponseLUGAP rep = new ReponseLUGAP(TypeReponseLUGAP.OK, "", t);

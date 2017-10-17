@@ -32,7 +32,6 @@ public class Application_Bagage extends javax.swing.JFrame {
         this.setVisible(ouverture);
         this.setEnabled(false);
         try {
-            //TODO Lecture via fichier properties
             Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")),Integer.valueOf(PropertiesReader.getProperties("Port")));
         }
         catch (IOException e) {
@@ -61,6 +60,7 @@ public class Application_Bagage extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,e.getLocalizedMessage(),"Exception",JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         }
+
         if (rep.getCode() != TypeReponseLUGAP.OK)
         {
             JOptionPane.showMessageDialog(this,"Erreur lors de la réception du tableau","Exception",JOptionPane.ERROR_MESSAGE);
