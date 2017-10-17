@@ -12,11 +12,6 @@ public class Bd {
         this.Connection = createConnection(type);
     }
 
-    public Bd(Connection connection) throws SQLException {
-        if (!connection.isClosed())
-            Connection = connection;
-    }
-
     public static void main(String[] argv) throws IOException, SQLException {
         Bd b = new Bd(BdType.MySql);
         AfficheResultSet(b.Select("Login"));
