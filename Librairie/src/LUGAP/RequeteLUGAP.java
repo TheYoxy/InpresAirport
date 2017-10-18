@@ -14,6 +14,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class RequeteLUGAP implements Requete {
+
     private TypeRequeteLUGAP Type = null;
     private String ChargeUtile = null;
     private Serializable Param = null;
@@ -74,10 +75,11 @@ public class RequeteLUGAP implements Requete {
                         ResultSetMetaData rsmd = rs.getMetaData();
                         int user = -1, password = -1;
                         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                            if (rsmd.getColumnName(i).equals("username"))
+                            if (rsmd.getColumnName(i).equals("username")) {
                                 user = i;
-                            else if (rsmd.getColumnName(i).equals("password"))
+                            } else if (rsmd.getColumnName(i).equals("password")) {
                                 password = i;
+                            }
                         }
                         if (user == -1) {
                             System.out.println(Thread.currentThread().getName() + "> User introuvable");
@@ -117,8 +119,7 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_vols de " + From);
                     try {
-                        //TODO Fix sélection des vols d'une journée
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", Bd.toTable(MySql.Select("Vols"))));
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", Bd.toTable(MySql.SelectTodayVols())));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         try {
@@ -146,8 +147,9 @@ public class RequeteLUGAP implements Requete {
                         t.getTete().add("Vérifié");
                         t.getTete().add("Remarque");
                         t.getChamps().stream().forEach((v) -> {
-                            for (int i = 0; i < 4; i++)
+                            for (int i = 0; i < 4; i++) {
                                 v.add("N");
+                            }
                         });
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", t));
                     } catch (SQLException e) {

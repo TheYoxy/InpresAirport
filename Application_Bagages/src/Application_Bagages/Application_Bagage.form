@@ -28,6 +28,9 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -54,7 +57,7 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="BagagisteNomPrenomLabel" min="-2" pref="138" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="volsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="VolsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="170" max="32767" attributes="0"/>
                   </Group>
@@ -72,7 +75,7 @@
                   <Component id="BagagisteNomPrenomLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-              <Component id="volsLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="VolsLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="ScrollPane" pref="202" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -117,7 +120,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="volsLabel">
+    <Component class="javax.swing.JLabel" name="VolsLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Vols pr&#xe9;vus ce jour :"/>
       </Properties>

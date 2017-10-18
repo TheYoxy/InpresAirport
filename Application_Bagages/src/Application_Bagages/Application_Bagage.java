@@ -17,23 +17,17 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class Application_Bagage extends javax.swing.JFrame {
+
     private Login Log = null;
     private Liste_Bagages ListeBag = null;
     private Socket Serveur = null;
     private ObjectInputStream Ois = null;
     private ObjectOutputStream Oos = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel BagagisteLabel;
-    private javax.swing.JLabel BagagisteNomPrenomLabel;
-    private javax.swing.JMenuItem DisconnectMI;
-    private javax.swing.JMenuBar MenuBar;
-    private javax.swing.JMenu OptionMenu;
-    private javax.swing.JTable ResultatJTable;
-    private javax.swing.JScrollPane ScrollPane;
-    private javax.swing.JLabel volsLabel;
+
     public Application_Bagage() {
         initComponents();
     }
+
     public Application_Bagage(boolean ouverture) {
         initComponents();
         this.setVisible(ouverture);
@@ -111,13 +105,18 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteNomPrenomLabel = new javax.swing.JLabel();
         ScrollPane = new javax.swing.JScrollPane();
         ResultatJTable = new javax.swing.JTable();
-        volsLabel = new javax.swing.JLabel();
+        VolsLabel = new javax.swing.JLabel();
         MenuBar = new javax.swing.JMenuBar();
         OptionMenu = new javax.swing.JMenu();
         DisconnectMI = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Application Bagages");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         BagagisteLabel.setText("Bagagiste :");
 
@@ -125,15 +124,15 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteNomPrenomLabel.setText("non prenom");
 
         ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
         ));
         ResultatJTable.setCellSelectionEnabled(true);
         ResultatJTable.setEnabled(false);
@@ -144,7 +143,7 @@ public class Application_Bagage extends javax.swing.JFrame {
         });
         ScrollPane.setViewportView(ResultatJTable);
 
-        volsLabel.setText("Vols prévus ce jour :");
+        VolsLabel.setText("Vols prévus ce jour :");
 
         OptionMenu.setText("Options");
 
@@ -158,60 +157,82 @@ public class Application_Bagage extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(BagagisteLabel)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(volsLabel))
-                                                .addGap(0, 170, Short.MAX_VALUE)))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BagagisteLabel)
+                                .addGap(18, 18, 18)
+                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(VolsLabel))
+                        .addGap(0, 170, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(BagagisteLabel)
-                                        .addComponent(BagagisteNomPrenomLabel))
-                                .addGap(24, 24, 24)
-                                .addComponent(volsLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BagagisteLabel)
+                    .addComponent(BagagisteNomPrenomLabel))
+                .addGap(24, 24, 24)
+                .addComponent(VolsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
-        int row = ResultatJTable.rowAtPoint(evt.getPoint());
-        if (row >= 0) {
-            ReponseLUGAP rep;
-            try {
-                Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, "", ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
-                rep = (ReponseLUGAP) Ois.readObject();
-                if (rep.getCode() != TypeReponseLUGAP.OK)
-                    //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
+        if (evt.getClickCount() == 1) {
+            int row = ResultatJTable.rowAtPoint(evt.getPoint());
+            if (row >= 0) {
+                ReponseLUGAP rep;
+                try {
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, "", ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
+                    rep = (ReponseLUGAP) Ois.readObject();
+                    if (rep.getCode() != TypeReponseLUGAP.OK) //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
+                    {
+                        return;
+                    }
+                } catch (IOException e) {
+                    //Todo Affichage d'une messagebox disant qu'il y a une erreur
+                    e.printStackTrace();
                     return;
-            } catch (IOException e) {
-                //Todo Affichage d'une messagebox disant qu'il y a une erreur
-                e.printStackTrace();
-                return;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return;
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                ListeBag = new Liste_Bagages((String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
+                ListeBag.setVisible(true);
             }
 
-            ListeBag = new Liste_Bagages((String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
-            ListeBag.setVisible(true);
         }
     }//GEN-LAST:event_ResultatJTableMouseClicked
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Disconnect, ""));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel BagagisteLabel;
+    private javax.swing.JLabel BagagisteNomPrenomLabel;
+    private javax.swing.JMenuItem DisconnectMI;
+    private javax.swing.JMenuBar MenuBar;
+    private javax.swing.JMenu OptionMenu;
+    private javax.swing.JTable ResultatJTable;
+    private javax.swing.JScrollPane ScrollPane;
+    private javax.swing.JLabel VolsLabel;
     // End of variables declaration//GEN-END:variables
 }

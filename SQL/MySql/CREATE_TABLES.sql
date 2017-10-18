@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS Vols;
 CREATE TABLE Vols (
   numVol           VARCHAR(15) PRIMARY KEY,
   destination      VARCHAR(30),
-  heureArrivee     DATETIME,
   heureDepart      DATETIME NOT NULL,
+  heureArrivee     DATETIME NOT NULL,
   heureArriveeDest DATETIME NOT NULL,
   idAvion          INT REFERENCES Avion (id)
 )
