@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Vector;
 
 public class RequeteLUGAP implements Requete {
     private TypeRequeteLUGAP Type = null;
@@ -61,6 +60,7 @@ public class RequeteLUGAP implements Requete {
         MySql = base;
     }
 
+    @Override
     public Runnable createRunnable(final ObjectOutputStream oosClient) {
         Runnable retour = null;
         this.setBd(Bd.getMySql());
@@ -145,9 +145,10 @@ public class RequeteLUGAP implements Requete {
                         t.getTete().add("Chargé");
                         t.getTete().add("Vérifié");
                         t.getTete().add("Remarque");
-                        for (Vector<String> v : t.getChamps())
+                        t.getChamps().stream().forEach((v) -> {
                             for (int i = 0; i < 4; i++)
                                 v.add("N");
+                        });
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", t));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
