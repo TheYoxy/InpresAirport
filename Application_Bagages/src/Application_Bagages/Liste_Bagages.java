@@ -5,22 +5,28 @@
  */
 package Application_Bagages;
 
+import LUGAP.NetworkObject.Table;
+
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Nicolas
  */
-public class liste_Bagages extends javax.swing.JFrame {
+public class Liste_Bagages extends javax.swing.JFrame {
 
     /**
      * Creates new form liste_Bagages
      */
-    public liste_Bagages() {
+    public Liste_Bagages() {
         initComponents();
     }
     
-    public liste_Bagages(String vol) {
+    public Liste_Bagages(String vol, Table t) {
         initComponents();
-        volLabel2.setText(vol);
+        setTitle("Vol: " + vol);
+        VolLabel2.setText(vol);
+        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(),t.getTete()));
     }
 
     /**
@@ -32,21 +38,22 @@ public class liste_Bagages extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        volLabel = new javax.swing.JLabel();
-        bagagesLabel = new javax.swing.JLabel();
-        volLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        resultatJTable = new javax.swing.JTable();
+        VolLabel = new javax.swing.JLabel();
+        BagagesLabel = new javax.swing.JLabel();
+        VolLabel2 = new javax.swing.JLabel();
+        ScrollPane1 = new javax.swing.JScrollPane();
+        ResultatJTable = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
 
-        volLabel.setText("Vol :");
+        VolLabel.setText("Vol :");
 
-        bagagesLabel.setText("Bagages pour ce vol :");
+        BagagesLabel.setText("Bagages pour ce vol :");
 
-        volLabel2.setText("Nom du vol");
+        VolLabel2.setText("Nom du vol");
 
-        resultatJTable.setModel(new javax.swing.table.DefaultTableModel(
+        ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -57,14 +64,14 @@ public class liste_Bagages extends javax.swing.JFrame {
                 "Identifiant", "Poids", "Type", "Réceptioné(O/N)", "Chargé en soute (O/N)", "Vérifié par la douane (O/N)", "Remarques"
             }
         ));
-        resultatJTable.setCellSelectionEnabled(true);
-        resultatJTable.setEnabled(false);
-        resultatJTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        ResultatJTable.setCellSelectionEnabled(true);
+        ResultatJTable.setEnabled(false);
+        ResultatJTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                resultatJTableMouseClicked(evt);
+                ResultatJTableMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(resultatJTable);
+        ScrollPane1.setViewportView(ResultatJTable);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -73,14 +80,14 @@ public class liste_Bagages extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(volLabel)
+                                .addComponent(VolLabel)
                                 .addGap(18, 18, 18)
-                                .addComponent(volLabel2))
-                            .addComponent(bagagesLabel))
+                                .addComponent(VolLabel2))
+                            .addComponent(BagagesLabel))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -89,21 +96,21 @@ public class liste_Bagages extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(volLabel)
-                    .addComponent(volLabel2))
+                    .addComponent(VolLabel)
+                    .addComponent(VolLabel2))
                 .addGap(25, 25, 25)
-                .addComponent(bagagesLabel)
+                .addComponent(BagagesLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void resultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultatJTableMouseClicked
+    private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
 
-    }//GEN-LAST:event_resultatJTableMouseClicked
+    }//GEN-LAST:event_ResultatJTableMouseClicked
 
     /**
      * @param args the command line arguments
@@ -122,29 +129,26 @@ public class liste_Bagages extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new liste_Bagages().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new Liste_Bagages().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel bagagesLabel;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable resultatJTable;
-    private javax.swing.JLabel volLabel;
-    private javax.swing.JLabel volLabel2;
+    private javax.swing.JLabel BagagesLabel;
+    private javax.swing.JTable ResultatJTable;
+    private javax.swing.JScrollPane ScrollPane1;
+    private javax.swing.JLabel VolLabel;
+    private javax.swing.JLabel VolLabel2;
     // End of variables declaration//GEN-END:variables
 }

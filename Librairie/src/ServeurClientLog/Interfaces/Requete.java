@@ -2,11 +2,12 @@ package ServeurClientLog.Interfaces;
 
 import com.sun.istack.internal.NotNull;
 
-import java.net.Socket;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public interface Requete {
+public interface Requete extends Serializable {
     @NotNull
-    Runnable createRunnable(Socket s);
+    Runnable createRunnable(ObjectOutputStream oosClient);
 
     boolean isDisconnect();
 }

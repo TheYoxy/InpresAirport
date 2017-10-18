@@ -1,22 +1,101 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Application_Bagages;
 
-/**
- *
- * @author Nicolas
- */
-public class Application_Bagage extends javax.swing.JFrame {
+import LUGAP.NetworkObject.Table;
+import LUGAP.ReponseLUGAP;
+import LUGAP.RequeteLUGAP;
+import LUGAP.TypeReponseLUGAP;
+import LUGAP.TypeRequeteLUGAP;
+import Tools.Procedural;
+import Tools.PropertiesReader;
 
-    liste_Bagages listeBag;
-    /**
-     * Creates new form Login
-     */
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+
+public class Application_Bagage extends javax.swing.JFrame {
+    private Login Log = null;
+    private Liste_Bagages ListeBag = null;
+    private Socket Serveur = null;
+    private ObjectInputStream Ois = null;
+    private ObjectOutputStream Oos = null;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel BagagisteLabel;
+    private javax.swing.JLabel BagagisteNomPrenomLabel;
+    private javax.swing.JMenuItem DisconnectMI;
+    private javax.swing.JMenuBar MenuBar;
+    private javax.swing.JMenu OptionMenu;
+    private javax.swing.JTable ResultatJTable;
+    private javax.swing.JScrollPane ScrollPane;
+    private javax.swing.JLabel volsLabel;
     public Application_Bagage() {
         initComponents();
+    }
+    public Application_Bagage(boolean ouverture) {
+        initComponents();
+        this.setVisible(ouverture);
+        this.setEnabled(false);
+        try {
+            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        this.setEnabled(true);
+
+        Log = new Login(this, true, Serveur);
+        Log.setVisible(true);
+        Ois = Log.getOis();
+        Oos = Log.getOos();
+        ReponseLUGAP rep = null;
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols, "", Procedural.IpPort(Serveur)));
+            rep = (ReponseLUGAP) Ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+
+        if (rep.getCode() != TypeReponseLUGAP.OK) {
+            JOptionPane.showMessageDialog(this, "Erreur lors de la réception du tableau", "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        Table t = (Table) rep.getParam();
+        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(), t.getTete()));
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | UnsupportedLookAndFeelException | IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new Application_Bagage().setVisible(true));
     }
 
     /**
@@ -28,158 +107,111 @@ public class Application_Bagage extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        bagagisteLabel = new javax.swing.JLabel();
-        bagagisteLabel2 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        resultatJTable = new javax.swing.JTable();
+        BagagisteLabel = new javax.swing.JLabel();
+        BagagisteNomPrenomLabel = new javax.swing.JLabel();
+        ScrollPane = new javax.swing.JScrollPane();
+        ResultatJTable = new javax.swing.JTable();
         volsLabel = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        optionMenu = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        aboutMenu = new javax.swing.JMenu();
-        helpMenu = new javax.swing.JMenu();
+        MenuBar = new javax.swing.JMenuBar();
+        OptionMenu = new javax.swing.JMenu();
+        DisconnectMI = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Application Bagages");
 
-        bagagisteLabel.setText("Bagagiste :");
+        BagagisteLabel.setText("Bagagiste :");
 
-        bagagisteLabel2.setFont(new java.awt.Font("Calibri", 2, 12)); // NOI18N
-        bagagisteLabel2.setText("non prenom");
+        BagagisteNomPrenomLabel.setFont(new java.awt.Font("Calibri", 2, 12)); // NOI18N
+        BagagisteNomPrenomLabel.setText("non prenom");
 
-        resultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+        ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
-        resultatJTable.setCellSelectionEnabled(true);
-        resultatJTable.setColumnSelectionAllowed(true);
-        resultatJTable.setEnabled(false);
-        resultatJTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        ResultatJTable.setCellSelectionEnabled(true);
+        ResultatJTable.setEnabled(false);
+        ResultatJTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                resultatJTableMouseClicked(evt);
+                ResultatJTableMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(resultatJTable);
+        ScrollPane.setViewportView(ResultatJTable);
 
         volsLabel.setText("Vols prévus ce jour :");
 
-        optionMenu.setText("Options");
+        OptionMenu.setText("Options");
 
-        jMenuItem1.setText("Disconnect");
-        optionMenu.add(jMenuItem1);
+        DisconnectMI.setText("Disconnect");
+        OptionMenu.add(DisconnectMI);
 
-        jMenuBar1.add(optionMenu);
+        MenuBar.add(OptionMenu);
 
-        aboutMenu.setText("About?");
-        jMenuBar1.add(aboutMenu);
-
-        helpMenu.setText("Help");
-        jMenuBar1.add(helpMenu);
-
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(MenuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(bagagisteLabel)
-                                .addGap(18, 18, 18)
-                                .addComponent(bagagisteLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(volsLabel))
-                        .addGap(0, 170, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(BagagisteLabel)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(volsLabel))
+                                                .addGap(0, 170, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bagagisteLabel)
-                    .addComponent(bagagisteLabel2))
-                .addGap(24, 24, 24)
-                .addComponent(volsLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(108, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BagagisteLabel)
+                                        .addComponent(BagagisteNomPrenomLabel))
+                                .addGap(24, 24, 24)
+                                .addComponent(volsLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void resultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultatJTableMouseClicked
-        int row = resultatJTable.rowAtPoint(evt.getPoint());
-        int col = resultatJTable.columnAtPoint(evt.getPoint());
-        
-        if (row >= 0 && col >= 0) {
-            System.out.println("coucou");
-            listeBag = new liste_Bagages((String)resultatJTable.getValueAt(col, row));
-            listeBag.setVisible(true);
-        }
-    }//GEN-LAST:event_resultatJTableMouseClicked
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
+        int row = ResultatJTable.rowAtPoint(evt.getPoint());
+        if (row >= 0) {
+            ReponseLUGAP rep;
+            try {
+                Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, "", ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
+                rep = (ReponseLUGAP) Ois.readObject();
+                if (rep.getCode() != TypeReponseLUGAP.OK)
+                    //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
+                    return;
+            } catch (IOException e) {
+                //Todo Affichage d'une messagebox disant qu'il y a une erreur
+                e.printStackTrace();
+                return;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                return;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Application_Bagage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+            ListeBag = new Liste_Bagages((String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
+            ListeBag.setVisible(true);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Application_Bagage().setVisible(true);
-            }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu aboutMenu;
-    private javax.swing.JLabel bagagisteLabel;
-    private javax.swing.JLabel bagagisteLabel2;
-    private javax.swing.JMenu helpMenu;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JMenu optionMenu;
-    private javax.swing.JTable resultatJTable;
-    private javax.swing.JLabel volsLabel;
+    }//GEN-LAST:event_ResultatJTableMouseClicked
     // End of variables declaration//GEN-END:variables
 }

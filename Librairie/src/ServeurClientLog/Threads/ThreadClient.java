@@ -7,6 +7,7 @@ import ServeurClientLog.Interfaces.Tache;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ThreadClient extends Thread {
@@ -14,6 +15,8 @@ public class ThreadClient extends Thread {
     private Tache Queue;
     private String Nom;
     private Socket Client;
+    private ObjectInputStream Ois;
+    private ObjectOutputStream Oos;
     private ThreadEsclave ThEsclave;
 
     public ThreadClient(FileSocket st, String n) {
@@ -33,11 +36,10 @@ public class ThreadClient extends Thread {
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
             }
-
             boolean boucle = true;
-            ObjectInputStream ois = null;
             try {
-                ois = new ObjectInputStream(Client.getInputStream());
+                Ois = new ObjectInputStream(Client.getInputStream());
+                Oos = new ObjectOutputStream(Client.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
                 boucle = false;
@@ -45,17 +47,20 @@ public class ThreadClient extends Thread {
 
             while (boucle) {
                 try {
-                    Requete req = (Requete) ois.readObject();
-                    Queue.addTache(req.createRunnable(Client));
+                    Requete req = (Requete) Ois.readObject();
+                    System.out.println("Ajout d'une requête à la file d'attente");
+                    boucle = !req.isDisconnect();
+                    if (boucle)
+                        Queue.addTache(req.createRunnable(Oos));
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    System.out.println(this.getName() + "> " + e.getMessage());
                 }
             }
 
             try {
                 Client.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
     }
