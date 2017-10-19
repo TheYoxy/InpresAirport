@@ -4,6 +4,7 @@ import ServeurClientLog.Containers.FileSocket;
 import ServeurClientLog.Containers.ListeTaches;
 import ServeurClientLog.Interfaces.Requete;
 import ServeurClientLog.Interfaces.Tache;
+import Tools.Procedural;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,11 +32,11 @@ public class ThreadClient extends Thread {
     public void run() {
         while (!isInterrupted()) {
             try {
-                //Le thread attends le socket
                 Client = TachesAExecuter.getSocket();
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
             }
+            // TODO Digest salé ici
             boolean boucle = true;
             try {
                 Ois = new ObjectInputStream(Client.getInputStream());
@@ -48,10 +49,13 @@ public class ThreadClient extends Thread {
             while (boucle) {
                 try {
                     Requete req = (Requete) Ois.readObject();
-                    System.out.println("Ajout d'une requête à la file d'attente");
                     boucle = !req.isDisconnect();
-                    if (boucle)
+                    if (boucle) {
+                        System.out.println(this.getName() + "> Ajout d'une requête à la file d'attente");
                         Queue.addTache(req.createRunnable(Oos));
+                    }
+                    else
+                        System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(this.getName() + "> " + e.getMessage());
                 }

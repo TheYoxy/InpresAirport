@@ -93,7 +93,7 @@ public class RequeteLUGAP implements Requete {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
                                 if (rs.getString(password).equals(((Login) Param).getPassword())) {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "");
+                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "",MySql.SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                     break;
                                 } else {
@@ -112,8 +112,6 @@ public class RequeteLUGAP implements Requete {
                 };
                 break;
             case Logout:
-                break;
-            case Disconnect:
                 break;
             case Request_Vols:
                 retour = () -> {

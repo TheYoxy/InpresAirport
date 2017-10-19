@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
+
     private ThreadServeur Ts = null;
 
     /**
@@ -17,6 +18,21 @@ public class ServeurFrame extends javax.swing.JFrame {
         initComponents();
         System.setOut(new PrintStream(new TextAreaOutputStream(ConsoleTA)));
         StateRB.setEnabled(false);
+        try {
+            Class.forName("Tools.Bd").newInstance();
+        } catch (InstantiationException e) {
+            System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (IllegalAccessException e) {
+            System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (ClassNotFoundException e) {
+            System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     /**
@@ -45,7 +61,6 @@ public class ServeurFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ServeurFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new ServeurFrame().setVisible(true));
     }
@@ -85,30 +100,31 @@ public class ServeurFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(StateRB)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(StartB)))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(StateRB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(StartB)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(StateRB)
-                                        .addComponent(StartB))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(StateRB)
+                    .addComponent(StartB))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void StartBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartBActionPerformed

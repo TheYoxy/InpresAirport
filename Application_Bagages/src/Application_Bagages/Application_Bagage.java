@@ -27,44 +27,9 @@ public class Application_Bagage extends javax.swing.JFrame {
     public Application_Bagage() {
         initComponents();
     }
-
     public Application_Bagage(boolean ouverture) {
         initComponents();
-        this.setVisible(ouverture);
-        this.setEnabled(false);
-        try {
-            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
-        this.setEnabled(true);
-
-        Log = new Login(this, true, Serveur);
-        Log.setVisible(true);
-        Ois = Log.getOis();
-        Oos = Log.getOos();
-        ReponseLUGAP rep = null;
-        try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols, "", Procedural.IpPort(Serveur)));
-            rep = (ReponseLUGAP) Ois.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
-
-        if (rep.getCode() != TypeReponseLUGAP.OK) {
-            JOptionPane.showMessageDialog(this, "Erreur lors de la réception du tableau", "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
-        Table t = (Table) rep.getParam();
-        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(), t.getTete()));
+        Connection(ouverture);
     }
 
     /**
@@ -90,6 +55,47 @@ public class Application_Bagage extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new Application_Bagage().setVisible(true));
+    }
+
+    public void Connection(boolean ouvertureFenetre) {
+        //TODO Bouger ça dans un connecteur custom
+        this.setVisible(ouvertureFenetre);
+        this.setEnabled(false);
+        try {
+            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        this.setEnabled(true);
+
+        Log = new Login(this, true, Serveur);
+        Log.setVisible(true);
+        this.setVisible(true);
+        Ois = Log.getOis();
+        Oos = Log.getOos();
+        BagagisteNomPrenomLabel.setText(Log.getNomPrenomUser());
+
+        ReponseLUGAP rep = null;
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols, "", Procedural.IpPort(Serveur)));
+            rep = (ReponseLUGAP) Ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        if (rep.getCode() != TypeReponseLUGAP.OK) {
+            JOptionPane.showMessageDialog(this, "Erreur lors de la réception du tableau", "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        Table t = (Table) rep.getParam();
+        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(), t.getTete()));
     }
 
     /**
@@ -124,15 +130,15 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteNomPrenomLabel.setText("non prenom");
 
         ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         ResultatJTable.setCellSelectionEnabled(true);
         ResultatJTable.setEnabled(false);
@@ -157,36 +163,39 @@ public class Application_Bagage extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(BagagisteLabel)
-                                .addGap(18, 18, 18)
-                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(VolsLabel))
-                        .addGap(0, 170, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(BagagisteLabel)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(VolsLabel))
+                                                .addGap(0, 170, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(BagagisteLabel)
-                    .addComponent(BagagisteNomPrenomLabel))
-                .addGap(24, 24, 24)
-                .addComponent(VolsLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(BagagisteLabel)
+                                        .addComponent(BagagisteNomPrenomLabel))
+                                .addGap(24, 24, 24)
+                                .addComponent(VolsLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
+        getAccessibleContext().setAccessibleDescription("");
+
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
