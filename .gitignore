@@ -1,0 +1,13 @@
+nbproject/*
+/nbproject/private/
+.idea/
+*.iml
+~*
+*.csv
+*.docx
+*.pcapng
+*.png
+*.zip
+*.lun
+*.txt
+C++/Build/*
