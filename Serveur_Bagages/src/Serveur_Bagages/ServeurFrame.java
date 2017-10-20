@@ -38,7 +38,7 @@ public class ServeurFrame extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if (info.getName().equals("Nimbus")) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -72,9 +72,12 @@ public class ServeurFrame extends javax.swing.JFrame {
         StartB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Serveur");
+        setFont(new java.awt.Font("Laksaman", 0, 10)); // NOI18N
 
         ConsoleTA.setEditable(false);
         ConsoleTA.setColumns(20);
+        ConsoleTA.setFont(new java.awt.Font("Liberation Mono", 0, 12)); // NOI18N
         ConsoleTA.setRows(5);
         ConsoleTA.setToolTipText("");
         ConsoleTA.setFocusable(false);
@@ -96,7 +99,7 @@ public class ServeurFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(StateRB)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -111,7 +114,7 @@ public class ServeurFrame extends javax.swing.JFrame {
                     .addComponent(StateRB)
                     .addComponent(StartB))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
