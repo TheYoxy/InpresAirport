@@ -98,6 +98,7 @@ public class Login extends javax.swing.JDialog {
         LoginTF.setText("");
         PasswordPF.setText("");
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -169,43 +170,53 @@ public class Login extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectionButtonActionPerformed
-        LUGAP.NetworkObject.Login l = new LUGAP.NetworkObject.Login(LoginTF.getText(), new String(PasswordPF.getPassword()));
-        RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Login, "", l, Procedural.IpPort(Socket));
-        try {
-            if (Oos == null)
-                Oos = new ObjectOutputStream(Socket.getOutputStream());
-            Oos.writeObject(req);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
-        }
+        int challenge = 0;
         ReponseLUGAP rep = null;
+        //Demande du digest
         try {
+            if (Oos == null) {
+                Oos = new ObjectOutputStream(Socket.getOutputStream());
+            }
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect));
             if (Ois == null)
                 Ois = new ObjectInputStream(Socket.getInputStream());
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+        if (rep == null) return;
+        if (rep.getCode() == TypeReponseLUGAP.OK)
+            challenge = (int) rep.getParam();
+        System.out.println("Challenge: " + challenge);
+        //Login
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, "", new LUGAP.NetworkObject.Login(LoginTF.getText(), RequeteLUGAP.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
+            rep = (ReponseLUGAP) Ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        if (rep != null) {
-            TypeReponseLUGAP i = (TypeReponseLUGAP) rep.getCode();
-            switch (i) {
-                case UNKNOWN_LOGIN:
-                    JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
-                    break;
-                case BAD_PASSWORD:
-                    JOptionPane.showMessageDialog(this, "Le mot de passe entré est incorrect", "Retour de connection", JOptionPane.WARNING_MESSAGE);
-                    break;
-                case LOG:
-                    JOptionPane.showMessageDialog(this, "Connecté", "Retour de connection", JOptionPane.INFORMATION_MESSAGE);
-                    this.setVisible(false);
-                    Connecter = true;
-                    NomPrenomUser = (String) rep.getParam();
-                    break;
-            }
+
+        if (rep == null) return;
+        switch ((TypeReponseLUGAP) rep.getCode()) {
+            case UNKNOWN_LOGIN:
+                JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
+                break;
+            case BAD_PASSWORD:
+                JOptionPane.showMessageDialog(this, "Le mot de passe entré est incorrect", "Retour de connection", JOptionPane.WARNING_MESSAGE);
+                break;
+            case LOG:
+                JOptionPane.showMessageDialog(this, "Connecté", "Retour de connection", JOptionPane.INFORMATION_MESSAGE);
+                this.setVisible(false);
+                Connecter = true;
+                NomPrenomUser = (String) rep.getParam();
+                break;
         }
     }//GEN-LAST:event_ConnectionButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ConnectionButton;
     private javax.swing.JLabel LoginLabel;

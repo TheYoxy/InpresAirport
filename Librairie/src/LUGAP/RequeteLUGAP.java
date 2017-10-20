@@ -5,21 +5,44 @@ import LUGAP.NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
 import Tools.Bd;
 import Tools.BdType;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Random;
 
 public class RequeteLUGAP implements Requete {
+    private static final ThreadLocal<Integer> rand = ThreadLocal.withInitial(() -> 0);
+    private static MessageDigest Md;
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+        try {
+            Md = MessageDigest.getInstance("SHA-1", "BC");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
     private TypeRequeteLUGAP Type = null;
-    private String ChargeUtile = null;
+    private String ChargeUtile = "";
     private Serializable Param = null;
     private Bd MySql = null;
-    private String From = null;
+    private String From = "";
+
+    public RequeteLUGAP(TypeRequeteLUGAP t) {
+        this.Type = t;
+    }
 
     public RequeteLUGAP(TypeRequeteLUGAP type, String chargeUtile) {
         Type = type;
@@ -45,6 +68,14 @@ public class RequeteLUGAP implements Requete {
         this.Param = Param;
     }
 
+    public static byte[] hashPassword(String password, int challenge) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        dos.writeUTF(password);
+        dos.writeInt(challenge);
+        return Md.digest(baos.toByteArray());
+    }
+
     public Serializable getParam() {
         return Param;
     }
@@ -67,6 +98,19 @@ public class RequeteLUGAP implements Requete {
         this.setBd(Bd.getMySql());
         System.out.println(Thread.currentThread().getName() + "> Message " + From);
         switch (this.Type) {
+            case TryConnect:
+                retour = () -> {
+                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête trylogin de " + From);
+                    rand.set(new Random().nextInt());
+                    try {
+                        System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + rand.get());
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", rand.get()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        //TODO Gestion erreurs
+                    }
+                };
+                break;
             case Login:
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête login de " + From);
@@ -92,8 +136,9 @@ public class RequeteLUGAP implements Requete {
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
-                                if (rs.getString(password).equals(((Login) Param).getPassword())) {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "",MySql.SelectLogUser(rs.getString(user)));
+                                //TODO Digest Salé ici
+                                if (MessageDigest.isEqual(hashPassword(rs.getString(password), rand.get()), ((Login) Param).getPassword())) {
+                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "", MySql.SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                     break;
                                 } else {

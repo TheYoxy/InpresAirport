@@ -19,15 +19,7 @@ public class ServeurFrame extends javax.swing.JFrame {
         System.setOut(new PrintStream(new TextAreaOutputStream(ConsoleTA)));
         StateRB.setEnabled(false);
         try {
-            Class.forName("Tools.Bd").newInstance();
-        } catch (InstantiationException e) {
-            System.out.println("Exception: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (IllegalAccessException e) {
-            System.out.println("Exception: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(-1);
+            Class.forName("Tools.Bd");
         } catch (ClassNotFoundException e) {
             System.out.println("Exception: " + e.getMessage());
             e.printStackTrace();

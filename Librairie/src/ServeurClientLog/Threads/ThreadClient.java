@@ -29,6 +29,7 @@ public class ThreadClient extends Thread {
         ThEsclave.start();
     }
 
+    @Override
     public void run() {
         while (!isInterrupted()) {
             try {
@@ -36,7 +37,6 @@ public class ThreadClient extends Thread {
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
             }
-            // TODO Digest salé ici
             boolean boucle = true;
             try {
                 Ois = new ObjectInputStream(Client.getInputStream());
@@ -53,8 +53,7 @@ public class ThreadClient extends Thread {
                     if (boucle) {
                         System.out.println(this.getName() + "> Ajout d'une requête à la file d'attente");
                         Queue.addTache(req.createRunnable(Oos));
-                    }
-                    else
+                    } else
                         System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(this.getName() + "> " + e.getMessage());
