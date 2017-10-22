@@ -27,13 +27,11 @@ CREATE TABLE Bagages (
   Poids        FLOAT,
   Valise       BOOLEAN,
   NumeroBillet VARCHAR(40) REFERENCES Billets (NumeroBillet),
-  Reception    CHAR(1)       DEFAULT 'N',
+  Reception    BOOLEAN       DEFAULT FALSE,
   Charger      CHAR(1)       DEFAULT 'N',
-  Verifier     CHAR(1)       DEFAULT 'N',
+  Verifier     BOOLEAN       DEFAULT FALSE,
   Remarque     VARCHAR(1000) DEFAULT '',
-  CHECK (Reception IN ('O', 'N')),
-  CHECK (Charger IN ('O', 'N', 'R')),
-  CHECK (Verifier IN ('O', 'N'))
+  CHECK (Charger IN ('O', 'N', 'R'))
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Login;
