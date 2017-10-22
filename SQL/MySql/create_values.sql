@@ -9,5 +9,5 @@ INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar',
 INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date + 1, 42);
 INSERT INTO Vols VALUES ('2', 'Londres', current_date - 1, current_date, current_date, 43);
 INSERT INTO Billets VALUES ('1', '1');
-INSERT INTO Bagages VALUES ('1', 40, TRUE, '1'), ('2', 20, FALSE, '1'), ('3', 10, TRUE, '1'), ('4', 3, TRUE, '1');
+INSERT INTO Bagages(NumeroBagage, Poids, Valise, NumeroBillet) VALUES ('1', 40, TRUE, '1'), ('2', 20, FALSE, '1'), ('3', 10, TRUE, '1'), ('4', 3, TRUE, '1');
 COMMIT;
