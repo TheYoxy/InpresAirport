@@ -119,25 +119,28 @@ public class RequeteLUGAP implements Requete {
                         ResultSetMetaData rsmd = rs.getMetaData();
                         int user = -1, password = -1;
                         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                            if (rsmd.getColumnName(i).equals("username")) {
+                            if (rsmd.getColumnName(i).equals("Username")) {
                                 user = i;
-                            } else if (rsmd.getColumnName(i).equals("password")) {
+                            } else if (rsmd.getColumnName(i).equals("Password")) {
                                 password = i;
                             }
                         }
                         if (user == -1) {
-                            System.out.println(Thread.currentThread().getName() + "> User introuvable");
+                            System.out.println(Thread.currentThread().getName() + "> (Server error) User introuvable");
                             return;
                         } else if (password == -1) {
-                            System.out.println(Thread.currentThread().getName() + "> Password introuvable");
+                            System.out.println(Thread.currentThread().getName() + "> (Server error) Password introuvable");
                             return;
                         }
                         ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN, "");
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
+                                byte envoye[] = ((Login)Param).getPassword();
+                                byte pass[] = hashPassword(rs.getString(password), rand.get());
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
-                                //TODO Digest Salé ici
-                                if (MessageDigest.isEqual(hashPassword(rs.getString(password), rand.get()), ((Login) Param).getPassword())) {
+                                System.out.println(Thread.currentThread().getName() + "> Hash envoyé: " + new String(envoye));
+                                System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + new String(pass));
+                                if (MessageDigest.isEqual(pass, ((Login) Param).getPassword())) {
                                     reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "", MySql.SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                     break;
@@ -184,16 +187,6 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     try {
                         Table t = Bd.toTable(MySql.SelectBagageVol((String) getParam()));
-                        //t.getTete().removeElementAt(t.getTete().size());
-                        t.getTete().add("Réceptionné");
-                        t.getTete().add("Chargé");
-                        t.getTete().add("Vérifié");
-                        t.getTete().add("Remarque");
-                        t.getChamps().stream().forEach((v) -> {
-                            for (int i = 0; i < 4; i++) {
-                                v.add("N");
-                            }
-                        });
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", t));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());

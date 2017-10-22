@@ -16,7 +16,9 @@ public class ThreadEsclave extends Thread {
     public void run() {
         while (!isInterrupted()) {
             try {
-                File.getTache().run();
+                Runnable r = File.getTache();
+                System.out.println();
+                r.run();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

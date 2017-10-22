@@ -5,9 +5,11 @@
  */
 package Application_Bagages;
 
+import LUGAP.NetworkObject.Bagage;
 import LUGAP.NetworkObject.Table;
 
 import javax.swing.table.DefaultTableModel;
+import java.util.Vector;
 
 /**
  *
@@ -15,18 +17,25 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Liste_Bagages extends javax.swing.JFrame {
 
+    private Table BagagesTable;
+
     /**
      * Creates new form liste_Bagages
      */
     public Liste_Bagages() {
         initComponents();
     }
-    
+
     public Liste_Bagages(String vol, Table t) {
         initComponents();
         setTitle("Vol: " + vol);
         VolLabel2.setText(vol);
-        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(),t.getTete()));
+        BagagesTable = t;
+        UpdateJTable();
+    }
+
+    private void UpdateJTable() {
+        ResultatJTable.setModel(new DefaultTableModel(BagagesTable.getChamps(), BagagesTable.getTete()));
     }
 
     /**
@@ -38,14 +47,25 @@ public class Liste_Bagages extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        RightPM = new javax.swing.JPopupMenu();
+        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         VolLabel = new javax.swing.JLabel();
         BagagesLabel = new javax.swing.JLabel();
         VolLabel2 = new javax.swing.JLabel();
         ScrollPane1 = new javax.swing.JScrollPane();
         ResultatJTable = new javax.swing.JTable();
 
+        RightPM.setInvoker(ResultatJTable);
+
+        jCheckBoxMenuItem1.setSelected(true);
+        jCheckBoxMenuItem1.setText("Couocu");
+        RightPM.add(jCheckBoxMenuItem1);
+
+        jMenuItem1.setText("jMenuItem1");
+        RightPM.add(jMenuItem1);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
 
         VolLabel.setText("Vol :");
 
@@ -80,7 +100,7 @@ public class Liste_Bagages extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -101,15 +121,23 @@ public class Liste_Bagages extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addComponent(BagagesLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                .addComponent(ScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
-
+        if (evt.getClickCount() == 1) {
+            int pos = ResultatJTable.rowAtPoint(evt.getPoint());
+            Vector<String> v = BagagesTable.getChamps().remove(pos);
+            DetailsBagage db = new DetailsBagage(this, true, Bagage.FromVector(v));
+            db.setVisible(true);
+            BagagesTable.getChamps().add(pos, db.getBagage().toVector());
+            UpdateJTable();
+        }
     }//GEN-LAST:event_ResultatJTableMouseClicked
 
     /**
@@ -119,7 +147,7 @@ public class Liste_Bagages extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -138,7 +166,6 @@ public class Liste_Bagages extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Liste_Bagages.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new Liste_Bagages().setVisible(true));
@@ -147,8 +174,11 @@ public class Liste_Bagages extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BagagesLabel;
     private javax.swing.JTable ResultatJTable;
+    private javax.swing.JPopupMenu RightPM;
     private javax.swing.JScrollPane ScrollPane1;
     private javax.swing.JLabel VolLabel;
     private javax.swing.JLabel VolLabel2;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
+    private javax.swing.JMenuItem jMenuItem1;
     // End of variables declaration//GEN-END:variables
 }

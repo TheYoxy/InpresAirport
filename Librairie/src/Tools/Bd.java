@@ -104,7 +104,13 @@ public class Bd {
             for (int i = 1; i <= rsmd.getColumnCount(); i++)
                 try {
                     //Sous MySql, n'importe quel type de données peut être directement converti en String
-                    temp.add(rs.getString(i));
+                    //Le passage via le type ne fonctionne pas
+                    if (rsmd.getColumnTypeName(i) == "TINYINT")
+                        temp.add(String.valueOf(rs.getBoolean(i)));
+                    else if (rsmd.getColumnType(i) == Types.FLOAT)
+                        temp.add(String.valueOf(rs.getFloat(i)));
+                    else
+                        temp.add(rs.getString(i));
                 } catch (SQLException e) {
                     System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
                 }
@@ -115,7 +121,7 @@ public class Bd {
 
     @NotNull
     public String SelectLogUser(@NotNull String User) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("select nom,prenom from Agents NATURAL join Login where username = ?");
+        PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ?");
         s.setString(1, User);
         if (s.execute()) {
             final Vector<String> strings = toTable(s.getResultSet()).getChamps().elementAt(0);
@@ -125,13 +131,13 @@ public class Bd {
     }
 
     public ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE numVol = ?");
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ?");
         s.setString(1, numVol);
         return s.executeQuery();
     }
 
     public ResultSet SelectTodayVols() throws SQLException {
-        return Connection.createStatement().executeQuery("select * from Vols where heureDepart = CURRENT_DATE");
+        return Connection.createStatement().executeQuery("select * from Vols where HeureDepart = CURRENT_DATE");
     }
 
     public ResultSet Select(@NotNull String table) throws SQLException {

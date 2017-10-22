@@ -27,6 +27,7 @@ public class Application_Bagage extends javax.swing.JFrame {
     public Application_Bagage() {
         initComponents();
     }
+
     public Application_Bagage(boolean ouverture) {
         initComponents();
         Connection(ouverture);
@@ -58,7 +59,6 @@ public class Application_Bagage extends javax.swing.JFrame {
     }
 
     public void Connection(boolean ouvertureFenetre) {
-        //TODO Bouger ça dans un connecteur custom
         this.setVisible(ouvertureFenetre);
         this.setEnabled(false);
         try {
@@ -72,6 +72,9 @@ public class Application_Bagage extends javax.swing.JFrame {
 
         Log = new Login(this, true, Serveur);
         Log.setVisible(true);
+        if (!Log.isConnecter()) {
+            System.exit(-1);
+        }
         this.setVisible(true);
         Ois = Log.getOis();
         Oos = Log.getOos();
@@ -130,15 +133,15 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteNomPrenomLabel.setText("non prenom");
 
         ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null},
-                        {null, null, null, null}
-                },
-                new String[]{
-                        "Title 1", "Title 2", "Title 3", "Title 4"
-                }
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
         ));
         ResultatJTable.setCellSelectionEnabled(true);
         ResultatJTable.setEnabled(false);
@@ -154,6 +157,11 @@ public class Application_Bagage extends javax.swing.JFrame {
         OptionMenu.setText("Options");
 
         DisconnectMI.setText("Disconnect");
+        DisconnectMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DisconnectMIActionPerformed(evt);
+            }
+        });
         OptionMenu.add(DisconnectMI);
 
         MenuBar.add(OptionMenu);
@@ -163,33 +171,33 @@ public class Application_Bagage extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(BagagisteLabel)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(VolsLabel))
-                                                .addGap(0, 170, Short.MAX_VALUE)))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(BagagisteLabel)
+                                .addGap(18, 18, 18)
+                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(VolsLabel))
+                        .addGap(0, 636, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(BagagisteLabel)
-                                        .addComponent(BagagisteNomPrenomLabel))
-                                .addGap(24, 24, 24)
-                                .addComponent(VolsLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BagagisteLabel)
+                    .addComponent(BagagisteNomPrenomLabel))
+                .addGap(24, 24, 24)
+                .addComponent(VolsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         getAccessibleContext().setAccessibleDescription("");
@@ -221,8 +229,9 @@ public class Application_Bagage extends javax.swing.JFrame {
 
                 ListeBag = new Liste_Bagages((String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
                 ListeBag.setVisible(true);
+                //TODO Déconnexion
+                DisconnectMIActionPerformed(null);
             }
-
         }
     }//GEN-LAST:event_ResultatJTableMouseClicked
 
@@ -233,6 +242,10 @@ public class Application_Bagage extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }//GEN-LAST:event_formWindowClosing
+
+    private void DisconnectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DisconnectMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DisconnectMIActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BagagisteLabel;
