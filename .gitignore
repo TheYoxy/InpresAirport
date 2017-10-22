@@ -1,6 +1,7 @@
-nbproject/*
+nbproject/
 /nbproject/private/
 .idea/
+Out/
 *.iml
 ~*
 *.csv
@@ -11,3 +12,5 @@ nbproject/*
 *.lun
 *.txt
 C++/Build/*
+build.xml
+manifest.mf
