@@ -24,6 +24,7 @@ public class RequeteLUGAP implements Requete {
     private static MessageDigest Md;
 
     static {
+        //addProvider en local, car on travaille sur différentes machines
         Security.addProvider(new BouncyCastleProvider());
         try {
             Md = MessageDigest.getInstance("SHA-1", "BC");
@@ -92,7 +93,7 @@ public class RequeteLUGAP implements Requete {
                     Rand.set(new Random().nextInt());
                     try {
                         System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + Rand.get());
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", Rand.get()));
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Rand.get()));
                     } catch (IOException e) {
                         e.printStackTrace();
                         //TODO Gestion erreurs
@@ -120,7 +121,7 @@ public class RequeteLUGAP implements Requete {
                             System.out.println(Thread.currentThread().getName() + "> (Server error) Password introuvable");
                             return;
                         }
-                        ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN, "");
+                        ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN);
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
                                 byte envoye[] = ((Login) Param).getPassword();
@@ -136,12 +137,12 @@ public class RequeteLUGAP implements Requete {
                                 System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + Arrays.toString(pass));
 
                                 if (MessageDigest.isEqual(pass, ((Login) Param).getPassword())) {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "", MySql.SelectLogUser(rs.getString(user)));
+                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, MySql.SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                     Logged.set(true);
                                     break;
                                 } else {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD, "");
+                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD);
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe incorrect");
                                     break;
                                 }
@@ -170,7 +171,7 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_vols de " + From);
                     try {
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", Bd.toTable(MySql.SelectTodayVols())));
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(MySql.SelectTodayVols())));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         try {
@@ -192,7 +193,7 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     try {
                         Table t = Bd.toTable(MySql.SelectBagageVol((String) getParam()));
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", t));
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, t));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         try {
