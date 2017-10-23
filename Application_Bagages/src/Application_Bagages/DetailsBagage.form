@@ -162,11 +162,17 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Charg&#xe9; ?"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ChargeCBActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="VerifierCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="V&#xe9;rifi&#xe9; par la douane ?"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="VerifierCBActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="RefuserCB">
       <Properties>
@@ -175,6 +181,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Refus&#xe9; ? "/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="RefuserCBActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="RemarquesLabel">
       <Properties>

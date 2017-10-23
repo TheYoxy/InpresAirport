@@ -139,11 +139,26 @@ public class DetailsBagage extends javax.swing.JDialog {
 
         ChargementBG.add(ChargeCB);
         ChargeCB.setText("Chargé ?");
+        ChargeCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ChargeCBActionPerformed(evt);
+            }
+        });
 
         VerifierCB.setText("Vérifié par la douane ?");
+        VerifierCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                VerifierCBActionPerformed(evt);
+            }
+        });
 
         ChargementBG.add(RefuserCB);
         RefuserCB.setText("Refusé ? ");
+        RefuserCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RefuserCBActionPerformed(evt);
+            }
+        });
 
         RemarquesLabel.setText("Remarques: ");
 
@@ -221,6 +236,19 @@ public class DetailsBagage extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void ChargeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChargeCBActionPerformed
+        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
+    }//GEN-LAST:event_ChargeCBActionPerformed
+
+    private void RefuserCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefuserCBActionPerformed
+        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
+        if (!VerifierCB.isSelected()) VerifierCB.setSelected(true);
+    }//GEN-LAST:event_RefuserCBActionPerformed
+
+    private void VerifierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifierCBActionPerformed
+        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
+    }//GEN-LAST:event_VerifierCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ChargeCB;
