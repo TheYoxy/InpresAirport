@@ -3,14 +3,14 @@ package LUGAP.NetworkObject;
 import java.util.Vector;
 
 public class Bagage {
-    private String NumeroBagage;
-    private double Poids;
-    private boolean Valise;
-    private String NumeroBillet;
-    private boolean Reception;
-    private char Charger;
-    private boolean Verifier;
-    private String Remarque;
+    private final String NumeroBagage;
+    private final double Poids;
+    private final boolean Valise;
+    private final String NumeroBillet;
+    private final boolean Reception;
+    private final char Charger;
+    private final boolean Verifier;
+    private final String Remarque;
 
     public Bagage(String numeroBagage, double poids, boolean valise, String numeroBillet, boolean reception, char charger, boolean verifier, String remarque) {
         NumeroBagage = numeroBagage;

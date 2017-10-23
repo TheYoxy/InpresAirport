@@ -13,9 +13,9 @@ public class OracleDB {
     private Connection Con;
     private Statement Instruction;
 
-    private String Url = "";
-    private String User = "";
-    private String Passwd = "";
+    private final String Url = "";
+    private final String User = "";
+    private final String Passwd = "";
 
     public OracleDB() throws SQLException {
 

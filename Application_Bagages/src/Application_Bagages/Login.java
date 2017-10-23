@@ -97,6 +97,7 @@ public class Login extends javax.swing.JDialog {
     public void ResetChamps() {
         LoginTF.setText("");
         PasswordPF.setText("");
+        Connecter = false;
     }
 
     /**
@@ -177,7 +178,7 @@ public class Login extends javax.swing.JDialog {
             if (Oos == null) {
                 Oos = new ObjectOutputStream(Socket.getOutputStream());
             }
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect,Procedural.IpPort(Socket)));
             if (Ois == null)
                 Ois = new ObjectInputStream(Socket.getInputStream());
             rep = (ReponseLUGAP) Ois.readObject();
@@ -192,7 +193,7 @@ public class Login extends javax.swing.JDialog {
         System.out.println("Challenge: " + challenge);
         //Login
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, "", new LUGAP.NetworkObject.Login(LoginTF.getText(), RequeteLUGAP.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, new LUGAP.NetworkObject.Login(LoginTF.getText(), RequeteLUGAP.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();

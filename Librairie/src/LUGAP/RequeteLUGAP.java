@@ -15,10 +15,12 @@ import java.security.Security;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Random;
 
 public class RequeteLUGAP implements Requete {
-    private static final ThreadLocal<Integer> rand = ThreadLocal.withInitial(() -> 0);
+    private static final ThreadLocal<Integer> Rand = ThreadLocal.withInitial(() -> 0);
+    private static final ThreadLocal<Boolean> Logged = ThreadLocal.withInitial(() -> false);
     private static MessageDigest Md;
 
     static {
@@ -35,37 +37,27 @@ public class RequeteLUGAP implements Requete {
     }
 
     private TypeRequeteLUGAP Type = null;
-    private String ChargeUtile = "";
     private Serializable Param = null;
     private Bd MySql = null;
     private String From = "";
 
-    public RequeteLUGAP(TypeRequeteLUGAP t) {
-        this.Type = t;
+    private RequeteLUGAP(TypeRequeteLUGAP type) {
+        this.Type = type;
     }
 
-    public RequeteLUGAP(TypeRequeteLUGAP type, String chargeUtile) {
-        Type = type;
-        ChargeUtile = chargeUtile;
-    }
-
-    public RequeteLUGAP(TypeRequeteLUGAP type, String chargeUtile, Serializable param, String from) {
-        Type = type;
-        ChargeUtile = chargeUtile;
-        Param = param;
+    public RequeteLUGAP(TypeRequeteLUGAP type, String from) {
+        this(type);
         From = from;
     }
 
-    public RequeteLUGAP(TypeRequeteLUGAP type, String chargeUtile, String from) {
-        Type = type;
-        ChargeUtile = chargeUtile;
-        From = from;
-    }
-
-    public RequeteLUGAP(TypeRequeteLUGAP t, Serializable Param, String chu) {
-        this.Type = t;
-        this.ChargeUtile = chu;
+    public RequeteLUGAP(TypeRequeteLUGAP type, Serializable Param) {
+        this(type);
         this.Param = Param;
+    }
+
+    public RequeteLUGAP(TypeRequeteLUGAP type, Serializable param, String from) {
+        this(type, from);
+        Param = param;
     }
 
     public static byte[] hashPassword(String password, int challenge) throws IOException {
@@ -78,10 +70,6 @@ public class RequeteLUGAP implements Requete {
 
     public Serializable getParam() {
         return Param;
-    }
-
-    public String getChargeUtile() {
-        return ChargeUtile;
     }
 
     private void setBd() throws IOException, SQLException {
@@ -101,10 +89,10 @@ public class RequeteLUGAP implements Requete {
             case TryConnect:
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête trylogin de " + From);
-                    rand.set(new Random().nextInt());
+                    Rand.set(new Random().nextInt());
                     try {
-                        System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + rand.get());
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", rand.get()));
+                        System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + Rand.get());
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, "", Rand.get()));
                     } catch (IOException e) {
                         e.printStackTrace();
                         //TODO Gestion erreurs
@@ -135,14 +123,22 @@ public class RequeteLUGAP implements Requete {
                         ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN, "");
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
-                                byte envoye[] = ((Login)Param).getPassword();
-                                byte pass[] = hashPassword(rs.getString(password), rand.get());
+                                byte envoye[] = ((Login) Param).getPassword();
+                                byte pass[] = hashPassword(rs.getString(password), Rand.get());
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
-                                System.out.println(Thread.currentThread().getName() + "> Hash envoyé: " + new String(envoye));
+
+                                System.out.println(Thread.currentThread().getName() + "> Hash en string: ");
+                                System.out.println(Thread.currentThread().getName() + "> Hash envoyé:           " + new String(envoye));
                                 System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + new String(pass));
+
+                                System.out.println(Thread.currentThread().getName() + "> Hash en tableau: ");
+                                System.out.println(Thread.currentThread().getName() + "> Hash envoyé:           " + Arrays.toString(envoye));
+                                System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + Arrays.toString(pass));
+
                                 if (MessageDigest.isEqual(pass, ((Login) Param).getPassword())) {
                                     reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, "", MySql.SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
+                                    Logged.set(true);
                                     break;
                                 } else {
                                     reponse = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD, "");
@@ -160,6 +156,15 @@ public class RequeteLUGAP implements Requete {
                 };
                 break;
             case Logout:
+                retour = () -> {
+                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de logout de " + From);
+                    Logged.set(false);
+                    try{
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                };
                 break;
             case Request_Vols:
                 retour = () -> {
@@ -207,6 +212,21 @@ public class RequeteLUGAP implements Requete {
                 break;
         }
         return retour;
+    }
+
+    @Override
+    public boolean isLogin() {
+        return this.Type == TypeRequeteLUGAP.Login || this.Type == TypeRequeteLUGAP.TryConnect;
+    }
+
+    @Override
+    public boolean loginSucced() {
+        return Logged.get();
+    }
+
+    @Override
+    public boolean isLogout() {
+        return this.Type == TypeRequeteLUGAP.Logout;
     }
 
     @Override

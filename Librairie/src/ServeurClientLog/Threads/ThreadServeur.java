@@ -14,8 +14,8 @@ import java.net.Socket;
 
 public class ThreadServeur extends Thread {
     private final int NbThreads;
-    private int Port;
-    private FileSocket File;
+    private final int Port;
+    private final FileSocket File;
     private ServerSocket SSocket = null;
 
     public ThreadServeur(int port, int nb_threads) {
@@ -43,7 +43,7 @@ public class ThreadServeur extends Thread {
         while (!isInterrupted()) {
             try {
                 Socket cSocket = SSocket.accept();
-                System.out.println("Connexion de " + cSocket.getInetAddress().toString() + ":" + cSocket.getPort() + '\n');
+                System.out.println("Connexion de " + Procedural.IpPort(cSocket) + '\n');
                 File.addSocket(cSocket);
             } catch (IOException e) {
                 System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");

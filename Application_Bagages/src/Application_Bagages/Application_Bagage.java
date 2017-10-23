@@ -19,7 +19,7 @@ import java.net.Socket;
 public class Application_Bagage extends javax.swing.JFrame {
 
     private Login Log = null;
-    private Liste_Bagages ListeBag = null;
+    private ListeBagages ListeBag = null;
     private Socket Serveur = null;
     private ObjectInputStream Ois = null;
     private ObjectOutputStream Oos = null;
@@ -30,6 +30,18 @@ public class Application_Bagage extends javax.swing.JFrame {
 
     public Application_Bagage(boolean ouverture) {
         initComponents();
+
+        this.setEnabled(false);
+        try {
+            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        this.setEnabled(true);
+        Log = new Login(this, true, Serveur);
+
         Connection(ouverture);
     }
 
@@ -60,29 +72,24 @@ public class Application_Bagage extends javax.swing.JFrame {
 
     public void Connection(boolean ouvertureFenetre) {
         this.setVisible(ouvertureFenetre);
-        this.setEnabled(false);
-        try {
-            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
-        this.setEnabled(true);
-
-        Log = new Login(this, true, Serveur);
         Log.setVisible(true);
         if (!Log.isConnecter()) {
             System.exit(-1);
         }
-        this.setVisible(true);
-        Ois = Log.getOis();
-        Oos = Log.getOos();
+        if (!ouvertureFenetre) {
+            this.setVisible(true);
+        }
+        if (Ois == null) {
+            Ois = Log.getOis();
+        }
+        if (Oos == null) {
+            Oos = Log.getOos();
+        }
         BagagisteNomPrenomLabel.setText(Log.getNomPrenomUser());
 
         ReponseLUGAP rep = null;
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols, "", Procedural.IpPort(Serveur)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols,Procedural.IpPort(Serveur)));
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,17 +137,13 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteLabel.setText("Bagagiste :");
 
         BagagisteNomPrenomLabel.setFont(new java.awt.Font("Calibri", 2, 12)); // NOI18N
-        BagagisteNomPrenomLabel.setText("non prenom");
 
         ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         ResultatJTable.setCellSelectionEnabled(true);
@@ -212,7 +215,7 @@ public class Application_Bagage extends javax.swing.JFrame {
             if (row >= 0) {
                 ReponseLUGAP rep;
                 try {
-                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, "", ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
                     rep = (ReponseLUGAP) Ois.readObject();
                     if (rep.getCode() != TypeReponseLUGAP.OK) //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
                     {
@@ -227,24 +230,32 @@ public class Application_Bagage extends javax.swing.JFrame {
                     return;
                 }
 
-                ListeBag = new Liste_Bagages((String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
+                ListeBag = new ListeBagages(this,true,(String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
                 ListeBag.setVisible(true);
                 //TODO Déconnexion
                 DisconnectMIActionPerformed(null);
             }
         }
     }//GEN-LAST:event_ResultatJTableMouseClicked
-
+    private void clearChamps(){
+        ResultatJTable.setModel(new DefaultTableModel());
+        BagagisteNomPrenomLabel.setText("");
+    }
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Disconnect, ""));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Disconnect, Procedural.IpPort(Serveur)));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_formWindowClosing
 
     private void DisconnectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DisconnectMIActionPerformed
-        // TODO add your handling code here:
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Logout, Procedural.IpPort(Serveur)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Connection(true);
     }//GEN-LAST:event_DisconnectMIActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

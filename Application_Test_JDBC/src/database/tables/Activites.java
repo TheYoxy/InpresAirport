@@ -2,9 +2,9 @@ package database.tables;
 
 public class Activites {
 
-    private String Cours;
-    private String Type;
-    private String Date;
+    private final String Cours;
+    private final String Type;
+    private final String Date;
     private String Description;
     private String Reference;
 

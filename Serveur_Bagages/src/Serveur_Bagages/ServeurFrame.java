@@ -4,7 +4,6 @@ import ServeurClientLog.Threads.ThreadServeur;
 import Tools.PropertiesReader;
 import Tools.TextAreaOutputStream;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
@@ -65,7 +64,7 @@ public class ServeurFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        ConsoleSPTA = new javax.swing.JScrollPane();
         ConsoleTA = new javax.swing.JTextArea();
         StateRB = new javax.swing.JRadioButton();
         StartB = new javax.swing.JButton();
@@ -73,7 +72,6 @@ public class ServeurFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Serveur");
         setFont(new java.awt.Font("Liberation Mono", 0, 14)); // NOI18N
-        setPreferredSize(new java.awt.Dimension(632, 350));
 
         ConsoleTA.setEditable(false);
         ConsoleTA.setColumns(20);
@@ -81,7 +79,7 @@ public class ServeurFrame extends javax.swing.JFrame {
         ConsoleTA.setRows(5);
         ConsoleTA.setToolTipText("");
         ConsoleTA.setFocusable(false);
-        jScrollPane1.setViewportView(ConsoleTA);
+        ConsoleSPTA.setViewportView(ConsoleTA);
 
         StateRB.setText("State");
         StateRB.setToolTipText("");
@@ -102,7 +100,7 @@ public class ServeurFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
+                    .addComponent(ConsoleSPTA, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(StateRB)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -117,7 +115,7 @@ public class ServeurFrame extends javax.swing.JFrame {
                     .addComponent(StateRB)
                     .addComponent(StartB))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addComponent(ConsoleSPTA, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -126,11 +124,10 @@ public class ServeurFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void StartBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartBActionPerformed
-        // TODO add your handling code here:
         if (!StateRB.isSelected()) {
             try {
                 Ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BAGAGES")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")));
-            } catch (IOException | NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
@@ -141,9 +138,9 @@ public class ServeurFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_StartBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane ConsoleSPTA;
     private javax.swing.JTextArea ConsoleTA;
     private javax.swing.JButton StartB;
     private javax.swing.JRadioButton StateRB;
-    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

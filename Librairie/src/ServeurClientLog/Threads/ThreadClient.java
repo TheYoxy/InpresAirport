@@ -12,13 +12,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ThreadClient extends Thread {
-    private FileSocket TachesAExecuter;
-    private Tache Queue;
-    private String Nom;
+    private final FileSocket TachesAExecuter;
+    private final Tache Queue;
+    private final String Nom;
     private Socket Client;
     private ObjectInputStream Ois;
     private ObjectOutputStream Oos;
-    private ThreadEsclave ThEsclave;
+    private final ThreadEsclave ThEsclave;
+    private boolean Logged;
 
     public ThreadClient(FileSocket st, String n) {
         TachesAExecuter = st;
@@ -49,12 +50,17 @@ public class ThreadClient extends Thread {
             while (boucle) {
                 try {
                     Requete req = (Requete) Ois.readObject();
-                    boucle = !req.isDisconnect();
-                    if (boucle) {
-                        System.out.println(this.getName() + "> Ajout d'une requête à la file d'attente");
-                        Queue.addTache(req.createRunnable(Oos));
-                    } else
-                        System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
+                    if (!Logged) {
+                        if (req.isLogin()) req.createRunnable(Oos).run();
+                        Logged = req.loginSucced();
+                    } else {
+                        boucle = !req.isDisconnect();
+                        if (boucle) {
+                            System.out.println(this.getName() + "> Ajout d'une requête à la file d'attente");
+                            Queue.addTache(req.createRunnable(Oos));
+                        } else
+                            System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
+                    }
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(this.getName() + "> " + e.getMessage());
                 }

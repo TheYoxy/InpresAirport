@@ -19,7 +19,7 @@ public abstract class PropertiesReader {
         }
     }
 
-    public static String getProperties(String propertiesName) throws IOException {
+    public static String getProperties(String propertiesName) {
         return p.getProperty(propertiesName);
     }
 

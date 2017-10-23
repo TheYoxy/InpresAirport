@@ -8,7 +8,7 @@ import java.util.LinkedList;
  * Objet servant de queue pour les tâches que le serveur doit traiter
  */
 public class ListeTaches implements Tache {
-    private LinkedList<Runnable> ListTaches;
+    private final LinkedList<Runnable> ListTaches;
 
     public ListeTaches() {
         ListTaches = new LinkedList<>();

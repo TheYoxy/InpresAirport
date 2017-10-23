@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.util.LinkedList;
 
 public class FileSocket {
-    private LinkedList<Socket> ListSocket;
+    private final LinkedList<Socket> ListSocket;
 
     public FileSocket() {
         ListSocket = new LinkedList<>();

@@ -9,5 +9,11 @@ public interface Requete extends Serializable {
     @NotNull
     Runnable createRunnable(ObjectOutputStream oosClient);
 
+    boolean isLogin();
+
+    boolean loginSucced();
+
+    boolean isLogout();
+
     boolean isDisconnect();
 }

@@ -3,8 +3,8 @@ package ServeurClientLog.Threads;
 import ServeurClientLog.Interfaces.Tache;
 
 public class ThreadEsclave extends Thread {
-    private String Nom;
-    private Tache File;
+    private final String Nom;
+    private final Tache File;
 
     public ThreadEsclave(Tache t, String nom) {
         File = t;
