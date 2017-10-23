@@ -1,13 +1,15 @@
 package Tools;
 
 import LUGAP.NetworkObject.Table;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 import java.util.Vector;
+
+import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
 public class Bd {
     private static Bd MySql;
@@ -28,6 +30,8 @@ public class Bd {
 
     public Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
+        this.Connection.setAutoCommit(false);
+        this.Connection.setTransactionIsolation(TRANSACTION_SERIALIZABLE);
     }
 
     public static Bd getMySql() {
@@ -107,7 +111,7 @@ public class Bd {
                     //Le passage via le type ne fonctionne pas
                     if (rsmd.getColumnTypeName(i) == "TINYINT")
                         temp.add(String.valueOf(rs.getBoolean(i)));
-                    else if (rsmd.getColumnType(i) == Types.FLOAT)
+                    else if (rsmd.getColumnTypeName(i) == "FLOAT")
                         temp.add(String.valueOf(rs.getFloat(i)));
                     else
                         temp.add(rs.getString(i));
@@ -130,10 +134,47 @@ public class Bd {
             return "";
     }
 
+    /**
+     * @param numVol Numéro du vol à sélectionner
+     * @return Un objet ResultSet contenant les résultats de la requête
+     * @throws SQLException Exceptions qui sont générées par la BD
+     */
     public ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ?");
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? FOR UPDATE ");
         s.setString(1, numVol);
         return s.executeQuery();
+    }
+
+    public Savepoint setSavepoint() throws SQLException {
+        return Connection.setSavepoint();
+    }
+
+    public void rollback() throws SQLException {
+        Connection.rollback();
+    }
+
+    public void rollback(Savepoint s) throws SQLException {
+        Connection.rollback(s);
+    }
+
+    public void commit() throws SQLException {
+        Connection.commit();
+    }
+
+    public int UpdateVol(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
+        switch (champ) {
+            case Reception:
+            case Verifier:
+                ps.setInt(1, Boolean.valueOf(String.valueOf(value))? 1 : 0);
+                break;
+            case Charger:
+            case Remarque:
+                ps.setObject(1, value);
+                break;
+        }
+        ps.setString(2, numBagage);
+        return ps.executeUpdate();
     }
 
     public ResultSet SelectTodayVols() throws SQLException {

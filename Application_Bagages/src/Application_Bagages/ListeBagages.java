@@ -20,13 +20,20 @@ import LUGAP.NetworkObject.Table;
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Vector;
 
 /**
  * @author floryan
  */
 public class ListeBagages extends javax.swing.JDialog {
-    private Table BagagesTable;
+    private Table BagagesTable = null;
+
+    private HashMap<Vector<String>,Vector<Integer>> Modifier = null;
+
+    public HashMap<Vector<String>,Vector<Integer>> getModifier() {
+        return Modifier;
+    }
 
     /**
      * Creates new form ListeBagages
@@ -34,12 +41,12 @@ public class ListeBagages extends javax.swing.JDialog {
     public ListeBagages(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        Modifier = new HashMap<>();
     }
 
     public ListeBagages(java.awt.Frame parent, boolean modal, String vol, Table t) {
-        super(parent, modal);
-        initComponents();
-        setTitle("Vol: " + vol);
+        this(parent, modal);
+        setTitle("Vol " + vol);
         VolLabel2.setText(vol);
         BagagesTable = t;
         UpdateJTable();
@@ -172,11 +179,23 @@ public class ListeBagages extends javax.swing.JDialog {
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
         if (evt.getClickCount() == 1) {
             int pos = ResultatJTable.rowAtPoint(evt.getPoint());
-            Vector<String> v = BagagesTable.getChamps().remove(pos);
-            DetailsBagage db = new DetailsBagage((Frame) this.getParent(), true, Bagage.FromVector(v));
+            Vector<String> champModifier = BagagesTable.getChamps().get(pos);
+            DetailsBagage db = new DetailsBagage((Frame) this.getParent(), true, Bagage.FromVector(champModifier));
             db.setVisible(true);
-            BagagesTable.getChamps().add(pos, db.getBagage().toVector());
-            UpdateJTable();
+            Vector<String> retour = db.getBagage().toVector();
+            //Une modification a eu lieu sur un des champs
+            if (!retour.containsAll(champModifier)) {
+                //TODO Fix lorsque c'est le premier element
+                //Soit il y a déjà une entrée, on la supprime et on la récupère, soit il n'y en a pas eue, et on crée un nouveau vector
+                Vector<Integer> vi = Modifier.get(champModifier) == null ? new Vector<>() : Modifier.remove(champModifier);
+                for(int i = 0; i < retour.size();i++)
+                    if (!retour.get(i).equals(champModifier.get(i)))
+                        vi.add(i);
+                Modifier.put(retour,vi);
+                BagagesTable.getChamps().remove(champModifier);
+                BagagesTable.getChamps().add(pos,retour);
+                UpdateJTable();
+            }
         }
     }//GEN-LAST:event_ResultatJTableMouseClicked
 

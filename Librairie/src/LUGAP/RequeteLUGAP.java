@@ -5,6 +5,7 @@ import LUGAP.NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
 import Tools.Bd;
 import Tools.BdType;
+import Tools.VolField;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
@@ -15,8 +16,8 @@ import java.security.Security;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Random;
+import java.sql.Savepoint;
+import java.util.*;
 
 public class RequeteLUGAP implements Requete {
     private static final ThreadLocal<Integer> Rand = ThreadLocal.withInitial(() -> 0);
@@ -160,12 +161,14 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de logout de " + From);
                     Logged.set(false);
-                    try{
+                    try {
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 };
+                break;
+            case Disconnect:
                 break;
             case Request_Vols:
                 retour = () -> {
@@ -191,11 +194,15 @@ public class RequeteLUGAP implements Requete {
                 break;
             case Request_Bagages_Vol:
                 retour = () -> {
+                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_Bagages_Vol de " + From);
                     try {
                         Table t = Bd.toTable(MySql.SelectBagageVol((String) getParam()));
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, t));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
+                        System.out.println(Thread.currentThread().getName() + "> SQLException code: " + e.getErrorCode());
+                        if (e.getErrorCode() == 1205)
+                            System.out.println(Thread.currentThread().getName() + "> Lock error");
                         try {
                             oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
                         } catch (IOException e1) {
@@ -208,6 +215,60 @@ public class RequeteLUGAP implements Requete {
                         } catch (IOException e1) {
                             System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
                         }
+                    }
+                };
+                break;
+            case Update_Bagages_Vols:
+                retour = () -> {
+                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Update_Bagages_Vols de " + From);
+                    HashMap<Vector<String>, Vector<Integer>> map = (HashMap<Vector<String>, Vector<Integer>>) Param;
+                    for (Map.Entry<Vector<String>, Vector<Integer>> e : map.entrySet()) {
+                        Savepoint s = null;
+                        for (Integer i : e.getValue()) {
+                            VolField champ = null;
+                            switch (i) {
+                                case 4:
+                                    champ = VolField.Reception;
+                                    break;
+                                case 5:
+                                    champ = VolField.Charger;
+                                    break;
+                                case 6:
+                                    champ = VolField.Verifier;
+                                    break;
+                                case 7:
+                                    champ = VolField.Remarque;
+                                    break;
+                            }
+                            try {
+                                int nb = MySql.UpdateVol(champ, e.getKey().get(i), e.getKey().firstElement());
+                                System.out.println(Thread.currentThread().getName() + "> update effectué sur " + nb + " élément" + (nb > 1 ? "s" : ""));
+                                s = MySql.setSavepoint();
+                            } catch (SQLException e1) {
+                                e1.printStackTrace(System.out);
+                                try {
+                                    if (s != null)
+                                        MySql.rollback(s);
+                                    else
+                                        MySql.rollback();
+                                } catch (SQLException e2) {
+                                    e2.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+
+                    try {
+                        MySql.commit();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 };
                 break;

@@ -71,6 +71,7 @@ public class Application_Bagage extends javax.swing.JFrame {
     }
 
     public void Connection(boolean ouvertureFenetre) {
+        //TODO Tester la déconnexion reconnexion
         this.setVisible(ouvertureFenetre);
         Log.setVisible(true);
         if (!Log.isConnecter()) {
@@ -210,7 +211,7 @@ public class Application_Bagage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
-        if (evt.getClickCount() == 1) {
+        if (evt.getClickCount() == 2) {
             int row = ResultatJTable.rowAtPoint(evt.getPoint());
             if (row >= 0) {
                 ReponseLUGAP rep;
@@ -218,9 +219,7 @@ public class Application_Bagage extends javax.swing.JFrame {
                     Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
                     rep = (ReponseLUGAP) Ois.readObject();
                     if (rep.getCode() != TypeReponseLUGAP.OK) //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
-                    {
                         return;
-                    }
                 } catch (IOException e) {
                     //Todo Affichage d'une messagebox disant qu'il y a une erreur
                     e.printStackTrace();
@@ -232,7 +231,20 @@ public class Application_Bagage extends javax.swing.JFrame {
 
                 ListeBag = new ListeBagages(this,true,(String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
                 ListeBag.setVisible(true);
-                //TODO Déconnexion
+                try{
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagages_Vols,ListeBag.getModifier(),Procedural.IpPort(Serveur)));
+                    rep = (ReponseLUGAP) Ois.readObject();
+                    if (rep.getCode() != TypeReponseLUGAP.OK)
+                        //Todo Gestion erreur
+                        return;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
                 DisconnectMIActionPerformed(null);
             }
         }
