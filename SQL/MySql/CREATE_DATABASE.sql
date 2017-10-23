@@ -15,7 +15,7 @@ SHOW GRANTS FOR 'java';
 DROP USER 'java';
 CREATE USER 'java'
   IDENTIFIED BY 'java';
-GRANT SELECT ON bd_airport.* TO 'java';
+GRANT SELECT,UPDATE ON bd_airport.* TO 'java';
 
 DROP USER 'flo';
 CREATE USER 'flo'

@@ -1,6 +1,7 @@
 package Tools;
 
 import LUGAP.NetworkObject.Table;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -89,6 +90,7 @@ public class Bd {
         }
     }
 
+    @NotNull
     public static Table toTable(ResultSet rs) throws SQLException {
         Vector<String> title = new Vector<>();
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -102,7 +104,13 @@ public class Bd {
             for (int i = 1; i <= rsmd.getColumnCount(); i++)
                 try {
                     //Sous MySql, n'importe quel type de données peut être directement converti en String
-                    temp.add(rs.getString(i));
+                    //Le passage via le type ne fonctionne pas
+                    if (rsmd.getColumnTypeName(i) == "TINYINT")
+                        temp.add(String.valueOf(rs.getBoolean(i)));
+                    else if (rsmd.getColumnType(i) == Types.FLOAT)
+                        temp.add(String.valueOf(rs.getFloat(i)));
+                    else
+                        temp.add(rs.getString(i));
                 } catch (SQLException e) {
                     System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
                 }
@@ -111,15 +119,29 @@ public class Bd {
         return new Table(title, champs);
     }
 
-    public ResultSet SelectBagageVol(String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE numVol = ?");
+    @NotNull
+    public String SelectLogUser(@NotNull String User) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ?");
+        s.setString(1, User);
+        if (s.execute()) {
+            final Vector<String> strings = toTable(s.getResultSet()).getChamps().elementAt(0);
+            return strings.elementAt(0) + " " + strings.elementAt(1);
+        } else
+            return "";
+    }
+
+    public ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ?");
         s.setString(1, numVol);
         return s.executeQuery();
     }
 
-    public ResultSet Select(String table) throws SQLException {
-        Statement s = Connection.createStatement();
+    public ResultSet SelectTodayVols() throws SQLException {
+        return Connection.createStatement().executeQuery("select * from Vols where HeureDepart = CURRENT_DATE");
+    }
+
+    public ResultSet Select(@NotNull String table) throws SQLException {
         //La table doit être hard codée
-        return s.executeQuery("select * from " + table);
+        return Connection.createStatement().executeQuery("select * from " + table);
     }
 }

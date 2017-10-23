@@ -2,9 +2,9 @@ package database.tables;
 
 public class Bagages {
 
-    private String NumeroBagages;
-    private double Poids;
-    private boolean Valise;
+    private final String NumeroBagages;
+    private final double Poids;
+    private final boolean Valise;
 
     public Bagages() {
         NumeroBagages = "";

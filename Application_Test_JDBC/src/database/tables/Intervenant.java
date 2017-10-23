@@ -1,9 +1,9 @@
 package database.tables;
 
 public class Intervenant {
-    private String Nom;
-    private String Prenom;
-    private String Status;
+    private final String Nom;
+    private final String Prenom;
+    private final String Status;
 
     public Intervenant() {
         Nom = "";

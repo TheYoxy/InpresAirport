@@ -4,10 +4,10 @@ import ServeurClientLog.Threads.ThreadServeur;
 import Tools.PropertiesReader;
 import Tools.TextAreaOutputStream;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
+
     private ThreadServeur Ts = null;
 
     /**
@@ -16,7 +16,13 @@ public class ServeurFrame extends javax.swing.JFrame {
     public ServeurFrame() {
         initComponents();
         System.setOut(new PrintStream(new TextAreaOutputStream(ConsoleTA)));
-        StateRB.setEnabled(false);
+        try {
+            Class.forName("Tools.Bd");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Exception: " + e.getMessage());
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     /**
@@ -30,7 +36,7 @@ public class ServeurFrame extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if (info.getName().equals("Nimbus")) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -45,7 +51,6 @@ public class ServeurFrame extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ServeurFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new ServeurFrame().setVisible(true));
     }
@@ -59,21 +64,27 @@ public class ServeurFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        ConsoleSPTA = new javax.swing.JScrollPane();
         ConsoleTA = new javax.swing.JTextArea();
         StateRB = new javax.swing.JRadioButton();
         StartB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Serveur");
+        setFont(new java.awt.Font("Liberation Mono", 0, 14)); // NOI18N
 
         ConsoleTA.setEditable(false);
         ConsoleTA.setColumns(20);
+        ConsoleTA.setFont(ConsoleTA.getFont().deriveFont(ConsoleTA.getFont().getSize()+2f));
         ConsoleTA.setRows(5);
         ConsoleTA.setToolTipText("");
         ConsoleTA.setFocusable(false);
-        jScrollPane1.setViewportView(ConsoleTA);
+        ConsoleSPTA.setViewportView(ConsoleTA);
 
         StateRB.setText("State");
+        StateRB.setToolTipText("");
+        StateRB.setEnabled(false);
+        StateRB.setFocusable(false);
 
         StartB.setText("Start");
         StartB.addActionListener(new java.awt.event.ActionListener() {
@@ -85,38 +96,38 @@ public class ServeurFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(StateRB)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(StartB)))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ConsoleSPTA, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(StateRB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(StartB)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(StateRB)
-                                        .addComponent(StartB))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(StateRB)
+                    .addComponent(StartB))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ConsoleSPTA, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void StartBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartBActionPerformed
-        // TODO add your handling code here:
         if (!StateRB.isSelected()) {
             try {
                 Ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BAGAGES")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")));
-            } catch (IOException | NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
@@ -127,9 +138,9 @@ public class ServeurFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_StartBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane ConsoleSPTA;
     private javax.swing.JTextArea ConsoleTA;
     private javax.swing.JButton StartB;
     private javax.swing.JRadioButton StateRB;
-    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

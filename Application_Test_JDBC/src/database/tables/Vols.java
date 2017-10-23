@@ -2,12 +2,12 @@ package database.tables;
 
 public class Vols {
 
-    private String NumVol;
-    private String Destination;
-    private String HeureArrivee;
-    private String HeureDepart;
-    private String HeureArriveeDestination;
-    private int AvionUtilise;
+    private final String NumVol;
+    private final String Destination;
+    private final String HeureArrivee;
+    private final String HeureDepart;
+    private final String HeureArriveeDestination;
+    private final int AvionUtilise;
 
     public Vols() {
         this.NumVol = "";

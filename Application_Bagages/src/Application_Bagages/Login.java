@@ -13,23 +13,16 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
- *
  * @author floryan
  */
 public class Login extends javax.swing.JDialog {
+
     private Socket Socket = null;
     private boolean Connecter = false;
     private ObjectOutputStream Oos = null;
-
-    public ObjectOutputStream getOos() {
-        return Oos;
-    }
-
-    public ObjectInputStream getOis() {
-        return Ois;
-    }
-
     private ObjectInputStream Ois = null;
+    private String NomPrenomUser = "";
+
     /**
      * Creates new form Login
      */
@@ -85,8 +78,26 @@ public class Login extends javax.swing.JDialog {
         });
     }
 
+    public String getNomPrenomUser() {
+        return NomPrenomUser;
+    }
+
+    public ObjectOutputStream getOos() {
+        return Oos;
+    }
+
+    public ObjectInputStream getOis() {
+        return Ois;
+    }
+
     public boolean isConnecter() {
         return Connecter;
+    }
+
+    public void ResetChamps() {
+        LoginTF.setText("");
+        PasswordPF.setText("");
+        Connecter = false;
     }
 
     /**
@@ -125,72 +136,85 @@ public class Login extends javax.swing.JDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(LoginTF)
-                    .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(LoginLabel)
-                                    .addComponent(PasswordLabel)
-                                    .addComponent(ConnectionButton))
-                            .addGap(0, 91, Short.MAX_VALUE))
-                        .addComponent(PasswordPF))
-                    .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(LoginTF)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(LoginLabel)
+                                                        .addComponent(PasswordLabel)
+                                                        .addComponent(ConnectionButton))
+                                                .addGap(0, 91, Short.MAX_VALUE))
+                                        .addComponent(PasswordPF))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                    .addComponent(LoginLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(LoginTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                    .addComponent(PasswordLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(PasswordPF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(20, 20, 20)
-                    .addComponent(ConnectionButton)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(LoginLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(LoginTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(PasswordLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(PasswordPF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(20, 20, 20)
+                                .addComponent(ConnectionButton)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void ConnectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectionButtonActionPerformed
-        LUGAP.NetworkObject.Login l = new LUGAP.NetworkObject.Login(LoginTF.getText(), new String(PasswordPF.getPassword()));
-        RequeteLUGAP req = new RequeteLUGAP(TypeRequeteLUGAP.Login, "",l, Procedural.IpPort(Socket));
-        try {
-            Oos = new ObjectOutputStream(Socket.getOutputStream());
-            Oos.writeObject(req);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
-        }
+        int challenge = 0;
         ReponseLUGAP rep = null;
+        //Demande du digest
         try {
-            Ois = new ObjectInputStream(Socket.getInputStream());
+            if (Oos == null) {
+                Oos = new ObjectOutputStream(Socket.getOutputStream());
+            }
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect,Procedural.IpPort(Socket)));
+            if (Ois == null)
+                Ois = new ObjectInputStream(Socket.getInputStream());
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+        if (rep == null) return;
+        if (rep.getCode() == TypeReponseLUGAP.OK)
+            challenge = (int) rep.getParam();
+        System.out.println("Challenge: " + challenge);
+        //Login
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, new LUGAP.NetworkObject.Login(LoginTF.getText(), RequeteLUGAP.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
+            rep = (ReponseLUGAP) Ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        if (rep != null) {
-            TypeReponseLUGAP i = (TypeReponseLUGAP) rep.getCode();
-            switch (i) {
-                case UNKNOWN_LOGIN:
-                    JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
-                    break;
-                case BAD_PASSWORD:
-                    JOptionPane.showMessageDialog(this, "Le mot de passe entré est incorrect", "Retour de connection", JOptionPane.WARNING_MESSAGE);
-                    break;
-                case LOG:
-                    JOptionPane.showMessageDialog(this, "Connecté", "Retour de connection", JOptionPane.INFORMATION_MESSAGE);
-                    this.setVisible(false);
-                    Connecter = true;
-                    break;
-            }
+
+        if (rep == null) return;
+        switch ((TypeReponseLUGAP) rep.getCode()) {
+            case UNKNOWN_LOGIN:
+                JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
+                break;
+            case BAD_PASSWORD:
+                JOptionPane.showMessageDialog(this, "Le mot de passe entré est incorrect", "Retour de connection", JOptionPane.WARNING_MESSAGE);
+                break;
+            case LOG:
+                JOptionPane.showMessageDialog(this, "Connecté", "Retour de connection", JOptionPane.INFORMATION_MESSAGE);
+                this.setVisible(false);
+                Connecter = true;
+                NomPrenomUser = (String) rep.getParam();
+                break;
         }
     }//GEN-LAST:event_ConnectionButtonActionPerformed
 
