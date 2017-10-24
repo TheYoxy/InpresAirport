@@ -1,9 +1,7 @@
 package ServeurClientLog.Threads;
 
-import ServeurClientLog.Containers.FileSocket;
-import ServeurClientLog.Containers.ListeTaches;
+import ServeurClientLog.Containers.Containeur;
 import ServeurClientLog.Interfaces.Requete;
-import ServeurClientLog.Interfaces.Tache;
 import Tools.Procedural;
 
 import java.io.IOException;
@@ -12,29 +10,24 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ThreadClient extends Thread {
-    private final FileSocket TachesAExecuter;
-    private final Tache Queue;
+    private final Containeur<Socket> TachesAExecuter;
     private final String Nom;
     private Socket Client;
     private ObjectInputStream Ois;
     private ObjectOutputStream Oos;
-    private final ThreadEsclave ThEsclave;
     private boolean Logged;
 
-    public ThreadClient(FileSocket st, String n) {
+    public ThreadClient(Containeur<Socket> st, String n) {
         TachesAExecuter = st;
-        Queue = new ListeTaches();
         Nom = n;
         this.setName(Nom);
-        ThEsclave = new ThreadEsclave(Queue, Nom + " esclave");
-        ThEsclave.start();
     }
 
     @Override
     public void run() {
         while (!isInterrupted()) {
             try {
-                Client = TachesAExecuter.getSocket();
+                Client = TachesAExecuter.get();
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
             }
@@ -56,8 +49,7 @@ public class ThreadClient extends Thread {
                     } else {
                         boucle = !req.isDisconnect();
                         if (boucle) {
-                            System.out.println(this.getName() + "> Ajout d'une requête à la file d'attente");
-                            Queue.addTache(req.createRunnable(Oos));
+                            req.createRunnable(Oos).run();
                         } else
                             System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                     }

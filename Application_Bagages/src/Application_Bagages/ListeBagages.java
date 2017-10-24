@@ -185,7 +185,6 @@ public class ListeBagages extends javax.swing.JDialog {
             Vector<String> retour = db.getBagage().toVector();
             //Une modification a eu lieu sur un des champs
             if (!retour.containsAll(champModifier)) {
-                //TODO Fix lorsque c'est le premier element
                 //Soit il y a déjà une entrée, on la supprime et on la récupère, soit il n'y en a pas eue, et on crée un nouveau vector
                 Vector<Integer> vi = Modifier.get(champModifier) == null ? new Vector<>() : Modifier.remove(champModifier);
                 for(int i = 0; i < retour.size();i++)

@@ -183,14 +183,20 @@ public class Login extends javax.swing.JDialog {
                 Ois = new ObjectInputStream(Socket.getInputStream());
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(),"Exception" , JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Exception", e.getLocalizedMessage(), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(),"Exception" , JOptionPane.ERROR_MESSAGE);
         }
         if (rep == null) return;
-        if (rep.getCode() == TypeReponseLUGAP.OK)
+        if (rep.getCode() == TypeReponseLUGAP.OK) {
+            if (rep.getParam() == null) {
+                System.err.println("getParam() = null lors de la réception du challenge");
+                this.setVisible(false);
+                return;
+            }
             //TODO Bug getParam retourn NULL alors qu'un paramètre est bien intègré
             challenge = (int) rep.getParam();
+        }
         System.out.println("Challenge: " + challenge);
         //Login
         try {

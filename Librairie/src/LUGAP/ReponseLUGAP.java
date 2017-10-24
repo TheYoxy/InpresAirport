@@ -18,6 +18,14 @@ public class ReponseLUGAP implements Reponse, Serializable {
         this.Param = param;
     }
 
+    @Override
+    public String toString() {
+        return "ReponseLUGAP{" +
+                "Reponse=" + Reponse +
+                ", Param=" + Param +
+                '}';
+    }
+
     public Serializable getParam() {
         return Param;
     }

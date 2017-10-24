@@ -30,10 +30,10 @@ public class RequeteLUGAP implements Requete {
         try {
             Md = MessageDigest.getInstance("SHA-1", "BC");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
             System.exit(-1);
         } catch (NoSuchProviderException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
             System.exit(-1);
         }
     }
@@ -93,11 +93,12 @@ public class RequeteLUGAP implements Requete {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête trylogin de " + From);
                     Rand.set(new Random().nextInt());
                     try {
+                        ReponseLUGAP req = new ReponseLUGAP(TypeReponseLUGAP.OK, Rand.get());
                         System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + Rand.get());
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Rand.get()));
+                        System.out.println(Thread.currentThread().getName() + "> Donnée renvoyée:    " + req);
+                        oosClient.writeObject(req);
                     } catch (IOException e) {
-                        e.printStackTrace();
-                        //TODO Gestion erreurs
+                        e.printStackTrace(System.out);
                     }
                 };
                 break;
@@ -164,7 +165,7 @@ public class RequeteLUGAP implements Requete {
                     try {
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        e.printStackTrace(System.out);
                     }
                 };
                 break;
@@ -276,7 +277,7 @@ public class RequeteLUGAP implements Requete {
                     try {
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        e.printStackTrace(System.out);
                     }
                 };
                 break;
