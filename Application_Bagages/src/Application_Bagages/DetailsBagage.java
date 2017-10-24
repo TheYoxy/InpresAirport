@@ -88,7 +88,7 @@ public class DetailsBagage extends javax.swing.JDialog {
     }
 
     public Bagage getBagage() {
-        return new Bagage(NumBilletTF.getText(), Double.parseDouble(PoidsTF.getText()), ValiseRB.isSelected(), NumBilletTF.getText(), ReceptionnerCB.isSelected(), ChargeCB.isSelected() ? 'O' : RefuserCB.isSelected() ? 'R' : 'N', VerifierCB.isSelected(), RemarqueTA.getText());
+        return new Bagage(NumBagageTF.getText(), Double.parseDouble(PoidsTF.getText()), ValiseRB.isSelected(), NumBilletTF.getText(), ReceptionnerCB.isSelected(), ChargeCB.isSelected() ? 'O' : RefuserCB.isSelected() ? 'R' : 'N', VerifierCB.isSelected(), RemarqueTA.getText());
     }
 
     /**

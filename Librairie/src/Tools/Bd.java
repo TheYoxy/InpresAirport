@@ -1,7 +1,7 @@
 package Tools;
 
 import LUGAP.NetworkObject.Table;
-import org.jetbrains.annotations.NotNull;
+import com.sun.istack.internal.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 public class Bd {
+    /* Impossible d'avoir des lock si jamais on reste sur la même session de bd */
     private static Bd MySql;
 
     static {
@@ -26,17 +27,33 @@ public class Bd {
 
     private Connection Connection;
 
-    public Bd(BdType type) throws IOException, SQLException {
+    private Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
+//        this.Connection.setAutoCommit(false);
+//        this.Connection.setTransactionIsolation(TRANSACTION_SERIALIZABLE);
     }
 
     public static Bd getMySql() {
         return MySql;
     }
 
-    public static void main(String[] argv) throws IOException, SQLException {
-        Bd b = new Bd(BdType.MySql);
-        AfficheResultSet(b.Select("Login"));
+    public static void main(String[] argv) {
+        Bd b = getMySql();
+        Bd c = getMySql();
+        Runnable r = () -> {
+            try {
+                System.out.println(Thread.currentThread().getName() + "> Requête ");
+                ResultSet rs = c.SelectBagageVol("1");
+                System.out.println(Thread.currentThread().getName() + "> Select passé");
+                Table t = toTable(rs);
+                System.out.println(t);
+                System.out.println(Thread.currentThread().getName() + "> Fin requête");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        };
+        new Thread(r).start();
+        r.run();
     }
 
     public static Connection createConnection(BdType type) throws SQLException, IOException {
@@ -65,6 +82,7 @@ public class Bd {
         }
         System.out.println("Driver trouvé");
         Connection retour = DriverManager.getConnection(url, user, passwd);
+
         System.out.println("Connexion établie");
         System.out.print("----------------------------------");
         for (int i = 0; i < name.length(); i++)
@@ -107,7 +125,7 @@ public class Bd {
                     //Le passage via le type ne fonctionne pas
                     if (rsmd.getColumnTypeName(i) == "TINYINT")
                         temp.add(String.valueOf(rs.getBoolean(i)));
-                    else if (rsmd.getColumnType(i) == Types.FLOAT)
+                    else if (rsmd.getColumnTypeName(i) == "FLOAT")
                         temp.add(String.valueOf(rs.getFloat(i)));
                     else
                         temp.add(rs.getString(i));
@@ -130,10 +148,63 @@ public class Bd {
             return "";
     }
 
+    /**
+     * @param numVol Numéro du vol à sélectionner
+     * @return Un objet ResultSet contenant les résultats de la requête
+     * @throws SQLException Exceptions qui sont générées par la BD
+     */
     public ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ?");
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? and locked = 0");
         s.setString(1, numVol);
         return s.executeQuery();
+    }
+
+    public void LockVol(@NotNull String numVol) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 1 where NumeroVol = ?");
+        s.setString(1, numVol);
+        s.executeUpdate();
+    }
+
+    public void UnlockVol(@NotNull String numVol) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 0 where NumeroVol = ?");
+        s.setString(1, numVol);
+        s.executeUpdate();
+    }
+
+    public Savepoint setSavepoint() throws SQLException {
+        return Connection.setSavepoint();
+    }
+
+    public void rollback() throws SQLException {
+        Connection.rollback();
+    }
+
+    public void rollback(Savepoint s) throws SQLException {
+        Connection.rollback(s);
+    }
+
+    public void commit() throws SQLException {
+        Connection.commit();
+    }
+
+    public void setAutoComit(boolean b) throws SQLException {
+        Connection.setAutoCommit(b);
+    }
+
+    public boolean UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
+        switch (champ) {
+            case Reception:
+            case Verifier:
+                ps.setInt(1, Boolean.valueOf(String.valueOf(value)) ? 1 : 0);
+                break;
+            case Charger:
+            case Remarque:
+                ps.setObject(1, value);
+                break;
+        }
+        ps.setString(2, numBagage);
+        return ps.execute();
     }
 
     public ResultSet SelectTodayVols() throws SQLException {
