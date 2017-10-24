@@ -86,7 +86,6 @@ public class RequeteLUGAP implements Requete {
     public Runnable createRunnable(final ObjectOutputStream oosClient) {
         Runnable retour = null;
         this.setBd(Bd.getMySql());
-        System.out.println(Thread.currentThread().getName() + "> Message " + From);
         switch (this.Type) {
             case TryConnect:
                 retour = () -> {

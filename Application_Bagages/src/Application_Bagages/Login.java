@@ -194,7 +194,6 @@ public class Login extends javax.swing.JDialog {
                 this.setVisible(false);
                 return;
             }
-            //TODO Bug getParam retourn NULL alors qu'un paramètre est bien intègré
             challenge = (int) rep.getParam();
         }
         System.out.println("Challenge: " + challenge);
