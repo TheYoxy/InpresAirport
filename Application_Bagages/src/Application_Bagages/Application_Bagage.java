@@ -228,14 +228,11 @@ public class Application_Bagage extends javax.swing.JFrame {
                 try {
                     Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
                     rep = (ReponseLUGAP) Ois.readObject();
-                    if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK)
-                    {
-                        //TODO Gestion d'erreur en cas de requête qui n'est pas correctement renvoyée (Exception serveur)
+                    if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK) {
                         JOptionPane.showMessageDialog(this, "Les bagages de ce vol sont déjà en cours de modification.", "Erreur", JOptionPane.ERROR_MESSAGE);
                         return;
                     } else if (rep.getCode() != TypeReponseLUGAP.OK) {
-                        //TODO Supprimer debug
-                        JOptionPane.showMessageDialog(this, "Erreur de communication", "Erreur", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                 } catch (IOException e) {
@@ -252,9 +249,10 @@ public class Application_Bagage extends javax.swing.JFrame {
                 try {
                     Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagages_Vols, ListeBag.getModifier(), Procedural.IpPort(Serveur)));
                     rep = (ReponseLUGAP) Ois.readObject();
-                    if (rep.getCode() != TypeReponseLUGAP.OK)
-                        //Todo Gestion erreur
+                    if (rep.getCode() != TypeReponseLUGAP.OK) {
+                        JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
                         return;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
@@ -284,7 +282,13 @@ public class Application_Bagage extends javax.swing.JFrame {
     private void DisconnectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DisconnectMIActionPerformed
         try {
             Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Logout, Procedural.IpPort(Serveur)));
+            ReponseLUGAP rep = (ReponseLUGAP) Ois.readObject();
+            if (rep.getCode() != TypeReponseLUGAP.OK)
+                //TODO Gestion d'exception
+                return;
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         Log.ResetChamps();
