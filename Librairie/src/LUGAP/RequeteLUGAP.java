@@ -4,7 +4,6 @@ import LUGAP.NetworkObject.Login;
 import LUGAP.NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
 import Tools.Bd;
-import Tools.BdType;
 import Tools.VolField;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -22,6 +21,7 @@ import java.util.*;
 public class RequeteLUGAP implements Requete {
     private static final ThreadLocal<Integer> Rand = ThreadLocal.withInitial(() -> 0);
     private static final ThreadLocal<Boolean> Logged = ThreadLocal.withInitial(() -> false);
+    private static final ThreadLocal<String> Id = ThreadLocal.withInitial(() -> "");
     private static MessageDigest Md;
 
     static {
@@ -74,8 +74,8 @@ public class RequeteLUGAP implements Requete {
         return Param;
     }
 
-    private void setBd() throws IOException, SQLException {
-        MySql = new Bd(BdType.MySql);
+    private void setBd() {
+        MySql = Bd.getMySql();
     }
 
     private void setBd(Bd base) {
@@ -174,7 +174,9 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_vols de " + From);
                     try {
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(MySql.SelectTodayVols())));
+                        Table t = Bd.toTable(MySql.SelectTodayVols());
+                        t.removeColumn(t.getTete().indexOf("locked"));
+                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, t));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         try {
@@ -196,13 +198,15 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_Bagages_Vol de " + From);
                     try {
-                        Table t = Bd.toTable(MySql.SelectBagageVol((String) getParam()));
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, t));
+                        Id.set((String) Param);
+                        ResultSet s = MySql.SelectBagageVol(Id.get());
+                        if (s.next()) {
+                            s.beforeFirst();
+                            MySql.LockVol(Id.get());
+                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(s)));
+                        } else oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.SQL_LOCK));
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
-                        System.out.println(Thread.currentThread().getName() + "> SQLException code: " + e.getErrorCode());
-                        if (e.getErrorCode() == 1205)
-                            System.out.println(Thread.currentThread().getName() + "> Lock error");
                         try {
                             oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
                         } catch (IOException e1) {
@@ -222,6 +226,11 @@ public class RequeteLUGAP implements Requete {
                 retour = () -> {
                     System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Update_Bagages_Vols de " + From);
                     HashMap<Vector<String>, Vector<Integer>> map = (HashMap<Vector<String>, Vector<Integer>>) Param;
+                    try {
+                        MySql.setAutoComit(false);
+                    } catch (SQLException e) {
+                        e.printStackTrace(System.out);
+                    }
                     for (Map.Entry<Vector<String>, Vector<Integer>> e : map.entrySet()) {
                         Savepoint s = null;
                         for (Integer i : e.getValue()) {
@@ -241,8 +250,7 @@ public class RequeteLUGAP implements Requete {
                                     break;
                             }
                             try {
-                                int nb = MySql.UpdateVol(champ, e.getKey().get(i), e.getKey().firstElement());
-                                System.out.println(Thread.currentThread().getName() + "> update effectué sur " + nb + " élément" + (nb > 1 ? "s" : ""));
+                                MySql.UpdateBagage(champ, e.getKey().get(i), e.getKey().firstElement());
                                 s = MySql.setSavepoint();
                             } catch (SQLException e1) {
                                 e1.printStackTrace(System.out);
@@ -252,19 +260,19 @@ public class RequeteLUGAP implements Requete {
                                     else
                                         MySql.rollback();
                                 } catch (SQLException e2) {
-                                    e2.printStackTrace();
+                                    e2.printStackTrace(System.out);
                                 }
                             }
                         }
-
                     }
-
                     try {
+                        MySql.UnlockVol(Id.get());
                         MySql.commit();
+                        MySql.setAutoComit(false);
+                        Id.set("");
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        e.printStackTrace(System.out);
                     }
-
                     try {
                         oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
                     } catch (IOException e) {
