@@ -205,7 +205,9 @@ public class RequeteLUGAP implements Requete {
                             s.beforeFirst();
                             MySql.LockVol(Id.get());
                             oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(s)));
-                        } else oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.SQL_LOCK));
+                        } else {
+                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.SQL_LOCK));
+                        }
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         try {
@@ -256,10 +258,11 @@ public class RequeteLUGAP implements Requete {
                             } catch (SQLException e1) {
                                 e1.printStackTrace(System.out);
                                 try {
-                                    if (s != null)
+                                    if (s != null) {
                                         MySql.rollback(s);
-                                    else
+                                    } else {
                                         MySql.rollback();
+                                    }
                                 } catch (SQLException e2) {
                                     e2.printStackTrace(System.out);
                                 }
