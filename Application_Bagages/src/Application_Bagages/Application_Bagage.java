@@ -86,6 +86,7 @@ public class Application_Bagage extends javax.swing.JFrame {
         if (!Log.isConnecter()) {
             formWindowClosing(null);
             dispose();
+            return;
         }
         if (!ouvertureFenetre) {
             this.setVisible(true);
