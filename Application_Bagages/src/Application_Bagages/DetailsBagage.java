@@ -250,18 +250,14 @@ public class DetailsBagage extends javax.swing.JDialog {
 
     private void VerifierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifierCBActionPerformed
         System.out.println("Verifier: " + VerifierCB.isSelected());
-        if (VerifierCB.isSelected()) {
-            if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
-        }
+        if (VerifierCB.isSelected() && !ReceptionnerCB.isSelected())  ReceptionnerCB.setSelected(true);
         else if (RefuserCB.isSelected()) ChargementBG.clearSelection();
         System.out.println("Verifier: " + VerifierCB.isSelected());
     }//GEN-LAST:event_VerifierCBActionPerformed
 
     private void ChargeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChargeCBActionPerformed
         System.out.println("Charge: " + ChargeCB.isSelected());
-        if (ChargeCB.isSelected()) {
-            if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
-        }
+        if (ChargeCB.isSelected() && !ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
         System.out.println("Charge: " + ChargeCB.isSelected());
     }//GEN-LAST:event_ChargeCBActionPerformed
 
