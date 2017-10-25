@@ -2,7 +2,6 @@ package Tools;
 
 import LUGAP.NetworkObject.Table;
 import com.sun.istack.internal.NotNull;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -10,6 +9,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 public class Bd {
+
     /* Impossible d'avoir des lock si jamais on reste sur la même session de bd */
     private static Bd MySql;
 
@@ -85,8 +85,9 @@ public class Bd {
 
         System.out.println("Connexion établie");
         System.out.print("----------------------------------");
-        for (int i = 0; i < name.length(); i++)
+        for (int i = 0; i < name.length(); i++) {
             System.out.print("-");
+        }
         System.out.println();
         return retour;
     }
@@ -101,8 +102,9 @@ public class Bd {
         System.out.println(sb);
         while (rs.next()) {
             sb = new StringBuilder();
-            for (int i = 1; i <= rsmf.getColumnCount(); i++)
+            for (int i = 1; i <= rsmf.getColumnCount(); i++) {
                 sb.append(rs.getObject(i)).append("|");
+            }
             sb.deleteCharAt(sb.length() - 1);
             System.out.println(sb);
         }
@@ -119,33 +121,36 @@ public class Bd {
         rs.beforeFirst();
         while (rs.next()) {
             Vector<String> temp = new Vector<>();
-            for (int i = 1; i <= rsmd.getColumnCount(); i++)
+            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                 try {
                     //Sous MySql, n'importe quel type de données peut être directement converti en String
                     //Le passage via le type ne fonctionne pas
-                    if (rsmd.getColumnTypeName(i) == "TINYINT")
+                    if (rsmd.getColumnTypeName(i) == "TINYINT") {
                         temp.add(String.valueOf(rs.getBoolean(i)));
-                    else if (rsmd.getColumnTypeName(i) == "FLOAT")
+                    } else if (rsmd.getColumnTypeName(i) == "FLOAT") {
                         temp.add(String.valueOf(rs.getFloat(i)));
-                    else
+                    } else {
                         temp.add(rs.getString(i));
+                    }
                 } catch (SQLException e) {
                     System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
                 }
+            }
             champs.add(temp);
         }
         return new Table(title, champs);
     }
 
     @NotNull
-    public String SelectLogUser(@NotNull String User) throws SQLException {
+    public synchronized String SelectLogUser(@NotNull String User) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ?");
         s.setString(1, User);
         if (s.execute()) {
             final Vector<String> strings = toTable(s.getResultSet()).getChamps().elementAt(0);
             return strings.elementAt(0) + " " + strings.elementAt(1);
-        } else
+        } else {
             return "";
+        }
     }
 
     /**
@@ -153,45 +158,45 @@ public class Bd {
      * @return Un objet ResultSet contenant les résultats de la requête
      * @throws SQLException Exceptions qui sont générées par la BD
      */
-    public ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
+    public synchronized ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? and locked = 0");
         s.setString(1, numVol);
         return s.executeQuery();
     }
 
-    public void LockVol(@NotNull String numVol) throws SQLException {
+    public synchronized void LockVol(@NotNull String numVol) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 1 where NumeroVol = ?");
         s.setString(1, numVol);
         s.executeUpdate();
     }
 
-    public void UnlockVol(@NotNull String numVol) throws SQLException {
+    public synchronized void UnlockVol(@NotNull String numVol) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 0 where NumeroVol = ?");
         s.setString(1, numVol);
         s.executeUpdate();
     }
 
-    public Savepoint setSavepoint() throws SQLException {
+    public synchronized Savepoint setSavepoint() throws SQLException {
         return Connection.setSavepoint();
     }
 
-    public void rollback() throws SQLException {
+    public synchronized void rollback() throws SQLException {
         Connection.rollback();
     }
 
-    public void rollback(Savepoint s) throws SQLException {
+    public synchronized void rollback(Savepoint s) throws SQLException {
         Connection.rollback(s);
     }
 
-    public void commit() throws SQLException {
+    public synchronized void commit() throws SQLException {
         Connection.commit();
     }
 
-    public void setAutoComit(boolean b) throws SQLException {
+    public synchronized void setAutoComit(boolean b) throws SQLException {
         Connection.setAutoCommit(b);
     }
 
-    public boolean UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
+    public synchronized boolean UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
         switch (champ) {
             case Reception:
@@ -207,11 +212,11 @@ public class Bd {
         return ps.execute();
     }
 
-    public ResultSet SelectTodayVols() throws SQLException {
+    public synchronized ResultSet SelectTodayVols() throws SQLException {
         return Connection.createStatement().executeQuery("select * from Vols where HeureDepart BETWEEN CURRENT_DATE and CURRENT_DATE + 1");
     }
 
-    public ResultSet Select(@NotNull String table) throws SQLException {
+    public synchronized ResultSet Select(@NotNull String table) throws SQLException {
         //La table doit être hard codée
         return Connection.createStatement().executeQuery("select * from " + table);
     }
