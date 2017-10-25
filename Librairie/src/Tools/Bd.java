@@ -208,7 +208,7 @@ public class Bd {
     }
 
     public ResultSet SelectTodayVols() throws SQLException {
-        return Connection.createStatement().executeQuery("select * from Vols where HeureDepart = CURRENT_DATE");
+        return Connection.createStatement().executeQuery("select * from Vols where HeureDepart BETWEEN CURRENT_DATE and CURRENT_DATE + 1");
     }
 
     public ResultSet Select(@NotNull String table) throws SQLException {
