@@ -11,12 +11,12 @@ public class Procedural {
         byte[] tabl = i.getAddress();
         if (i instanceof Inet4Address) {
             for (byte b : tabl) {
-                retour.append(String.valueOf(b)).append(".");
+                retour.append(String.valueOf(b & 0xFF)).append(".");
             }
             retour.deleteCharAt(retour.length() - 1);
         } else if (i instanceof Inet6Address) {
             for (byte b : tabl) {
-                retour.append(String.valueOf(b)).append(":");
+                retour.append(String.valueOf(b & 0xFF)).append(":");
             }
             retour.deleteCharAt(retour.length() - 1);
         }

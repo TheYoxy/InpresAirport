@@ -2,14 +2,13 @@
 #### Délais de présentation
 | Application                              | Semaine                               | Pondération |
 | ---------------------------------------- | ------------------------------------- | ----------- |
-| 1: [Client/Serveur multithread TCP en C/C++](https://github.com/TheYoxy/InpresAirport#1-serveur_checkin-et-application_checkin) | 2/10/2017                             | 20          |
-| 2: [JDBC](https://github.com/TheYoxy/InpresAirport#2-les-accès-aux-bases-de-données)                                  | 9/10/2017                             | 10          |
-| 3: [Client serveur multithread TCP en Java](https://github.com/TheYoxy/InpresAirport#3-le-serveur-serveur_bagages) | 23/10/2017                            | 20          |
-| 4: [Programmation web java classique]()      | 20/11/2017                            | 20          |
+| 1: [Client/Serveur multithread TCP en C/C++](#1. Serveur_CheckIN et Application_CheckIn) | 2/10/2017                             | 20          |
+| 2: [JDBC]()                                  | 9/10/2017                             | 10          |
+| 3: Client serveur multithread TCP en Java | 23/10/2017                            | 20          |
+| 4: Programmation web java classique      | 20/11/2017                            | 20          |
 | 5: Client-serveur UDP en C/C++ et Java   | 4/12/2017                             | 10          |
 | 6: Client-serveur sécurisé en Java et complément caddie virtuel en Java | Examen de laboratoire de Janvier 2018 | 80          |
 | 7: Communications réseaux C/C++ - Java   | Examen de laboratoire de janvier 2018 | 20          |
----
 #### Fonctions utiles:
 > ##### TCP
 - ###### Client:
@@ -25,7 +24,7 @@
     - accept
     - send
     - recv
-    - close
+    - close 
 
 *Pour les send et recv l'ordre n'a pas d'importance, on peut appeler l'un avant l'autre ou vice-versa. Ils sont par ailleurs facultatifs.*
 > ##### UDP
@@ -49,8 +48,8 @@
 ----------
 
 
-# 1. Serveur_CheckIN et Application_CheckIn
-## 1.1. L'enregistrement des passagers : client-serveur
+## 1. Serveur_CheckIN et Application_CheckIn
+### 1.1. L'enregistrement des passagers : client-serveur
 Dossier attendu:
 - Tableau des commandes et diagramme du protocole CIMP - du type ci-contre.
 - Code *C*/*C++* du serveur Serveur_CheckIn.
@@ -66,7 +65,7 @@ des compagnies aériennes qui assurent l'accueil des passagers pour les différe
 programmés. Le serveur attend ce type de requête sur le *PORT_CHCK*. Il utilise le protocole
 applicatif (basé TCP) **CIMP** (CheckIn Management Protocol).
 
-## 1.2 La gestion des bagages : accès à Serveur_Bagages
+### 1.2 La gestion des bagages : accès à Serveur_Bagages
 On utilise donc ici des fichiers de données de type *csv*. Il est bien clair que ce serveur
 **Serveur_CheckIn** devra agir directement sur la base de données (exposée au point suivant)
 ainsi qu'interagir avec le serveur **Serveur_Bagages** (voir plus loin) qui agit sur cette même
@@ -80,14 +79,14 @@ librairie de fonctions dont l'implémentation sera modifiée ultérieurement (av
 de réécriture de code). On pense donc ici à des fonctions du type suivant (ce sont des
 exemples - libre à vous d'en concevoir d'autres du même style) :
 
-### Exemple : Librairie AccessBilBag
+#### Exemple : Librairie AccessBilBag
 
 | Fonction                                 | Sémantique                               | Valeur retournée                   |
 | ---------------------------------------- | ---------------------------------------- | ---------------------------------- |
 | `int verifyTicket(char * number, int nbPassengers)` | Vérification de l'existence d'un billet d'avion avec un certain nombre d’accompagnants. | 0 ou 1                             |
 | `float addLuggage(char * number, float weight, char suitcase)` | Enregistrement d'un bagage de poids donné, sous forme de valise ou pas, pour le billet d'avion précisé. | Poids total actuel pour le billet. |
 
-## **1.3 Quelques conseils méthodologiques pour le développement de CIMP**
+### **1.3 Quelques conseils méthodologiques pour le développement de CIMP**
 
   1. Il faut tout d'abord choisir la manières d'implémenter les requêtes et les réponses des protocoles CIMP et plusieurs possibilités sont envisageables pour écrire les trames:
   Uniquement par chaîne de caractères contenant des séparateurs pour isoler les différents paramètres.
@@ -137,8 +136,9 @@ exemples - libre à vous d'en concevoir d'autres du même style) :
 ----------
 
 
-# 2. Les accès aux bases de données
-## 2.1 La base de données BD_AIRPORT
+## 2. Les accès aux bases de données
+
+### 2.1 La base de données BD_AIRPORT
 Dossier attendu:
 -  Schéma relationnel de BD_AIRPORT.
 -  Diagramme de classe *UML* des classes de *database.utilities*.
@@ -154,8 +154,7 @@ Base de données *MySql* BD_AIRPORT doit contenir toutes les informations utiles
 | Agents  | Elle contient tous les intervenants de l'aéroport (Agents de compagnies aériennes, bagagistes, employés agréés de tour-opérateur, aiguilleurs du ciel, etc). |
 
 On peut ajouter des tables ou des champs aux tables existantes, des vues ou des contraintes, mais uniquement si elles sont justifiées par le projet.
-
-## 2.2 Un outil d'accès aux bases de données
+### 2.2 Un outil d'accès aux bases de données
 L'accès à la base de données ne devrait pas se faire avec les primitives JDBC utilisée telles quelles, mais plutôt au moyen d'objets métiers encapsulant le travail, idéalement des *Java Beans* mais **sans utilisation d'un mécanisme d'event**.
 On demande donc de construire un groupe de telles classes (package *database.utilities*) permettant l'accès (c'est-à-dire à tout le moins la connextion et les sélections de base) le plus simple possible.
 On souhaite pourvoir accéder, au minimum, à des bases relationnelles de type *MySql* ou *Oracle*.
@@ -172,9 +171,11 @@ Le programme de test **APPLICATION_TEST_JDBC** de la petite librairie ainsi cons
 
 
 ----------
-# 3. Le serveur Serveur_Bagages
+
+
+## 3. Le serveur Serveur_Bagages
 Nous allons ici nous préoccuper de l'implémentation du modèle client-serveur pour le serveur **Serveur_Bagages** (Clients: *Application_Bagages* et *Serveur_CheckIn*)
-## 3.1 Serveur_Bagages
+### 3.1 Serveur_Bagages
 Ce serveur est donc un serveur **multithread** *Java/Windows-Unix* (en modèle **pool de threads**) qui est chargé de gèrer tous les accès à la base de données **BD_AIRPORT** qui relèvent de la gestion des bagages (donc à l'exclusion des opérations portant sur les billets, qui relèvent de **Serveur_Billets**):
 - Soit par les bagaistes de diverse compagnies aériennes
 - Soit par les agents de la compagnie aérienne du checkIn, qui agissent par le serveur SerChk interposé.
@@ -182,18 +183,18 @@ Ce serveur est donc un serveur **multithread** *Java/Windows-Unix* (en modèle *
 Le serveur attends ses requêtes sur deux ports différents:
 - **PORT_BAGAGES** pour les bagagistes
 - **PORT_CHECKIN** pour les requêtes provenant de *Serveur_CheckIn*
-## 3.2 Application_Bagages
+### 3.2 Application_Bagages
 Il s'agit donc ici de l'application destinée aux bagagistes. Pour interagir avec eux, le serveur utilise le *protocole applicatif* (basé TCP) **LUGAP** (**LUG**gage h**A**ndling **P**rotocol), dont les commnades sont à définir pour satisfaire au scénario exemple suivant:
 
 *Les bagages de Mr et Mmes Charvilrom ont donc été enregistrés sous les identifiants 362-WACHARVILROM-22082017-0070-001 à 362-WACHARVILROM-22082017-0070-008.*
 
 L'application présente donc un **GUI** qui permet tout d'abord à un bagagiste d'entrer dans l'application sur base d'un login-password (ce password ne passe pas en clair sur le réseau mais sous la forme d'un **digest salé**). Ce digest sera construit en utilisant la librairie *BouncyCastle*. En cas de succès, le bagagiste obtient alors une liste des vols prévus ce jour.\
 Exemple:
-
->VOL 714 WALABIES-AIRLINES - Sydney 5h30\
+---
+VOL 714 WALABIES-AIRLINES - Sydney 5h30\
 VOL 362 POWDER-AIRLINES - Peshawar 6h30\
 VOL 152 AIR FRANCE CANAILLE - Paris 7h20
-
+---
 
 Un double-clic sur un item de la liste fait appraître dans une boîte de dialogue un tableau reprenant les bages enregistrés pour ce vol (Données provenant du fichier associé pour les 3 premières colonnes, initislisée avec les valeurs par défaut "N" ou "NEANT" selon le cas).
 Exemple:
@@ -210,8 +211,7 @@ Le bagagiste, au fur et à mesure de ses activités, va interagir sur ce tableau
 actions va générer une commande spécifique du protocole **LUGAP**, commande envoyée au
 serveur *Serveur_Bagages* sur le port **PORT_BAGAGES**.
 
----
-**Sur base de l'exemple suivant, il vous appartient de définir les commandes du protocole LUGAP (et donc de leur donner un nom) et de choisir la manière de les implémenter (objets, chaînes de caractères, etc).**
+`**Sur base de l'exemple suivant, il vous appartient de définir les commandes du protocole LUGAP (et donc de leur donner un nom) et de choisir la manière de les implémenter (objets, chaînes de caractères, etc).**`
 
 Exemple:
 ---
@@ -247,9 +247,8 @@ Exemple:
 
 >5. Quand cette boîte se referme, le bagagiste est automatiquement déconnecté du serveur.
 
-# 4 Programmation Web Java classique
+##4 Programmation Web Java classique
 Dossier attendu:
 1. Diagramme de classes UML des classes de l'application Web.
 2. ​
-
-## 4.1 L'application Web_Applic_Billets
+###4.1 L'application Web_Applic_Billets
