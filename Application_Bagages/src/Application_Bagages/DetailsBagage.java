@@ -17,9 +17,6 @@ package Application_Bagages;
 
 import LUGAP.NetworkObject.Bagage;
 
-/**
- * @author floryan
- */
 public class DetailsBagage extends javax.swing.JDialog {
 
     /**
@@ -136,6 +133,11 @@ public class DetailsBagage extends javax.swing.JDialog {
         ValiseRB.setFocusable(false);
 
         ReceptionnerCB.setText("Réceptionné ? ");
+        ReceptionnerCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ReceptionnerCBActionPerformed(evt);
+            }
+        });
 
         ChargementBG.add(ChargeCB);
         ChargeCB.setText("Chargé ?");
@@ -238,17 +240,41 @@ public class DetailsBagage extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ChargeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChargeCBActionPerformed
-        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
+        System.out.println("Charge: " + ChargeCB.isSelected());
+        if (ChargeCB.isSelected()) {
+            if (!ReceptionnerCB.isSelected()) {
+                ReceptionnerCB.setSelected(true);
+            }
+        }
     }//GEN-LAST:event_ChargeCBActionPerformed
 
     private void RefuserCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefuserCBActionPerformed
-        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
-        if (!VerifierCB.isSelected()) VerifierCB.setSelected(true);
+        System.out.println("Refuser: " + RefuserCB.isSelected());
+        if (RefuserCB.isSelected()) {
+            if (!ReceptionnerCB.isSelected()) {
+                ReceptionnerCB.setSelected(true);
+            }
+            if (!VerifierCB.isSelected()) {
+                VerifierCB.setSelected(true);
+            }
+        }
     }//GEN-LAST:event_RefuserCBActionPerformed
 
     private void VerifierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifierCBActionPerformed
-        if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
+        System.out.println("Verifier: " + VerifierCB.isSelected());
+        VerifierCB.setSelected(!VerifierCB.isSelected());
+        System.out.println("Verifier: " + VerifierCB.isSelected());
+        if (VerifierCB.isSelected()) {
+            if (!ReceptionnerCB.isSelected()) {
+                ReceptionnerCB.setSelected(true);
+            }
+        }
     }//GEN-LAST:event_VerifierCBActionPerformed
+
+    private void ReceptionnerCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReceptionnerCBActionPerformed
+        System.out.println("Receptionner: " + ReceptionnerCB.isSelected());
+
+    }//GEN-LAST:event_ReceptionnerCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox ChargeCB;

@@ -200,6 +200,7 @@ public class RequeteLUGAP implements Requete {
                     try {
                         Id.set((String) Param);
                         ResultSet s = MySql.SelectBagageVol(Id.get());
+                        //Test si le resultset n'est pas vide
                         if (s.next()) {
                             s.beforeFirst();
                             MySql.LockVol(Id.get());

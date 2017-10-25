@@ -23,15 +23,6 @@ public class Application_Bagage extends javax.swing.JFrame {
     private Socket Serveur = null;
     private ObjectInputStream Ois = null;
     private ObjectOutputStream Oos = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel BagagisteLabel;
-    private javax.swing.JLabel BagagisteNomPrenomLabel;
-    private javax.swing.JMenuItem DisconnectMI;
-    private javax.swing.JMenuBar MenuBar;
-    private javax.swing.JMenu OptionMenu;
-    private javax.swing.JTable ResultatJTable;
-    private javax.swing.JScrollPane ScrollPane;
-    private javax.swing.JLabel VolsLabel;
 
     public Application_Bagage() {
         initComponents();
@@ -225,9 +216,10 @@ public class Application_Bagage extends javax.swing.JFrame {
         if (evt.getClickCount() == 2) {
             int row = ResultatJTable.rowAtPoint(evt.getPoint());
             if (row >= 0) {
+                String vol =ResultatJTable.getValueAt(row, 0).toString();
                 ReponseLUGAP rep;
                 try {
-                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, ResultatJTable.getValueAt(0, row).toString(), Procedural.IpPort(Serveur)));
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, vol, Procedural.IpPort(Serveur)));
                     rep = (ReponseLUGAP) Ois.readObject();
                     if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK) {
                         JOptionPane.showMessageDialog(this, "Les bagages de ce vol sont déjà en cours de modification.", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -245,7 +237,7 @@ public class Application_Bagage extends javax.swing.JFrame {
                     return;
                 }
 
-                ListeBag = new ListeBagages(this, true, (String) ResultatJTable.getValueAt(0, row), (Table) rep.getParam());
+                ListeBag = new ListeBagages(this, true, vol, (Table) rep.getParam());
                 ListeBag.setVisible(true);
                 try {
                     Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagages_Vols, ListeBag.getModifier(), Procedural.IpPort(Serveur)));
@@ -296,5 +288,15 @@ public class Application_Bagage extends javax.swing.JFrame {
         clearChamps();
         Connection(true);
     }//GEN-LAST:event_DisconnectMIActionPerformed
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel BagagisteLabel;
+    private javax.swing.JLabel BagagisteNomPrenomLabel;
+    private javax.swing.JMenuItem DisconnectMI;
+    private javax.swing.JMenuBar MenuBar;
+    private javax.swing.JMenu OptionMenu;
+    private javax.swing.JTable ResultatJTable;
+    private javax.swing.JScrollPane ScrollPane;
+    private javax.swing.JLabel VolsLabel;
     // End of variables declaration//GEN-END:variables
 }
