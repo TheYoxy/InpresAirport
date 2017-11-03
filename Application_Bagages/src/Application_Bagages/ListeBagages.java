@@ -27,11 +27,12 @@ import java.util.Vector;
  * @author floryan
  */
 public class ListeBagages extends javax.swing.JDialog {
+
     private Table BagagesTable = null;
 
-    private HashMap<Vector<String>,Vector<Integer>> Modifier = null;
+    private HashMap<Vector<String>, Vector<Integer>> Modifier = null;
 
-    public HashMap<Vector<String>,Vector<Integer>> getModifier() {
+    public HashMap<Vector<String>, Vector<Integer>> getModifier() {
         return Modifier;
     }
 
@@ -186,13 +187,16 @@ public class ListeBagages extends javax.swing.JDialog {
             //Une modification a eu lieu sur un des champs
             if (!retour.containsAll(champModifier)) {
                 //Soit il y a déjà une entrée, on la supprime et on la récupère, soit il n'y en a pas eue, et on crée un nouveau vector
+                //UPDATE En temps réel
                 Vector<Integer> vi = Modifier.get(champModifier) == null ? new Vector<>() : Modifier.remove(champModifier);
-                for(int i = 0; i < retour.size();i++)
-                    if (!retour.get(i).equals(champModifier.get(i)))
+                for (int i = 0; i < retour.size(); i++) {
+                    if (!retour.get(i).equals(champModifier.get(i))) {
                         vi.add(i);
-                Modifier.put(retour,vi);
+                    }
+                }
+                Modifier.put(retour, vi);
                 BagagesTable.getChamps().remove(champModifier);
-                BagagesTable.getChamps().add(pos,retour);
+                BagagesTable.getChamps().add(pos, retour);
                 UpdateJTable();
             }
         }

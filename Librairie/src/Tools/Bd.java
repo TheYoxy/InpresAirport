@@ -2,6 +2,7 @@ package Tools;
 
 import LUGAP.NetworkObject.Table;
 import com.sun.istack.internal.NotNull;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -143,7 +144,7 @@ public class Bd {
 
     @NotNull
     public synchronized String SelectLogUser(@NotNull String User) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ?");
+        PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ? and Poste = 'Bagagiste'");
         s.setString(1, User);
         if (s.execute()) {
             final Vector<String> strings = toTable(s.getResultSet()).getChamps().elementAt(0);

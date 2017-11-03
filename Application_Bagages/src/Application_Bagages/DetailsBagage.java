@@ -249,25 +249,19 @@ public class DetailsBagage extends javax.swing.JDialog {
     }//GEN-LAST:event_ReceptionnerCBActionPerformed
 
     private void VerifierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifierCBActionPerformed
-        System.out.println("Verifier: " + VerifierCB.isSelected());
         if (VerifierCB.isSelected() && !ReceptionnerCB.isSelected())  ReceptionnerCB.setSelected(true);
         else if (RefuserCB.isSelected()) ChargementBG.clearSelection();
-        System.out.println("Verifier: " + VerifierCB.isSelected());
     }//GEN-LAST:event_VerifierCBActionPerformed
 
     private void ChargeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChargeCBActionPerformed
-        System.out.println("Charge: " + ChargeCB.isSelected());
         if (ChargeCB.isSelected() && !ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
-        System.out.println("Charge: " + ChargeCB.isSelected());
     }//GEN-LAST:event_ChargeCBActionPerformed
 
     private void RefuserCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefuserCBActionPerformed
-        System.out.println("Refuser: " + RefuserCB.isSelected());
         if (RefuserCB.isSelected()) {
             if (!VerifierCB.isSelected()) VerifierCB.setSelected(true);
             if (!ReceptionnerCB.isSelected()) ReceptionnerCB.setSelected(true);
         }
-        System.out.println("Refuser: " + RefuserCB.isSelected());
     }//GEN-LAST:event_RefuserCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

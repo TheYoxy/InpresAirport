@@ -14,6 +14,8 @@ SELECT *
 FROM Vols
 WHERE heureDepart = CURRENT_DATE;
 
+select * from Vols;
+
 SELECT
   nom,
   prenom
