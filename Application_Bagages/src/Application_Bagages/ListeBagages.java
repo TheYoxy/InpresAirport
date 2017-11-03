@@ -177,6 +177,13 @@ public class ListeBagages extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private static boolean Comparaison(Vector<String> v1, Vector<String> v2)
+    {
+        if(v1.size() != v2.size()) return false;
+        for (int i = 0; i < v1.size(); i++) if (v1.get(i) != v2.get(i)) return false;
+        return true;
+    }
+
     private void ResultatJTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ResultatJTableMouseClicked
         if (evt.getClickCount() == 1) {
             int pos = ResultatJTable.rowAtPoint(evt.getPoint());
@@ -185,15 +192,11 @@ public class ListeBagages extends javax.swing.JDialog {
             db.setVisible(true);
             Vector<String> retour = db.getBagage().toVector();
             //Une modification a eu lieu sur un des champs
-            if (!retour.containsAll(champModifier)) {
+            if (!Comparaison(champModifier,retour)) {
                 //Soit il y a déjà une entrée, on la supprime et on la récupère, soit il n'y en a pas eue, et on crée un nouveau vector
                 //UPDATE En temps réel
                 Vector<Integer> vi = Modifier.get(champModifier) == null ? new Vector<>() : Modifier.remove(champModifier);
-                for (int i = 0; i < retour.size(); i++) {
-                    if (!retour.get(i).equals(champModifier.get(i))) {
-                        vi.add(i);
-                    }
-                }
+                for (int i = 0; i < retour.size(); i++) if (retour.get(i) != champModifier.get(i)) vi.add(i);
                 Modifier.put(retour, vi);
                 BagagesTable.getChamps().remove(champModifier);
                 BagagesTable.getChamps().add(pos, retour);

@@ -174,6 +174,7 @@ public class Login extends javax.swing.JDialog {
         int challenge = 0;
         ReponseLUGAP rep = null;
         //Demande du digest
+        //TODO Digest avec la date du jour
         try {
             if (Oos == null) {
                 Oos = new ObjectOutputStream(Socket.getOutputStream());
