@@ -48,10 +48,8 @@ public class ThreadClient extends Thread {
                         Logged = req.loginSucced();
                     } else {
                         boucle = !req.isDisconnect();
-                        if (boucle) {
-                            req.createRunnable(Oos).run();
-                        } else
-                            System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
+                        if (boucle) req.createRunnable(Oos).run();
+                        else System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println(this.getName() + "> " + e.getMessage());

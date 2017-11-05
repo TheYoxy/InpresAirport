@@ -7,9 +7,9 @@ DELETE FROM Bagages;
 
 INSERT INTO Login VALUES ('floryan', '1234'), ('nico', '1234');
 INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar', 'Floryan', 'Bagagiste', 'floryan');
-INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date + 1, 42, FALSE);
-INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date + 1, current_date + 2, 42, FALSE);
-INSERT INTO Vols VALUES ('3', 'Londres', current_date - 1, current_date, current_date, 43, FALSE);
+INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date + 1, 42);
+INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date + 1, current_date + 2, 42);
+INSERT INTO Vols VALUES ('3', 'Londres', current_date - 1, current_date, current_date, 43);
 INSERT INTO Billets VALUES ('1', '1');
 INSERT INTO Billets VALUES ('2', '1');
 INSERT INTO Billets VALUES ('3', '1');

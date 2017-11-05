@@ -4,6 +4,7 @@ import LUGAP.NetworkObject.Login;
 import LUGAP.NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
 import Tools.Bd;
+import Tools.BdType;
 import Tools.VolField;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -12,16 +13,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Random;
 
 public class RequeteLUGAP implements Requete {
-    private static final ThreadLocal<Integer> Rand = ThreadLocal.withInitial(() -> 0);
-    private static final ThreadLocal<Boolean> Logged = ThreadLocal.withInitial(() -> false);
-    private static final ThreadLocal<String> Id = ThreadLocal.withInitial(() -> "");
+    private static final ThreadLocal<Integer> CHALLENGE = ThreadLocal.withInitial(() -> 0);
+    private static final ThreadLocal<Boolean> LOG_STATUS = ThreadLocal.withInitial(() -> false);
+    private static final ThreadLocal<Bd> BD_THREAD_LOCAL = ThreadLocal.withInitial(() -> null);
+    private static final ThreadLocal<ResultSet> RESULT_SET_UPDATE = ThreadLocal.withInitial(() -> null);
     private static MessageDigest Md;
 
     static {
@@ -40,7 +44,6 @@ public class RequeteLUGAP implements Requete {
 
     private TypeRequeteLUGAP Type = null;
     private Serializable Param = null;
-    private Bd MySql = null;
     private String From = "";
 
     private RequeteLUGAP(TypeRequeteLUGAP type) {
@@ -74,40 +77,30 @@ public class RequeteLUGAP implements Requete {
         return Param;
     }
 
-    private void setBd() {
-        MySql = Bd.getMySql();
-    }
-
     private void setBd(Bd base) {
-        MySql = base;
+        BD_THREAD_LOCAL.set(base);
     }
 
     @Override
     public Runnable createRunnable(final ObjectOutputStream oosClient) {
         Runnable retour = null;
-        this.setBd(Bd.getMySql());
         switch (this.Type) {
             case TryConnect:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête trylogin de " + From);
-                    Rand.set(new Random().nextInt());
-                    try {
-                        ReponseLUGAP req = new ReponseLUGAP(TypeReponseLUGAP.OK, Rand.get());
-                        System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + Rand.get());
-                        System.out.println(Thread.currentThread().getName() + "> Donnée renvoyée:    " + req);
-                        oosClient.writeObject(req);
-                    } catch (IOException e) {
-                        e.printStackTrace(System.out);
-                    }
+                    HeaderRunnable();
+                    CHALLENGE.set(new Random().nextInt());
+                    ReponseLUGAP rep = new ReponseLUGAP(TypeReponseLUGAP.OK, CHALLENGE.get());
+                    System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + CHALLENGE.get());
+                    Reponse(oosClient, rep);
                 };
                 break;
             case Login:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête login de " + From);
+                    HeaderRunnable();
+                    ReponseLUGAP rep;
                     try {
-                        ResultSet rs = MySql.Select("Login");
+                        OpenBd();
+                        ResultSet rs = BD_THREAD_LOCAL.get().Select("Login");
                         ResultSetMetaData rsmd = rs.getMetaData();
                         int user = -1, password = -1;
                         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -124,51 +117,58 @@ public class RequeteLUGAP implements Requete {
                             System.out.println(Thread.currentThread().getName() + "> (Server error) Password introuvable");
                             return;
                         }
-                        ReponseLUGAP reponse = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN);
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN);
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
                                 byte envoye[] = ((Login) Param).getPassword();
-                                byte pass[] = hashPassword(rs.getString(password), Rand.get());
+                                byte pass[] = hashPassword(rs.getString(password), CHALLENGE.get());
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
 
+                                System.out.println("-------------------------------------------------------------------");
                                 System.out.println(Thread.currentThread().getName() + "> Hash en string: ");
                                 System.out.println(Thread.currentThread().getName() + "> Hash envoyé:           " + new String(envoye));
                                 System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + new String(pass));
-
+                                System.out.println("-------------------------------------------------------------------");
                                 System.out.println(Thread.currentThread().getName() + "> Hash en tableau: ");
                                 System.out.println(Thread.currentThread().getName() + "> Hash envoyé:           " + Arrays.toString(envoye));
                                 System.out.println(Thread.currentThread().getName() + "> Hash de l'utilisateur: " + Arrays.toString(pass));
+                                System.out.println("-------------------------------------------------------------------");
 
                                 if (MessageDigest.isEqual(pass, ((Login) Param).getPassword())) {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.LOG, MySql.SelectLogUser(rs.getString(user)));
+                                    rep = new ReponseLUGAP(TypeReponseLUGAP.LOG, BD_THREAD_LOCAL.get().SelectLogUser(rs.getString(user)));
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
-                                    Logged.set(true);
+                                    LOG_STATUS.set(true);
                                     break;
                                 } else {
-                                    reponse = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD);
+                                    rep = new ReponseLUGAP(TypeReponseLUGAP.BAD_PASSWORD);
                                     System.out.println(Thread.currentThread().getName() + "> Mot de passe incorrect");
                                     break;
                                 }
                             }
                         }
-                        oosClient.writeObject(reponse);
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     } catch (IOException e) {
                         System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
+                    Reponse(oosClient, rep);
                 };
                 break;
             case Logout:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de logout de " + From);
-                    Logged.set(false);
+                    HeaderRunnable();
+                    LOG_STATUS.set(false);
+                    ReponseLUGAP rep;
                     try {
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
-                    } catch (IOException e) {
+                        CloseBd();
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.OK);
+                    } catch (SQLException e) {
                         e.printStackTrace(System.out);
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
+                    Reponse(oosClient, rep);
                 };
                 break;
             case Disconnect:
@@ -179,76 +179,51 @@ public class RequeteLUGAP implements Requete {
                 break;
             case Request_Vols:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_vols de " + From);
+                    HeaderRunnable();
+                    ReponseLUGAP rep;
                     try {
-                        Table t = Bd.toTable(MySql.SelectTodayVols());
-                        t.removeColumn(t.getTete().indexOf("locked"));
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, t));
+                        Table t = Bd.toTable(BD_THREAD_LOCAL.get().SelectTodayVols());
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.OK, t);
                     } catch (SQLException e) {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
-                        try {
-                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                        } catch (IOException e1) {
-                            System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
-                        }
-                    } catch (IOException e) {
-                        System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
-                        try {
-                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                        } catch (IOException e1) {
-                            System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
-                        }
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
+                    Reponse(oosClient, rep);
                 };
                 break;
             case Request_Bagages_Vol:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Request_Bagages_Vol de " + From);
+                    HeaderRunnable();
+                    ReponseLUGAP rep;
                     try {
-                        Id.set((String) Param);
-                        ResultSet s = MySql.SelectBagageVol(Id.get());
-                        //Test si le resultset n'est pas vide
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(s)));
-                        //TODO Fix de l'utilisation des locks mysql
-//                        if (s.next()) {
-//                            s.beforeFirst();
-//                            MySql.LockVol(Id.get());
-//                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(s)));
-//                        } else {
-//                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.SQL_LOCK));
-//                        }
+                        BD_THREAD_LOCAL.get().setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE);
+                        final String vol = (String) Param;
+                        System.out.println(Thread.currentThread().getName() + "> Id du vol demandé: " + vol);
+                        ResultSet s = BD_THREAD_LOCAL.get().SelectBagageVol(vol);
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(s));
+                        RESULT_SET_UPDATE.set(s);
                     } catch (SQLException e) {
-                        System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
-                        try {
-                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                        } catch (IOException e1) {
-                            System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
-                        }
-                    } catch (IOException e) {
-                        System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
-                        try {
-                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                        } catch (IOException e1) {
-                            System.out.println(Thread.currentThread().getName() + "> IOException: " + e.getMessage());
+                        if (e.getErrorCode() == 1205)
+                            rep = new ReponseLUGAP(TypeReponseLUGAP.SQL_LOCK);
+                        else {
+                            rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
+                            System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
+                            System.out.println(Thread.currentThread().getName() + "> SQLException code: " + e.getErrorCode());
                         }
                     }
+                    Reponse(oosClient, rep);
                 };
                 break;
             case Update_Bagage_Vol:
                 retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Update_Bagage_Vol de " + From);
+                    HeaderRunnable();
+                    ReponseLUGAP rep;
                     LinkedList<Object> l = (LinkedList<Object>) Param;
                     //Blindage
                     if (l.size() < 3 && l.size() % 2 == 0) {
-                        try {
-                            System.out.println(Thread.currentThread().getName() + "> Taille incohérente\n");
-                            oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                        } catch (IOException e) {
-                            e.printStackTrace(System.out);
-                        }
+                        System.out.println(Thread.currentThread().getName() + "> Taille incohérente");
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
+                        Reponse(oosClient, rep);
                         return;
                     }
 
@@ -257,108 +232,102 @@ public class RequeteLUGAP implements Requete {
                         System.out.println(Thread.currentThread().getName() + "> " + (i % 2 == 0 ? "Position de l'élément modifié: " : "Valeur de l'élément modifié: ") + l.get(i));
                     }
 
-                    for (int i = 0; i < (l.size() - 1) / 2; i++)
-                    {
-                        VolField champ;
-                        switch ((int) l.get(i * 2+ 2)) {
-                            case 4:
-                                champ = VolField.Reception;
-                                break;
-                            case 5:
-                                champ = VolField.Charger;
-                                break;
-                            case 6:
-                                champ = VolField.Verifier;
-                                break;
-                            case 7:
-                                champ = VolField.Remarque;
-                                break;
-                            default:
-                                try {
-                                    System.out.println(Thread.currentThread().getName() + "> Champ inconnu\n");
-                                    oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
-                                } catch (IOException e) {
-                                    e.printStackTrace(System.out);
-                                }
-                                return;
-                        }
-                        try {
-                            System.out.println(Thread.currentThread().getName() + "> Update de " + champ.name() + "(" + l.get(i * 2 + 2) + ") = " + l.get(i * 2 + 1));
-                            MySql.UpdateBagage(champ, l.get(i * 2 + 1), (String) l.get(0));
-                            //MySql.commit();
-                        } catch (SQLException e) {
-                            e.printStackTrace(System.out);
-                        }
-                    }
                     try {
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                };
-                break;
-            case Update_Bagages_Vols:
-                retour = () -> {
-                    System.out.println();
-                    System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête Update_Bagages_Vols de " + From);
-                    HashMap<Vector<String>, Vector<Integer>> map = (HashMap<Vector<String>, Vector<Integer>>) Param;
-                    try {
-                        MySql.setAutoComit(false);
+                        Update(RESULT_SET_UPDATE.get(), l);
+                        RESULT_SET_UPDATE.set(null);
+                        BD_THREAD_LOCAL.get().commit();
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.OK);
                     } catch (SQLException e) {
                         e.printStackTrace(System.out);
-                    }
-                    for (Map.Entry<Vector<String>, Vector<Integer>> e : map.entrySet()) {
-                        Savepoint s = null;
-                        for (Integer i : e.getValue()) {
-                            VolField champ = null;
-                            switch (i) {
-                                case 4:
-                                    champ = VolField.Reception;
-                                    break;
-                                case 5:
-                                    champ = VolField.Charger;
-                                    break;
-                                case 6:
-                                    champ = VolField.Verifier;
-                                    break;
-                                case 7:
-                                    champ = VolField.Remarque;
-                                    break;
-                            }
-                            try {
-                                MySql.UpdateBagage(champ, e.getKey().get(i), e.getKey().firstElement());
-                                s = MySql.setSavepoint();
-                            } catch (SQLException e1) {
-                                e1.printStackTrace(System.out);
-                                try {
-                                    if (s != null) {
-                                        MySql.rollback(s);
-                                    } else {
-                                        MySql.rollback();
-                                    }
-                                } catch (SQLException e2) {
-                                    e2.printStackTrace(System.out);
-                                }
-                            }
-                        }
-                    }
-                    try {
-                        MySql.UnlockVol(Id.get());
-                        MySql.commit();
-                        MySql.setAutoComit(false);
-                        Id.set("");
-                    } catch (SQLException e) {
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
+                    } catch (UpdateException e) {
                         e.printStackTrace(System.out);
+                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
-                    try {
-                        oosClient.writeObject(new ReponseLUGAP(TypeReponseLUGAP.OK));
-                    } catch (IOException e) {
-                        e.printStackTrace(System.out);
-                    }
+                    Reponse(oosClient,rep);
                 };
                 break;
         }
         return retour;
+    }
+
+    private void HeaderRunnable() {
+        System.out.println();
+        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + Type.toString() + " de " + From);
+    }
+
+    private void Reponse(final ObjectOutputStream oos, ReponseLUGAP rep) {
+        System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
+        try {
+            oos.writeObject(rep);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void Update(ResultSet rs, LinkedList<Object> list) throws UpdateException, SQLException {
+        rs.beforeFirst();
+        while (rs.next())
+            if (rs.getString(1).contentEquals(list.get(0).toString()))
+                break;
+
+        if (rs.isAfterLast()) throw new UpdateException();
+        for (int i = 0; i < (list.size() - 1) / 2; i++) {
+            switch ((int) list.get(i * 2 + 2)) {
+                case 4:
+                    rs.updateInt(5, Boolean.valueOf(String.valueOf(list.get(i * 2 + 1))) ? 1 : 0);
+                    break;
+                case 5:
+                    rs.updateObject(6, list.get(i * 2 + 1));
+                    break;
+                case 6:
+                    rs.updateInt(7, Boolean.valueOf(String.valueOf(list.get(i * 2 + 1))) ? 1 : 0);
+                    break;
+                case 7:
+                    rs.updateObject(8, list.get(i * 2 + 1));
+                    break;
+                default:
+                    throw new UpdateException();
+            }
+        }
+        rs.updateRow();
+    }
+
+    private void SqlUpdate(LinkedList<Object> l) throws UpdateException {
+        for (int i = 0; i < (l.size() - 1) / 2; i++) {
+            VolField champ;
+            switch ((int) l.get(i * 2 + 2)) {
+                case 4:
+                    champ = VolField.Reception;
+                    break;
+                case 5:
+                    champ = VolField.Charger;
+                    break;
+                case 6:
+                    champ = VolField.Verifier;
+                    break;
+                case 7:
+                    champ = VolField.Remarque;
+                    break;
+                default:
+                    throw new UpdateException();
+            }
+            try {
+                System.out.println(Thread.currentThread().getName() + "> Update de " + champ.name() + "(" + l.get(i * 2 + 2) + ") = " + l.get(i * 2 + 1));
+                BD_THREAD_LOCAL.get().UpdateBagage(champ, l.get(i * 2 + 1), (String) l.get(0));
+            } catch (SQLException e) {
+                e.printStackTrace(System.out);
+            }
+        }
+    }
+
+    private synchronized void OpenBd() throws IOException, SQLException {
+        BD_THREAD_LOCAL.set(new Bd(BdType.MySql, 5));
+    }
+
+    private synchronized void CloseBd() throws SQLException {
+        BD_THREAD_LOCAL.get().Close(true);
+        BD_THREAD_LOCAL.set(null);
     }
 
     @Override
@@ -368,7 +337,7 @@ public class RequeteLUGAP implements Requete {
 
     @Override
     public boolean loginSucced() {
-        return Logged.get();
+        return LOG_STATUS.get();
     }
 
     @Override

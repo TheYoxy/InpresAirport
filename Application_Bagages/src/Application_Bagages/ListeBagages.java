@@ -75,6 +75,7 @@ public class ListeBagages extends javax.swing.JDialog {
     }
 
     private void UpdateJTable() {
+        //Si jamais il est bloquant, il lance une exception qui arrête la fonction
         ResultatJTable.setModel(new DefaultTableModel(BagagesTable.getChamps(), BagagesTable.getTete()));
     }
 
@@ -202,8 +203,7 @@ public class ListeBagages extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private static boolean Comparaison(Vector<String> v1, Vector<String> v2)
-    {
+    private static boolean Comparaison(Vector<String> v1, Vector<String> v2) {
         if(v1.size() != v2.size()) return false;
         for (int i = 0; i < v1.size(); i++) if (v1.get(i) != v2.get(i)) return false;
         return true;

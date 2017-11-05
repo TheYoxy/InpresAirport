@@ -11,88 +11,100 @@ import java.util.Vector;
 
 public class Bd {
 
-    /* Impossible d'avoir des lock si jamais on reste sur la même session de bd */
-    private static Bd MySql;
-
-    static {
-        try {
-            MySql = new Bd(BdType.MySql);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
     private Connection Connection;
 
-    private Bd(BdType type) throws IOException, SQLException {
+    /**
+     * @param type
+     * @throws IOException
+     * @throws SQLException
+     */
+    public Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
-//        this.Connection.setAutoCommit(false);
-//        this.Connection.setTransactionIsolation(TRANSACTION_SERIALIZABLE);
     }
 
-    public static Bd getMySql() {
-        return MySql;
+    /**
+     * @param type
+     * @param lockTime
+     * @throws IOException
+     * @throws SQLException
+     */
+    public Bd(BdType type, int lockTime) throws IOException, SQLException {
+        this.Connection = createConnection(type);
+        setInnoDB_Lock_Time(lockTime);
+        this.Connection.setAutoCommit(false);
     }
 
     public static void main(String[] argv) {
-        Bd b = getMySql();
-        Bd c = getMySql();
-        Runnable r = () -> {
-            try {
-                System.out.println(Thread.currentThread().getName() + "> Requête ");
-                ResultSet rs = c.SelectBagageVol("1");
-                System.out.println(Thread.currentThread().getName() + "> Select passé");
-                Table t = toTable(rs);
-                System.out.println(t);
-                System.out.println(Thread.currentThread().getName() + "> Fin requête");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            Bd b = new Bd(BdType.MySql);
+            Bd c = new Bd(BdType.MySql);
+            Bd a[] = new Bd[]{b, c};
+            for (int i = 0, aLength = a.length; i < aLength; i++) {
+                final Bd anA = a[i];
+                final int j = i;
+                new Thread(() -> {
+                    long debut = System.currentTimeMillis();
+                    try {
+                        System.out.println(Thread.currentThread().getName() + "> Requête ");
+                        String id = ((Integer)(j + 1)).toString();
+                        System.out.println(Thread.currentThread().getName() + "> Id: " + id);
+                        ResultSet rs = anA.SelectBagageVol(id);
+                        System.out.println(Thread.currentThread().getName() + "> Select passé");
+                        Table t = toTable(rs);
+                        System.out.println(t);
+                        System.out.println(Thread.currentThread().getName() + "> Fin requête");
+                    } catch (SQLException e) {
+                        e.printStackTrace(System.out);
+                        System.out.println(Thread.currentThread().getName() + "> SQLException code: " + e.getErrorCode());
+                    }
+                    long fin = System.currentTimeMillis();
+                    System.out.println(Thread.currentThread().getName() + "> Début: " + debut + " ms");
+                    System.out.println(Thread.currentThread().getName() + "> Fin: " + fin + " ms");
+                    System.out.println(Thread.currentThread().getName() + "> Temps d'execution: " + (fin - debut) + " ms");
+                }).start();
             }
-        };
-        new Thread(r).start();
-        r.run();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static Connection createConnection(BdType type) throws SQLException, IOException {
-        String name = "";
+    /**
+     * @param type
+     * @return
+     * @throws SQLException
+     * @throws IOException
+     */
+    public synchronized static Connection createConnection(BdType type) throws SQLException, IOException {
         String confFile = "";
         switch (type) {
             case MySql:
-                name = "MySql";
                 confFile = "mysql.properties";
                 break;
             case Oracle:
-                name = "Oracle";
                 confFile = "oracle.properties";
                 break;
+            default:
+                System.exit(-1);
         }
         Properties p = new Properties();
         p.load(new FileInputStream(confFile));
         String url = p.getProperty("url");
         String user = p.getProperty("user");
         String passwd = p.getProperty("password");
-        System.out.println("----- Recherche du driver " + name + " -----");
         try {
             Class.forName(p.getProperty("driver")).newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
-        System.out.println("Driver trouvé");
-        Connection retour = DriverManager.getConnection(url, user, passwd);
-
-        System.out.println("Connexion établie");
-        System.out.print("----------------------------------");
-        for (int i = 0; i < name.length(); i++) {
-            System.out.print("-");
-        }
-        System.out.println();
-        return retour;
+        return DriverManager.getConnection(url, user, passwd);
     }
 
+    /**
+     * @param rs
+     * @throws SQLException
+     */
     public static void AfficheResultSet(ResultSet rs) throws SQLException {
         ResultSetMetaData rsmf = rs.getMetaData();
         StringBuilder sb = new StringBuilder();
@@ -111,7 +123,11 @@ public class Bd {
         }
     }
 
-    @NotNull
+    /**
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     public static Table toTable(ResultSet rs) throws SQLException {
         Vector<String> title = new Vector<>();
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -142,9 +158,27 @@ public class Bd {
         return new Table(title, champs);
     }
 
+    /**
+     * @param isolationLevel
+     * @throws SQLException
+     */
+    public void setTransactionIsolationLevel(int isolationLevel) throws SQLException {
+        this.Connection.setTransactionIsolation(isolationLevel);
+    }
+
+    private void setInnoDB_Lock_Time(int time) throws SQLException {
+        Statement s = this.Connection.createStatement();
+        s.execute("SET SESSION innodb_lock_wait_timeout = " + (time - 1));
+    }
+
+    /**
+     * @param User
+     * @return
+     * @throws SQLException
+     */
     @NotNull
     public synchronized String SelectLogUser(@NotNull String User) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("select Nom,Prenom from Agents NATURAL join Login where Username = ? and Poste = 'Bagagiste'");
+        PreparedStatement s = Connection.prepareStatement("Select Nom,Prenom FROM Agents NATURAL JOIn Login WHERE Username = ? AND Poste = 'Bagagiste'");
         s.setString(1, User);
         if (s.execute()) {
             final Vector<String> strings = toTable(s.getResultSet()).getChamps().elementAt(0);
@@ -160,21 +194,28 @@ public class Bd {
      * @throws SQLException Exceptions qui sont générées par la BD
      */
     public synchronized ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? and locked = 0");
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? FOR UPDATE",
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_UPDATABLE);
         s.setString(1, numVol);
         return s.executeQuery();
     }
 
-    public synchronized void LockVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 1 where NumeroVol = ?");
-        s.setString(1, numVol);
-        s.executeUpdate();
-    }
-
-    public synchronized void UnlockVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("UPDATE Vols set locked = 0 where NumeroVol = ?");
-        s.setString(1, numVol);
-        s.executeUpdate();
+    public synchronized int UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
+        //Quand on passe via ?, ça ajoute des "" -> Obligé de le passer en dur
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
+        switch (champ) {
+            case Reception:
+            case Verifier:
+                ps.setInt(1, Boolean.valueOf(String.valueOf(value)) ? 1 : 0);
+                break;
+            case Charger:
+            case Remarque:
+                ps.setObject(1, value);
+                break;
+        }
+        ps.setString(2, numBagage);
+        return ps.executeUpdate();
     }
 
     public synchronized Savepoint setSavepoint() throws SQLException {
@@ -197,28 +238,21 @@ public class Bd {
         Connection.setAutoCommit(b);
     }
 
-    public synchronized boolean UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
-        switch (champ) {
-            case Reception:
-            case Verifier:
-                ps.setInt(1, Boolean.valueOf(String.valueOf(value)) ? 1 : 0);
-                break;
-            case Charger:
-            case Remarque:
-                ps.setObject(1, value);
-                break;
-        }
-        ps.setString(2, numBagage);
-        return ps.execute();
-    }
-
     public synchronized ResultSet SelectTodayVols() throws SQLException {
-        return Connection.createStatement().executeQuery("select * from Vols where HeureDepart BETWEEN CURRENT_DATE and CURRENT_DATE + 1");
+        return Connection.createStatement().executeQuery("SELECT * FROM Vols WHERE HeureDepart BETWEEN CURRENT_DATE and CURRENT_DATE + 1");
     }
 
     public synchronized ResultSet Select(@NotNull String table) throws SQLException {
         //La table doit être hard codée
         return Connection.createStatement().executeQuery("select * from " + table);
+    }
+
+    public synchronized void Close() throws SQLException {
+        Close(false);
+    }
+
+    public synchronized void Close(boolean commit) throws SQLException {
+        if (commit) Connection.commit();
+        Connection.close();
     }
 }

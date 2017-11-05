@@ -71,7 +71,6 @@ public class Application_Bagage extends javax.swing.JFrame {
     }
 
     public void Connection(boolean ouvertureFenetre) {
-        //TODO Tester la déconnexion reconnexion
         this.setVisible(ouvertureFenetre);
         Log.setVisible(true);
         if (!Log.isConnecter()) {
@@ -217,6 +216,7 @@ public class Application_Bagage extends javax.swing.JFrame {
             int row = ResultatJTable.rowAtPoint(evt.getPoint());
             if (row >= 0) {
                 String vol = ResultatJTable.getValueAt(row, 0).toString();
+                //Si il y a un lock, ListeBag renvoie une exception non gèrée, et fini la méthode
                 ListeBag = new ListeBagages(this, true, vol, Oos,Ois,Serveur);
                 ListeBag.setVisible(true);
                 DisconnectMIActionPerformed(null);

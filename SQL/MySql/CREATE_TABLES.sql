@@ -12,8 +12,7 @@ CREATE TABLE Vols (
   HeureDepart      DATETIME              NOT NULL,
   HeureArrivee     DATETIME              NOT NULL,
   HeureArriveeDest DATETIME              NOT NULL,
-  IdAvion          INT REFERENCES Avion (IdAvion),
-  locked           BOOLEAN DEFAULT FALSE NOT NULL
+  IdAvion          INT REFERENCES Avion (IdAvion)
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Billets;

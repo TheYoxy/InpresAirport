@@ -32,18 +32,9 @@ public class Table implements Serializable {
     @Override
     public String toString() {
         StringBuilder retour = new StringBuilder();
-        retour.append("|");
-        for (String s : Tete) {
-            retour.append(s).append("|");
-        }
-        retour.append("\n");
-        for (Vector<String> vs : Champs) {
-            retour.append("|");
-            for (String s : vs) {
-                retour.append(s).append("|");
-            }
-            retour.append("\n");
-        }
+        retour.append(Tete).append("\n\n");
+        for(Vector<String> body : Champs)
+            retour.append(body).append("\n");
         return retour.toString();
     }
 }
