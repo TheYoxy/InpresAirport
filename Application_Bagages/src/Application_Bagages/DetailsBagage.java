@@ -240,12 +240,10 @@ public class DetailsBagage extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ReceptionnerCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReceptionnerCBActionPerformed
-        System.out.println("Receptionner: " + ReceptionnerCB.isSelected());
         if (!ReceptionnerCB.isSelected()) {
             if (VerifierCB.isSelected()) VerifierCB.setSelected(false);
             if (RefuserCB.isSelected() | ChargeCB.isSelected()) ChargementBG.clearSelection();
         }
-        System.out.println("Receptionner: " + ReceptionnerCB.isSelected());
     }//GEN-LAST:event_ReceptionnerCBActionPerformed
 
     private void VerifierCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifierCBActionPerformed

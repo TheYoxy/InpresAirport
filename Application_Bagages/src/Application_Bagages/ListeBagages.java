@@ -17,24 +17,27 @@ package Application_Bagages;
 
 import LUGAP.NetworkObject.Bagage;
 import LUGAP.NetworkObject.Table;
+import LUGAP.ReponseLUGAP;
+import LUGAP.RequeteLUGAP;
+import LUGAP.TypeReponseLUGAP;
+import LUGAP.TypeRequeteLUGAP;
+import Tools.Procedural;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Vector;
 
-/**
- * @author floryan
- */
 public class ListeBagages extends javax.swing.JDialog {
-
     private Table BagagesTable = null;
-
-    private HashMap<Vector<String>, Vector<Integer>> Modifier = null;
-
-    public HashMap<Vector<String>, Vector<Integer>> getModifier() {
-        return Modifier;
-    }
+    private ObjectOutputStream Oos = null;
+    private ObjectInputStream Ois = null;
+    private Socket Serveur;
 
     /**
      * Creates new form ListeBagages
@@ -42,17 +45,43 @@ public class ListeBagages extends javax.swing.JDialog {
     public ListeBagages(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        Modifier = new HashMap<>();
     }
 
-    public ListeBagages(java.awt.Frame parent, boolean modal, String vol, Table t) {
+    public ListeBagages(java.awt.Frame parent, boolean modal, String vol, ObjectOutputStream oos, ObjectInputStream ois, Socket serveur) {
         this(parent, modal);
         setTitle("Vol " + vol);
         VolLabel2.setText(vol);
-        BagagesTable = t;
-        UpdateJTable();
+        Oos = oos;
+        Ois = ois;
+        Serveur = serveur;
+        Affichage();
     }
 
+    private void RecuperationVol()
+    {
+        ReponseLUGAP rep;
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, VolLabel2.getText(), Procedural.IpPort(Serveur)));
+            rep = (ReponseLUGAP) Ois.readObject();
+            if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK) JOptionPane.showMessageDialog(this, "Les bagages de ce vol sont déjà en cours de modification.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            else if (rep.getCode() != TypeReponseLUGAP.OK) JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
+            else BagagesTable = (Table) rep.getParam();
+        } catch (IOException e) {
+            //Todo Affichage d'une messagebox disant qu'il y a une erreur
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void UpdateJTable() {
+        ResultatJTable.setModel(new DefaultTableModel(BagagesTable.getChamps(), BagagesTable.getTete()));
+    }
+
+    private void Affichage() {
+        RecuperationVol();
+        UpdateJTable();
+    }
     /**
      * @param args the command line arguments
      */
@@ -93,10 +122,6 @@ public class ListeBagages extends javax.swing.JDialog {
                 dialog.setVisible(true);
             }
         });
-    }
-
-    private void UpdateJTable() {
-        ResultatJTable.setModel(new DefaultTableModel(BagagesTable.getChamps(), BagagesTable.getTete()));
     }
 
     /**
@@ -193,14 +218,23 @@ public class ListeBagages extends javax.swing.JDialog {
             Vector<String> retour = db.getBagage().toVector();
             //Une modification a eu lieu sur un des champs
             if (!Comparaison(champModifier,retour)) {
-                //Soit il y a déjà une entrée, on la supprime et on la récupère, soit il n'y en a pas eue, et on crée un nouveau vector
-                //UPDATE En temps réel
-                Vector<Integer> vi = Modifier.get(champModifier) == null ? new Vector<>() : Modifier.remove(champModifier);
-                for (int i = 0; i < retour.size(); i++) if (retour.get(i) != champModifier.get(i)) vi.add(i);
-                Modifier.put(retour, vi);
-                BagagesTable.getChamps().remove(champModifier);
-                BagagesTable.getChamps().add(pos, retour);
-                UpdateJTable();
+                LinkedList<Object> l = new LinkedList<>();
+                l.add(retour.get(0));
+                for (int i = 0; i < retour.size(); i++) if (!retour.get(i).contentEquals(champModifier.get(i))) {
+                    l.add(retour.get(i));
+                    l.add(i);
+                }
+                try {
+                    //Envoi de l'objet au serveur
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagage_Vol,l,Procedural.IpPort(Serveur)));
+                    ReponseLUGAP rep = (ReponseLUGAP) Ois.readObject();
+                    if (rep.getCode() != TypeReponseLUGAP.OK) JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                Affichage();
             }
         }
     }//GEN-LAST:event_ResultatJTableMouseClicked

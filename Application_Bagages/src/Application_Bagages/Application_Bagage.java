@@ -216,44 +216,9 @@ public class Application_Bagage extends javax.swing.JFrame {
         if (evt.getClickCount() == 2) {
             int row = ResultatJTable.rowAtPoint(evt.getPoint());
             if (row >= 0) {
-                String vol =ResultatJTable.getValueAt(row, 0).toString();
-                ReponseLUGAP rep;
-                try {
-                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, vol, Procedural.IpPort(Serveur)));
-                    rep = (ReponseLUGAP) Ois.readObject();
-                    if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK) {
-                        JOptionPane.showMessageDialog(this, "Les bagages de ce vol sont déjà en cours de modification.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    } else if (rep.getCode() != TypeReponseLUGAP.OK) {
-                        JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (IOException e) {
-                    //Todo Affichage d'une messagebox disant qu'il y a une erreur
-                    e.printStackTrace();
-                    return;
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
-                ListeBag = new ListeBagages(this, true, vol, (Table) rep.getParam());
+                String vol = ResultatJTable.getValueAt(row, 0).toString();
+                ListeBag = new ListeBagages(this, true, vol, Oos,Ois,Serveur);
                 ListeBag.setVisible(true);
-                try {
-                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagages_Vols, ListeBag.getModifier(), Procedural.IpPort(Serveur)));
-                    rep = (ReponseLUGAP) Ois.readObject();
-                    if (rep.getCode() != TypeReponseLUGAP.OK) {
-                        JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
                 DisconnectMIActionPerformed(null);
             }
         }
