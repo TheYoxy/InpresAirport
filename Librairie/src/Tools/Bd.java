@@ -36,8 +36,10 @@ public class Bd {
 
     public static void main(String[] argv) {
         try {
-            Bd b = new Bd(BdType.MySql);
-            Bd c = new Bd(BdType.MySql);
+            Bd b = new Bd(BdType.MySql,5);
+            b.setTransactionIsolationLevel(java.sql.Connection.TRANSACTION_SERIALIZABLE);
+            Bd c = new Bd(BdType.MySql,5);
+            c.setTransactionIsolationLevel(java.sql.Connection.TRANSACTION_SERIALIZABLE);
             Bd a[] = new Bd[]{b, c};
             for (int i = 0, aLength = a.length; i < aLength; i++) {
                 final Bd anA = a[i];
@@ -47,6 +49,7 @@ public class Bd {
                     try {
                         System.out.println(Thread.currentThread().getName() + "> Requête ");
                         String id = ((Integer)(j + 1)).toString();
+//                        String id = "1";
                         System.out.println(Thread.currentThread().getName() + "> Id: " + id);
                         ResultSet rs = anA.SelectBagageVol(id);
                         System.out.println(Thread.currentThread().getName() + "> Select passé");
@@ -194,13 +197,20 @@ public class Bd {
      * @throws SQLException Exceptions qui sont générées par la BD
      */
     public synchronized ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE NumeroVol = ? FOR UPDATE",
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE Vols.NumeroVol = ? FOR UPDATE",
                 ResultSet.TYPE_FORWARD_ONLY,
                 ResultSet.CONCUR_UPDATABLE);
         s.setString(1, numVol);
         return s.executeQuery();
     }
 
+    /**
+     * @param champ
+     * @param value
+     * @param numBagage
+     * @return
+     * @throws SQLException
+     */
     public synchronized int UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
         //Quand on passe via ?, ça ajoute des "" -> Obligé de le passer en dur
         PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");

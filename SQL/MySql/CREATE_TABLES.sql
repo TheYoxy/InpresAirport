@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS Vols;
 CREATE TABLE Vols (
   NumeroVol        VARCHAR(15) PRIMARY KEY,
   Destination      VARCHAR(30),
-  HeureDepart      DATETIME              NOT NULL,
-  HeureArrivee     DATETIME              NOT NULL,
-  HeureArriveeDest DATETIME              NOT NULL,
+  HeureDepart      DATETIME NOT NULL,
+  HeureArrivee     DATETIME NOT NULL,
+  HeureArriveeDest DATETIME NOT NULL,
   IdAvion          INT REFERENCES Avion (IdAvion)
 )
   ENGINE = INNODB;
