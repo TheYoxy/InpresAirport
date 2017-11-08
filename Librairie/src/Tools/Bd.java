@@ -1,7 +1,6 @@
 package Tools;
 
 import LUGAP.NetworkObject.Table;
-import com.sun.istack.internal.NotNull;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,9 +35,9 @@ public class Bd {
 
     public static void main(String[] argv) {
         try {
-            Bd b = new Bd(BdType.MySql,5);
+            Bd b = new Bd(BdType.MySql, 5);
             b.setTransactionIsolationLevel(java.sql.Connection.TRANSACTION_SERIALIZABLE);
-            Bd c = new Bd(BdType.MySql,5);
+            Bd c = new Bd(BdType.MySql, 5);
             c.setTransactionIsolationLevel(java.sql.Connection.TRANSACTION_SERIALIZABLE);
             Bd a[] = new Bd[]{b, c};
             for (int i = 0, aLength = a.length; i < aLength; i++) {
@@ -48,7 +47,7 @@ public class Bd {
                     long debut = System.currentTimeMillis();
                     try {
                         System.out.println(Thread.currentThread().getName() + "> Requête ");
-                        String id = ((Integer)(j + 1)).toString();
+                        String id = ((Integer) (j + 1)).toString();
 //                        String id = "1";
                         System.out.println(Thread.currentThread().getName() + "> Id: " + id);
                         ResultSet rs = anA.SelectBagageVol(id);
@@ -179,8 +178,7 @@ public class Bd {
      * @return
      * @throws SQLException
      */
-    @NotNull
-    public synchronized String SelectLogUser(@NotNull String User) throws SQLException {
+    public synchronized String SelectLogUser(String User) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("Select Nom,Prenom FROM Agents NATURAL JOIn Login WHERE Username = ? AND Poste = 'Bagagiste'");
         s.setString(1, User);
         if (s.execute()) {
@@ -196,7 +194,7 @@ public class Bd {
      * @return Un objet ResultSet contenant les résultats de la requête
      * @throws SQLException Exceptions qui sont générées par la BD
      */
-    public synchronized ResultSet SelectBagageVol(@NotNull String numVol) throws SQLException {
+    public synchronized ResultSet SelectBagageVol(String numVol) throws SQLException {
         PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE Vols.NumeroVol = ? FOR UPDATE",
                 ResultSet.TYPE_FORWARD_ONLY,
                 ResultSet.CONCUR_UPDATABLE);
@@ -211,7 +209,7 @@ public class Bd {
      * @return
      * @throws SQLException
      */
-    public synchronized int UpdateBagage(@NotNull VolField champ, @NotNull Object value, @NotNull String numBagage) throws SQLException {
+    public synchronized int UpdateBagage(VolField champ, Object value, String numBagage) throws SQLException {
         //Quand on passe via ?, ça ajoute des "" -> Obligé de le passer en dur
         PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
         switch (champ) {
@@ -252,7 +250,7 @@ public class Bd {
         return Connection.createStatement().executeQuery("SELECT * FROM Vols WHERE HeureDepart BETWEEN CURRENT_DATE and CURRENT_DATE + 1");
     }
 
-    public synchronized ResultSet Select(@NotNull String table) throws SQLException {
+    public synchronized ResultSet Select(String table) throws SQLException {
         //La table doit être hard codée
         return Connection.createStatement().executeQuery("select * from " + table);
     }
@@ -262,7 +260,9 @@ public class Bd {
     }
 
     public synchronized void Close(boolean commit) throws SQLException {
-        if (commit) Connection.commit();
+        if (commit) {
+            Connection.commit();
+        }
         Connection.close();
     }
 }

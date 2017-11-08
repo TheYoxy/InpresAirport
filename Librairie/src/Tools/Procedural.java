@@ -1,11 +1,9 @@
 package Tools;
 
-import com.sun.istack.internal.NotNull;
-
 import java.net.*;
 
 public class Procedural {
-    @NotNull
+
     public static String StringIp(InetAddress i) {
         StringBuilder retour = new StringBuilder();
         byte[] tabl = i.getAddress();
@@ -23,18 +21,15 @@ public class Procedural {
         return retour.toString();
     }
 
-    @NotNull
     public static String StringIp(Socket s) {
         return StringIp(s.getInetAddress());
     }
 
-    @NotNull
     public static String StringIp(ServerSocket s) {
         return StringIp(s.getInetAddress());
     }
 
-    @NotNull
-    public static String IpPort(@NotNull Socket s) {
+    public static String IpPort(Socket s) {
         return Procedural.StringIp(s) + ":" + s.getPort();
     }
 }

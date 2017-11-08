@@ -38,7 +38,7 @@ public class ListeBagages extends javax.swing.JDialog {
     private ObjectOutputStream Oos = null;
     private ObjectInputStream Ois = null;
     private Socket Serveur;
-
+    //serialUID
     /**
      * Creates new form ListeBagages
      */

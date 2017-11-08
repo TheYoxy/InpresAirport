@@ -10,13 +10,6 @@ INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar',
 INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date + 1, 42);
 INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date + 1, current_date + 2, 42);
 INSERT INTO Vols VALUES ('3', 'Londres', current_date - 1, current_date, current_date, 43);
-INSERT INTO Vols VALUES ('4', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('5', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('6', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('7', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('8', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('9', 'Liège', current_date, current_date + 1, current_date + 2, 42);
-INSERT INTO Vols VALUES ('10', 'Liège', current_date, current_date + 1, current_date + 2, 42);
 INSERT INTO Billets VALUES ('1', '1');
 INSERT INTO Billets VALUES ('2', '1');
 INSERT INTO Billets VALUES ('3', '1');
