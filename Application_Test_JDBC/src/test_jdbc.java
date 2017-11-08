@@ -10,6 +10,7 @@ import database.utilities.OracleDB;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -328,6 +329,7 @@ public class test_jdbc extends javax.swing.JFrame {
                 case "Avions":
                     LinkedList<Avion> listeAvion = MysqldConn.get_Avions();
                     model.setColumnIdentifiers(new String[]{"Id", "Modele", "Vol"});
+                    listeAvion.forEach((a) -> model.addRow(new String[]{String.valueOf(a.getId()), a.getModele(), a.isVol() ? "check_OK" : "check_FAIL"}));
                     break;
                 case "Activités":
                     LinkedList<Activites> listA = OracleConn.get_Activites();
@@ -360,6 +362,8 @@ public class test_jdbc extends javax.swing.JFrame {
 
     private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
         Agents temp = new Agents();
+        //TableModel d = resultatJTable.getModel();
+
 
         temp.setNom((String) resultatJTable.getValueAt(Row, 0));
         temp.setPrenom((String) resultatJTable.getValueAt(Row, 1));
