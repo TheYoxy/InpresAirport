@@ -14,3 +14,4 @@ Out/
 C++/Build/*
 build.xml
 manifest.mf
+/dist/
