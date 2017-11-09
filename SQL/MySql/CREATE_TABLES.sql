@@ -49,3 +49,39 @@ CREATE TABLE Agents (
   PRIMARY KEY (Nom, Prenom)
 )
   ENGINE = INNODB;
+DROP TABLE IF EXISTS VolReservable;
+CREATE TABLE VolReservable (
+  NumeroVol        VARCHAR(15) PRIMARY KEY REFERENCES Vols (NumeroVol),
+  Lieu             VARCHAR(100) REFERENCES Vols (Destination),
+  Date             DATE,
+  Prix             DECIMAL(15, 2),
+  Description      VARCHAR(1000),
+  PlacesDisponible INTEGER
+)
+  ENGINE = INNODB;
+DROP TABLE IF EXISTS Users;
+CREATE TABLE Users (
+  Username VARCHAR(20) PRIMARY KEY,
+  Password VARCHAR(20)  NOT NULL,
+  Nom      VARCHAR(100),
+  Prenom   VARCHAR(100),
+  Mail     VARCHAR(100) NOT NULL
+)
+  ENGINE = INNODB;
+DROP TABLE IF EXISTS Reservation;
+CREATE TABLE Reservation (
+  Username        VARCHAR(20) REFERENCES Users (Username),
+  NumeroVol       VARCHAR(15) REFERENCES Vols (NumeroVol),
+  nbPlaces        INTEGER                               NOT NULL CHECK (nbPlaces > 0),
+  timeReservation TIMESTAMP DEFAULT current_timestamp() NOT NULL,
+  PRIMARY KEY (Username, NumeroVol, timeReservation)
+)
+  ENGINE = INNODB;
+DROP TABLE IF EXISTS Acheter;
+CREATE TABLE Acheter (
+  id        VARCHAR(20) PRIMARY KEY,
+  Username  VARCHAR(20) REFERENCES Users (Username),
+  NumeroVol VARCHAR(15) REFERENCES Vols (NumeroVol),
+  nbPlaces  INTEGER NOT NULL
+)
+  ENGINE = INNODB;
