@@ -18,7 +18,6 @@
     <%! Date current = new Date(); %>
     <%! String currentDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.FRANCE).format(current); %>
     <!-- Page demandée le <%=currentDate%> -->
-
     <H2> Caddie virtuelle</H2>
     <p>Nous sommes le : <%=currentDate%> </p>
     <p> LOGIN REUSSIS</p>
