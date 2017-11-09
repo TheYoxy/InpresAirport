@@ -253,7 +253,6 @@ public class Application_Bagage extends javax.swing.JFrame {
         clearChamps();
         Connection(true);
     }//GEN-LAST:event_DisconnectMIActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BagagisteLabel;
     private javax.swing.JLabel BagagisteNomPrenomLabel;
