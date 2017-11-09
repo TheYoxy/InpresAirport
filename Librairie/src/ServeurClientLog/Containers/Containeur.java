@@ -3,7 +3,7 @@ package ServeurClientLog.Containers;
 import java.util.LinkedList;
 
 public class Containeur<T> {
-    private LinkedList<T> List;
+    private final LinkedList<T> List;
 
     public Containeur() {
         List = new LinkedList<>();
