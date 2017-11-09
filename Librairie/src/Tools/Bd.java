@@ -2,7 +2,8 @@ package Tools;
 
 import LUGAP.NetworkObject.Table;
 
-import java.io.FileInputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
@@ -79,19 +80,20 @@ public class Bd {
      * @throws IOException
      */
     public synchronized static Connection createConnection(BdType type) throws SQLException, IOException {
-        String confFile = "";
+        String confFile = Bd.class.getResource("Properties").getFile() + File.separator;
         switch (type) {
             case MySql:
-                confFile = "mysql.properties";
+                confFile += "mysql.properties";
                 break;
             case Oracle:
-                confFile = "oracle.properties";
+                confFile += "oracle.properties";
                 break;
             default:
                 System.exit(-1);
         }
+        confFile += File.separator;
         Properties p = new Properties();
-        p.load(new FileInputStream(confFile));
+        p.load(new FileReader(new File(confFile)));
         String url = p.getProperty("url");
         String user = p.getProperty("user");
         String passwd = p.getProperty("password");
