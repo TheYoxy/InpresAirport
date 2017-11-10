@@ -1,17 +1,29 @@
 package Servlet;
 
-import javax.servlet.http.HttpSession;
+import Tools.Bd;
+import Tools.BdType;
+
+import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+@WebServlet(name = "Servlet", value = "/Caddie")
 public class Servlet extends javax.servlet.http.HttpServlet {
-    protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
-        HttpSession hs = request.getSession();
-        PrintWriter pw = response.getWriter();
-
+    private static ResultSet SelectVols() {
+        try {
+            Bd mysql = new Bd(BdType.MySql);
+            return mysql.Select("VolReservable");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
-
+        request.setAttribute("Vols", SelectVols());
+        this.getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
     }
 }

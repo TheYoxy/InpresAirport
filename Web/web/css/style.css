@@ -138,6 +138,7 @@ h1 {
     font-size: 48px;
     position: relative;
     left: 25%;
+    width: 75%;
 }
 
 header {
@@ -160,7 +161,7 @@ a.lachat {
     color: black;
     display: block;
     margin: 1em 20%;
-    height: 15%;
+    height: 20%;
 }
 
 div.ticket {
@@ -171,9 +172,20 @@ div.ticket {
     padding: 1.5em;
     height: 60%;
 }
-
-div.ticket .title {
+div.ticket:hover {
+    transition-duration: 0.5s;
+    box-shadow: 0 0 20px 5px #606060;
+}
+div.ticket h2.title {
     font-size: 30px;
+}
+div.ticket h2.title + span.date{
+    font-size: 20px;
+    padding:0 .2em;
+}
+div.ticket h2.title,
+div.ticket h2.title + span.date {
+    display: inline;
 }
 
 div.ticket p {

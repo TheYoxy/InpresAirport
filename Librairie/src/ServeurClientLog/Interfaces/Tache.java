@@ -2,7 +2,7 @@ package ServeurClientLog.Interfaces;
 
 public interface Tache {
 
-    Runnable getTache() throws InterruptedException;
+    Runnable getTache();
 
     boolean existTache();
 
