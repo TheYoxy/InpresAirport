@@ -4,8 +4,14 @@
  * and open the template in the editor.
  */
 
+import Tools.Bd;
+import Tools.BdType;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,40 +30,57 @@ public class LoginServlet extends HttpServlet {
     int nbrConnexions;
     String status;
     String user = "admin";
+    Bd sgbd;
 
     public void init (ServletConfig config) throws ServletException{
         super.init(config);
         nbrConnexions = 0;
+        try {
+            sgbd = new Bd(BdType.MySql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         synchronized(this) {nbrConnexions++;}
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-
+        String email = "";
+        String pass = "";
+        String username = "";
+;
         /*out.println("<HTML><HEAD><TITLE>LoginServlet</TITLE></HEAD><BODY>");
         out.println("<H1>Nouveau client</H1>");
         out.println("<p>nom :  "+ request.getParameter("mail") + " Pass : " + request.getParameter("pass") + "</p>");*/
 
         String type = request.getParameter("type"); //signin or signup
-        String email = request.getParameter("mail");
-        String pass = request.getParameter("pass");
+
+        if(type.equals("signin")) {
+            email = request.getParameter("mail");
+            pass = request.getParameter("pass");
+            if(checkUser(email, pass)) //TO DO Creer cette fonction
+            {
+                status = "success";
+            }
+            else
+            {
+                out.println("Username or Password incorrect");
+                status = "fail";
+
+            }
+        }
 
         if(type.equals("signup")){
-            String username = request.getParameter("username");
+            email = request.getParameter("mail");
+            pass = request.getParameter("pass");
+            username = request.getParameter("username");
             //Bd.CreateUser();
         }
 
-        if(checkUser(email, pass)) //TO DO Creer cette fonction
-        {
-            status = "success";
-        }
-        else
-        {
-            out.println("Username or Password incorrect");
+        if(type.equals("logout"))
             status = "fail";
-
-        }
 
         doPost(request, response);
     }
@@ -71,8 +94,22 @@ public class LoginServlet extends HttpServlet {
     }
 
     public boolean checkUser(String mail, String pass){
+        /*StringBuilder sb = new StringBuilder();
+        ResultSetMetaData rsmf;
+        try {
+            ResultSet rs = sgbd.Select("login");
+            rsmf = rs.getMetaData();
+            while (rs.next()) {
+                for (int i = 1; i <= rsmf.getColumnCount(); i++) {//username, password
+                    sb.append(rs.getObject(i)).append("|");
+                }
+            }
+        }catch(Exception e)
+        {
+
+        }*/
         //Bd bd = new Bd(MySql, "", "1234", "nico");
-        return false;
+        return true;
     }
    
 

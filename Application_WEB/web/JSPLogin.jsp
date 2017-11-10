@@ -31,11 +31,25 @@
 <header role="banner">
     <div id="cd-logo"><a href="#"><img src="img/cd-logo.svg" alt="Logo"></a></div>
     <nav class="main-nav">
-        <ul>
+        <% if(type == null || type.equals("fail")) {
+            out.println("<ul>");
+            out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
+            out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign up</a></li>");
+            out.println("</ul>");
+        }
+        else{
+            out.println("<ul>");
+            out.println("<li><a class=\"user\" href=\"#0\">Connecté :"+ user + " </a></li>");
+            //request.setAttribute("type", "logout");
+            out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
+            out.println("</ul>");
+        }
+        %>
+       <!-- <ul> -->
             <!-- inser more links here -->
-            <li><a class="cd-signin" href="#0">Sign in</a></li>
+          <!--  <li><a class="cd-signin" href="#0">Sign in</a></li>
             <li><a class="cd-signup" href="#0">Sign up</a></li>
-        </ul>
+        </ul> -->
     </nav>
 </header>
 <!-- LOG IN -->
@@ -134,17 +148,6 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="Style/js/main.js"></script> <!-- Gem jQuery -->
 <!-- CORP -->
-
-<script type="text/javascript">
-    var msg1 = "<%=type%>";
-    var msg2 = "<%=user%>";
-    /*if(msg1!= "null")
-    {
-        if(msg2 == "success")
-        alert(msg1 + "- Bienvenue : " + msg2);
-    }*/
-    alert(msg1 + "- Bienvenue : " + msg2);
-</script>
 
 </body>
 </html>
