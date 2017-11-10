@@ -94,39 +94,33 @@ public class LoginServlet extends HttpServlet {
     }
 
     public boolean checkUser(String mail, String pass){
-        /*StringBuilder sb = new StringBuilder();
         ResultSetMetaData rsmf;
+        String userbd;
+        String passbd;
+        String mailbd;
+        boolean statusbd = false;
+
         try {
-            ResultSet rs = sgbd.Select("login");
-            rsmf = rs.getMetaData();
+            ResultSet rs = sgbd.Select("users");
             while (rs.next()) {
-                for (int i = 1; i <= rsmf.getColumnCount(); i++) {//username, password
-                    sb.append(rs.getObject(i)).append("|");
+                userbd = rs.getString(1);
+                passbd = rs.getString(2);
+                mailbd = rs.getString(5);
+                if(mailbd.equals(mail) && passbd.equals(pass))
+                {
+                    statusbd = true;
+                    user = userbd;
                 }
             }
-        }catch(Exception e)
-        {
+        }catch(Exception e) {
 
-        }*/
-        //Bd bd = new Bd(MySql, "", "1234", "nico");
-        return true;
+        }
+
+        return statusbd;
     }
    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    //@Override
-    /*protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }*/
 
     /**
      * Handles the HTTP <code>POST</code> method.
