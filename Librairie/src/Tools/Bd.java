@@ -22,10 +22,6 @@ public class Bd {
         this.Connection = createConnection(type);
     }
 
-    public Bd(BdType type, String Url, String Password, String User) throws IOException, SQLException {
-        this.Connection = createConnectionPerso(type, Url, Password, User);
-    }
-
     /**
      * @param type
      * @param lockTime
@@ -95,37 +91,11 @@ public class Bd {
             default:
                 System.exit(-1);
         }
-        confFile += File.separator;
         Properties p = new Properties();
         p.load(new FileReader(new File(confFile)));
         String url = p.getProperty("url");
         String user = p.getProperty("user");
         String passwd = p.getProperty("password");
-        try {
-            Class.forName(p.getProperty("driver")).newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-        return DriverManager.getConnection(url, user, passwd);
-    }
-
-    public synchronized static Connection createConnectionPerso(BdType type, String Url, String Pass, String User) throws SQLException, IOException {
-        String confFile = "";
-        switch (type) {
-            case MySql:
-                confFile = "mysql.properties";
-                break;
-            case Oracle:
-                confFile = "oracle.properties";
-                break;
-            default:
-                System.exit(-1);
-        }
-        Properties p = new Properties();
-        p.load(new FileInputStream(confFile));
-        String url = Url;
-        String user = User;
-        String passwd = Pass;
         try {
             Class.forName(p.getProperty("driver")).newInstance();
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
