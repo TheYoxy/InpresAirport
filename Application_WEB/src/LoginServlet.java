@@ -18,6 +18,7 @@ import javax.servlet.annotation.WebInitParam;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -45,19 +46,17 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         synchronized(this) {nbrConnexions++;}
         response.setContentType("text/html;charset=UTF-8");
+        HttpSession session = request.getSession();
         PrintWriter out = response.getWriter();
         String email = "";
         String pass = "";
         String username = "";
-;
-        /*out.println("<HTML><HEAD><TITLE>LoginServlet</TITLE></HEAD><BODY>");
-        out.println("<H1>Nouveau client</H1>");
-        out.println("<p>nom :  "+ request.getParameter("mail") + " Pass : " + request.getParameter("pass") + "</p>");*/
 
+        session.setAttribute("mail", request.getParameter("mail"));
         String type = request.getParameter("type"); //signin or signup
 
         if(type.equals("signin")) {
-            email = request.getParameter("mail");
+            email = (String)session.getAttribute("mail");
             pass = request.getParameter("pass");
             if(checkUser(email, pass)) //TO DO Creer cette fonction
             {
@@ -72,7 +71,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         if(type.equals("signup")){
-            email = request.getParameter("mail");
+            email = (String)session.getAttribute("mail");
             pass = request.getParameter("pass");
             username = request.getParameter("username");
             if(createUser(username, pass, email)){
@@ -83,6 +82,7 @@ public class LoginServlet extends HttpServlet {
 
         if(type.equals("logout"))
             status = "fail";
+            session.invalidate();
 
         doPost(request, response);
     }
