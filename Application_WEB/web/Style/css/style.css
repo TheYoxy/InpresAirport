@@ -169,6 +169,18 @@ header[role=banner]::after {
     background: #2f889a;
     border: none;
   }
+  .main-nav p {
+    display: inline-block;
+    height: auto;
+    line-height: normal;
+    background: transparent;
+  }
+  .main-nav a.logout, .main-nav p.user {
+    padding: .6em 1em;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50em;
+      background: #2f889a;
+  }
 }
 
 /* -------------------------------- 

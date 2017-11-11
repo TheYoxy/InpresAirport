@@ -6,12 +6,11 @@
 
 import Tools.Bd;
 import Tools.BdType;
+import com.sun.org.apache.bcel.internal.generic.Instruction;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -76,7 +75,10 @@ public class LoginServlet extends HttpServlet {
             email = request.getParameter("mail");
             pass = request.getParameter("pass");
             username = request.getParameter("username");
-            //Bd.CreateUser();
+            if(createUser(username, pass, email)){
+                status = "success";
+                user = username;
+            }
         }
 
         if(type.equals("logout"))
@@ -117,6 +119,21 @@ public class LoginServlet extends HttpServlet {
         }
 
         return statusbd;
+    }
+
+    public boolean createUser(String username, String password, String mail)
+    {
+        Connection con = sgbd.getConnection();
+        Statement Instruction;
+        try {
+            Instruction = con.createStatement();
+            String query = "insert into users(Username, Password, Mail)"  + " values ('" + username + "','" +  password + "','"+ mail + "')";
+            Instruction.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     }
    
 

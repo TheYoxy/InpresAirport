@@ -34,12 +34,15 @@
         <% if(type == null || type.equals("fail")) {
             out.println("<ul>");
             out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
-            out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign up</a></li>");
+            out.println("<li><a class=\"cd-signup\" href=\"#0\">Sign up</a></li>");
             out.println("</ul>");
+            /*if(type!=null && type.equals("fail")){
+                out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
+            }*/
         }
         else{
             out.println("<ul>");
-            out.println("<li><a class=\"user\" href=\"#0\">Connecté :"+ user + " </a></li>");
+            out.println("<li><p class=\"user\" >Connecté : "+ user + " </p></li>");
             //request.setAttribute("type", "logout");
             out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
             out.println("</ul>");
