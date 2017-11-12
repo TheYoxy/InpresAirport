@@ -266,4 +266,8 @@ public class Bd {
         }
         Connection.close();
     }
+
+    public Connection getConnection(){
+        return Connection;
+    }
 }

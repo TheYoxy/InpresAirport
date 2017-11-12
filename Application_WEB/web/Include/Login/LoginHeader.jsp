@@ -2,22 +2,22 @@
     <%--<div id="cd-logo"><a href="#"><img src="img/cd-logo.svg" alt="Logo"></a></div>--%>
     <h1>Inpres Airport</h1>
     <nav class="main-nav">
-        <%
-            String type = (String) request.getAttribute("type");
-            String user = (String) request.getAttribute("user");
-
-            if (type == null || type.equals("fail")) {
-                out.println("<ul>");
-                out.println("<li><a class=\"cd-signin\" href=\"#\">Sign in</a></li>");
-                out.println("<li><a class=\"cd-signup\" href=\"#\">Sign up</a></li>");
-                out.println("</ul>");
-            } else {
-                out.println("<ul>");
-                out.println("<li><a class=\"user\" href=\"#\">Connecté :" + user + " </a></li>");
-                //request.setAttribute("type", "logout");
-                out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
-                out.println("</ul>");
-            }
+        <% if(type == null || type.equals("fail")) {
+            out.println("<ul>");
+            out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
+            out.println("<li><a class=\"cd-signup\" href=\"#0\">Sign up</a></li>");
+            out.println("</ul>");
+            /*if(type!=null && type.equals("fail")){
+                out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
+            }*/
+        }
+        else{
+            out.println("<ul>");
+            out.println("<li><p class=\"user\" >Connecté : "+ user + " </p></li>");
+            //request.setAttribute("type", "logout");
+            out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
+            out.println("</ul>");
+        }
         %>
         <!-- <ul> -->
         <!-- inser more links here -->
@@ -45,9 +45,8 @@
 
                 <p class="fieldset">
                     <label class="image-replace cd-password" for="signin-password">Password</label>
-                    <input class="full-width has-padding has-border" id="signin-password" type="text" name="pass"
-                           placeholder="Password">
-                    <a href="#" class="hide-password">Hide</a>
+                    <input class="full-width has-padding has-border" id="signin-password" type="text" name="pass" placeholder="Password">
+                    <a href="#0" class="hide-password">Hide</a>
                     <span class="cd-error-message">Error message here!</span>
                 </p>
 

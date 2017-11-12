@@ -142,58 +142,63 @@ header[role=banner]::after {
 }
 
 @media only screen and (min-width: 768px) {
-    .main-nav {
-        width: auto;
-        height: auto;
-        background: none;
-        cursor: auto;
-    }
-
-    .main-nav ul {
-        position: static;
-        width: auto;
-        -webkit-transform: translateY(0);
-        -moz-transform: translateY(0);
-        -ms-transform: translateY(0);
-        -o-transform: translateY(0);
-        transform: translateY(0);
-        line-height: 80px;
-    }
-
-    .main-nav ul.is-visible {
-        -webkit-transform: translateY(0);
-        -moz-transform: translateY(0);
-        -ms-transform: translateY(0);
-        -o-transform: translateY(0);
-        transform: translateY(0);
-    }
-
-    .main-nav li {
-        display: inline-block;
-        margin-left: 1em;
-    }
-
-    .main-nav li:nth-last-child(2) {
-        margin-left: 2em;
-    }
-
-    .main-nav a {
-        display: inline-block;
-        height: auto;
-        line-height: normal;
-        background: transparent;
-    }
-
-    .main-nav a.cd-signin, .main-nav a.cd-signup {
-        padding: .6em 1em;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        border-radius: 50em;
-    }
-
-    /*.main-nav a.cd-signup {*/
-    /*background: #2f889a;*/
-    /*border: none;*/
-    /*}*/
+  .main-nav {
+    width: auto;
+    height: auto;
+    background: none;
+    cursor: auto;
+  }
+  .main-nav ul {
+    position: static;
+    width: auto;
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
+    transform: translateY(0);
+    line-height: 80px;
+  }
+  .main-nav ul.is-visible {
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
+    transform: translateY(0);
+  }
+  .main-nav li {
+    display: inline-block;
+    margin-left: 1em;
+  }
+  .main-nav li:nth-last-child(2) {
+    margin-left: 2em;
+  }
+  .main-nav a {
+    display: inline-block;
+    height: auto;
+    line-height: normal;
+    background: transparent;
+  }
+  .main-nav a.cd-signin, .main-nav a.cd-signup {
+    padding: .6em 1em;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50em;
+  }
+  .main-nav a.cd-signup {
+    background: #2f889a;
+    border: none;
+  }
+  .main-nav p {
+    display: inline-block;
+    height: auto;
+    line-height: normal;
+    background: transparent;
+  }
+  .main-nav a.logout, .main-nav p.user {
+    padding: .6em 1em;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50em;
+      background: #2f889a;
+  }
 }
 
 /* -------------------------------- 
