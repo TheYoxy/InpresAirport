@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 
 /**
@@ -24,10 +23,10 @@ import java.sql.*;
 @WebServlet(name = "Servlet.LoginServlet", value = "/Caddie")
 
 public class LoginServlet extends HttpServlet {
-    int NbrConnexions;
-    String Status;
-    String User = "admin";
-    Bd Sgbd;
+    private static int NbrConnexions;
+    private String Status;
+    private String User = "admin";
+    private Bd Sgbd;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -46,43 +45,7 @@ public class LoginServlet extends HttpServlet {
         synchronized (this) {
             NbrConnexions++;
         }
-        response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
-        PrintWriter out = response.getWriter();
-        String email;
-        String pass;
-        String username = "";
-
-        session.setAttribute("mail", request.getParameter("mail"));
-        String type = request.getParameter("type"); //signin or signup
-
-        if (type.equals("signin")) {
-            email = (String) session.getAttribute("mail");
-            pass = request.getParameter("pass");
-            if (checkUser(email, pass)) //TO DO Creer cette fonction
-            {
-                Status = "success";
-            } else {
-                out.println("Username or Password incorrect");
-                Status = "fail";
-
-            }
-        }
-
-        if (type.equals("signup")) {
-            email = (String) session.getAttribute("mail");
-            pass = request.getParameter("pass");
-            username = request.getParameter("username");
-            if (createUser(username, pass, email)) {
-                Status = "success";
-                User = username;
-            }
-        }
-
-        if (type.equals("logout")) {
-            Status = "fail";
-            session.invalidate();
-        }
         try {
             request.setAttribute("Vols", Sgbd.Select("VolReservable"));
         } catch (SQLException e) {
@@ -90,55 +53,82 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
-        request.getServletContext().getRequestDispatcher("/index.jsp").forward(request, response);
-//        doPost(request, response);
+        request.getRequestDispatcher("/index.jsp").forward(request, response);
+//      doPost(request, response);
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
-        //req.getSession().setAttribute("message", message);
-        req.setAttribute("type", Status);
-        req.setAttribute("user", User);
-        req.getRequestDispatcher("LoginHeader.jsp").forward(req, response);
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String email;
+        String pass;
+        String username;
+        String type = request.getParameter("type"); //signin or signup
+
+        if (type != null) {
+            switch (type) {
+                case "signin":
+                    email = (String) session.getAttribute("mail");
+                    pass = request.getParameter("pass");
+                    try {
+                        Status = checkUser(email,pass) ? "success" : "fail";
+                    } catch (SQLException e) {
+                        request.setAttribute("Exception", e);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
+                        return;
+                    }
+                    break;
+                case "signup":
+                    email = (String) session.getAttribute("mail");
+                    pass = request.getParameter("pass");
+                    username = request.getParameter("username");
+                    try {
+                        if (createUser(username, pass, email)) {
+                            Status = "success";
+                            User = username;
+                        }
+                    } catch (SQLException e) {
+                        request.setAttribute("Exception", e);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
+                        return;
+                    }
+                    break;
+                case "logout":
+                    Status = "fail";
+                    session.invalidate();
+                    break;
+            }
+        }
+        session.setAttribute("type", Status);
+        session.setAttribute("user", User);
+        session.setAttribute("mail", request.getParameter("mail"));
     }
 
-    public boolean checkUser(String mail, String pass) {
-        ResultSetMetaData rsmf;
+    public boolean checkUser(String mail, String pass) throws SQLException {
         String userbd;
         String passbd;
         String mailbd;
         boolean statusbd = false;
 
-        try {
-            ResultSet rs = Sgbd.Select("users");
-            rsmf = rs.getMetaData();
-            while (rs.next()) {
-                userbd = rs.getString(1);
-                passbd = rs.getString(2);
-                mailbd = rs.getString(5);
-                if (mailbd.equals(mail) && passbd.equals(pass)) {
-                    statusbd = true;
-                    User = userbd;
-                }
+        ResultSet rs = Sgbd.Select("users");
+        ResultSetMetaData rsmf = rs.getMetaData();
+        while (rs.next()) {
+            userbd = rs.getString(1);
+            passbd = rs.getString(2);
+            mailbd = rs.getString(5);
+            if (mailbd.equals(mail) && passbd.equals(pass)) {
+                statusbd = true;
+                User = userbd;
             }
-        } catch (Exception e) {
-            this.getServletContext().setAttribute("Exception", e);
-            this.getServletContext().getRequestDispatcher("/error.jsp");
-            return false;
         }
         return statusbd;
     }
 
-    public boolean createUser(String username, String password, String mail) {
+    public boolean createUser(String username, String password, String mail) throws SQLException {
         Connection con = Sgbd.getConnection();
-        try {
-            Statement Instruction = con.createStatement();
-            String query = "insert into users(Username, Password, Mail)" + " values ('" + username + "','" + password + "','" + mail + "')";
-            Instruction.executeUpdate(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        Statement instruction = con.createStatement();
+        String query = "insert into users(Username, Password, Mail)" + " values ('" + username + "','" + password + "','" + mail + "')";
+        instruction.executeUpdate(query);
         return true;
     }
 }

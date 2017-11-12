@@ -183,10 +183,10 @@ header[role=banner]::after {
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 50em;
   }
-  .main-nav a.cd-signup {
-    background: #2f889a;
-    border: none;
-  }
+  /*.main-nav a.cd-signup {*/
+    /*background: #2f889a;*/
+    /*border: none;*/
+  /*}*/
   .main-nav p {
     display: inline-block;
     height: auto;

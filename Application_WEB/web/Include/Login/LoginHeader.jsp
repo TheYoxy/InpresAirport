@@ -1,23 +1,24 @@
 <header role="banner">
-    <%--<div id="cd-logo"><a href="#"><img src="img/cd-logo.svg" alt="Logo"></a></div>--%>
     <h1>Inpres Airport</h1>
     <nav class="main-nav">
-        <% if(type == null || type.equals("fail")) {
-            out.println("<ul>");
-            out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
-            out.println("<li><a class=\"cd-signup\" href=\"#0\">Sign up</a></li>");
-            out.println("</ul>");
+        <%
+            String type = (String) session.getAttribute("type");
+            if (type == null || type.equals("fail")) {
+                out.println("<ul>");
+                out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
+                out.println("<li><a class=\"cd-signup\" href=\"#0\">Sign up</a></li>");
+                out.println("</ul>");
             /*if(type!=null && type.equals("fail")){
                 out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
             }*/
-        }
-        else{
-            out.println("<ul>");
-            out.println("<li><p class=\"user\" >Connecté : "+ user + " </p></li>");
-            //request.setAttribute("type", "logout");
-            out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
-            out.println("</ul>");
-        }
+            } else {
+                String user = (String) session.getAttribute("user");
+                out.println("<ul>");
+                out.println("<li><p class=\"user\" >Connecté : " + user + " </p></li>");
+                //request.setAttribute("type", "logout");
+                out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
+                out.println("</ul>");
+            }
         %>
         <!-- <ul> -->
         <!-- inser more links here -->
@@ -35,7 +36,7 @@
         </ul>
 
         <div id="cd-login"> <!-- log in form -->
-            <form action="Caddie" class="cd-form">
+            <form method="post" action="Caddie" class="cd-form">
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signin-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signin-email" type="email" name="mail"
@@ -45,8 +46,9 @@
 
                 <p class="fieldset">
                     <label class="image-replace cd-password" for="signin-password">Password</label>
-                    <input class="full-width has-padding has-border" id="signin-password" type="text" name="pass" placeholder="Password">
-                    <a href="#0" class="hide-password">Hide</a>
+                    <input class="full-width has-padding has-border" id="signin-password" type="password" name="pass"
+                           placeholder="Password">
+                    <a href="#" class="hide-password">Show</a>
                     <span class="cd-error-message">Error message here!</span>
                 </p>
 
@@ -56,7 +58,7 @@
                 </p>
 
                 <p class="fieldset">
-                    <input id="type" name="type" type="hidden" name="type" value="signin">
+                    <input id="type" type="hidden" name="type" value="signin">
                     <input class="full-width" type="submit" value="Login">
                 </p>
             </form>
@@ -66,7 +68,7 @@
         </div> <!-- cd-login -->
 
         <div id="cd-signup"> <!-- sign up form -->
-            <form class="cd-form" action="LoginServlet">
+            <form method="post" class="cd-form" action="Caddie">
                 <p class="fieldset">
                     <label class="image-replace cd-username" for="signup-username">Username</label>
                     <input class="full-width has-padding has-border" id="signup-username" type="text" name="username"
@@ -83,9 +85,9 @@
 
                 <p class="fieldset">
                     <label class="image-replace cd-password" for="signup-password">Password</label>
-                    <input class="full-width has-padding has-border" id="signup-password" type="text" name="pass"
+                    <input class="full-width has-padding has-border" id="signup-password" type="password" name="pass"
                            placeholder="Password">
-                    <a href="#" class="hide-password">Hide</a>
+                    <a href="#" class="hide-password">Show</a>
                     <span class="cd-error-message">Error message here!</span>
                 </p>
 

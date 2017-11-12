@@ -140,12 +140,11 @@ h1 {
     width: 75%;
 }
 
-header {
-
-}
-
-header, footer {
-    background-color: grey;
+h2 {
+    font-size: 36px;
+    position: relative;
+    left: 10%;
+    width: 90%;
 }
 
 footer {
@@ -153,7 +152,6 @@ footer {
     min-height: 5em;
     position: absolute;
     bottom: 0;
-
 }
 
 a.lachat {
