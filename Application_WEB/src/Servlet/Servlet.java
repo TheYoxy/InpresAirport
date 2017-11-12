@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@WebServlet(name = "Servlet", value = "/Caddie")
+@WebServlet(name = "Servlet", value = "/Caca.Couille.pute")
 public class Servlet extends javax.servlet.http.HttpServlet {
     private static ResultSet SelectVols() {
         try {

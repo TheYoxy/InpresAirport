@@ -5,10 +5,11 @@
   Time: 16:03
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page info="(c) BNSF - annee 2017" %>
-<%@ page import="java.util.*" %>
-<%@ page import="java.text.*" %>
+<%@ page import="java.text.DateFormat" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Locale" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -19,7 +20,8 @@
 <%! String currentDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.FRANCE).format(current); %>
 <!-- Page demandée le <%=currentDate%> -->
 <H2> Caddie virtuelle</H2>
-<p>Nous sommes le : <%=currentDate%> </p>
+<p>Nous sommes le : <%=currentDate%>
+</p>
 <p> LOGIN REUSSIS</p>
 <p>Bienvenue :
     <% String nom = request.getParameter("nom");
