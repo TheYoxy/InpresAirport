@@ -1,22 +1,30 @@
 <header role="banner">
-    <h1>Inpres Airport</h1>
+    <a href="${pageContext.request.contextPath}/Caddie"><h1>Inpres Airport</h1></a>
     <nav class="main-nav">
         <%
             String type = (String) session.getAttribute("type");
             if (type == null || type.equals("fail")) {
                 out.println("<ul>");
-                out.println("<li><a class=\"cd-signin\" href=\"#0\">Sign in</a></li>");
-                out.println("<li><a class=\"cd-signup\" href=\"#0\">Sign up</a></li>");
+                out.println("<li><a class=\"cd-signin\" href=\"#\">Sign in</a></li>");
+                out.println("<li><a class=\"cd-signup\" href=\"#\">Sign up</a></li>");
                 out.println("</ul>");
+                //TODO Message d'erreur lorsque le login foire
             /*if(type!=null && type.equals("fail")){
                 out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
             }*/
             } else {
                 String user = (String) session.getAttribute("user");
                 out.println("<ul>");
-                out.println("<li><p class=\"user\" >Connecté : " + user + " </p></li>");
+                out.println("<li><p class=\"user\">Connect\u00e9 : " + user + " </p></li>");
                 //request.setAttribute("type", "logout");
-                out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
+                out.println("<li><form method=\"post\" action=\"Caddie\" id=\"DC\">");
+                out.println("<a class=\"logout\" onClick=\"post()\" href='#'>Deconnexion</a>");
+                out.println("<input type='hidden' value='logout' name='type'/>");
+                out.println("</form></li>");
+//                out.println("<script>function post(){" +
+//                        "document.getElementById(\"Disconnect\").submit();" +
+//                        "console.log(\"Post\");" +
+//                        "}</script>");
                 out.println("</ul>");
             }
         %>
@@ -27,6 +35,12 @@
       </ul> -->
     </nav>
 </header>
+<script type="text/javascript">
+    function post() {
+        var d = document.getElementById("DC");
+        d.submit();
+    }
+</script>
 <!-- LOG IN -->
 <div class="cd-user-modal"> <!-- this is the entire modal form, including the background -->
     <div class="cd-user-modal-container"> <!-- this is the container wrapper -->

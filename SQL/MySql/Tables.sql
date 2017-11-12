@@ -65,7 +65,7 @@ CREATE TABLE Users (
   Password VARCHAR(20)  NOT NULL,
   Nom      VARCHAR(100),
   Prenom   VARCHAR(100),
-  Mail     VARCHAR(100) NOT NULL
+  Mail     VARCHAR(100) NOT NULL UNIQUE
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Reservation;

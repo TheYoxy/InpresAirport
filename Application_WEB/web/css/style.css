@@ -158,8 +158,12 @@ a.lachat {
     text-decoration: none;
     color: black;
     display: block;
-    margin: 1.5em 20%;
+    margin: 1.5em 15%;
     height: 15%;
+}
+
+div.body {
+    margin: 0 10%;
 }
 
 div.ticket {
@@ -178,6 +182,8 @@ div.ticket:hover {
 
 div.ticket h2.title {
     font-size: 30px;
+    left: 0;
+    width: 0;
 }
 
 div.ticket h2.title + span.date {

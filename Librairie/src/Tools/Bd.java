@@ -267,7 +267,19 @@ public class Bd {
         Connection.close();
     }
 
-    public Connection getConnection(){
+    public synchronized boolean InsertUser(String username, String password, String mail) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("insert into Users(Username, Password, Mail) values (?,?,?)");
+        ps.setString(1,username);
+        ps.setString(2,password);
+        ps.setString(3,mail);
+        if (ps.execute()) {
+            commit();
+            return true;
+        }
+        return false;
+    }
+
+    public Connection getConnection() {
         return Connection;
     }
 }
