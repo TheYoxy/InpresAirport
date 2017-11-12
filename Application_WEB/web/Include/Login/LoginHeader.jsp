@@ -15,7 +15,7 @@
                 out.println("<ul>");
                 out.println("<li><a class=\"user\" href=\"#\">Connecté :" + user + " </a></li>");
                 //request.setAttribute("type", "logout");
-                out.println("<li><a class=\"logout\" href=\"Servlet.LoginServlet?type=logout\">Deconnexion</a></li>");
+                out.println("<li><a class=\"logout\" href=\"LoginServlet?type=logout\">Deconnexion</a></li>");
                 out.println("</ul>");
             }
         %>
