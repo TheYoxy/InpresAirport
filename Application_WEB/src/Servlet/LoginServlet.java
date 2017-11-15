@@ -4,6 +4,10 @@ package Servlet;/*
  * and open the template in the editor.
  */
 
+import Beans.ConnectionB;
+import Enums.ConnectionResult;
+import Enums.ErrorField;
+import Enums.Form;
 import Tools.Bd;
 import Tools.BdType;
 
@@ -22,7 +26,6 @@ import java.sql.SQLException;
 @WebServlet(name = "Servlet.LoginServlet", value = "/Caddie")
 
 public class LoginServlet extends HttpServlet {
-    private String Status;
     private String User = "admin";
     private Bd Sgbd;
 
@@ -56,11 +59,11 @@ public class LoginServlet extends HttpServlet {
         String pass;
         String username;
         String type = request.getParameter("type"); //signin or signup
+        ConnectionB connectionB = new ConnectionB();
         if (type != null) {
             if (type.equals("logout")) {
-                Status = "fail";
                 session.invalidate();
-                doGet(request,response);
+                doGet(request, response);
                 return;
             }
             username = request.getParameter("username");
@@ -69,14 +72,29 @@ public class LoginServlet extends HttpServlet {
             try {
                 switch (type) {
                     case "signin":
-                        Status = checkUser(email, pass) ? "success" : "fail";
+                    {
+                        int retour;
+                        connectionB.setResult((retour = checkUser(email, pass)) == 0 ? ConnectionResult.SUCCES : ConnectionResult.FAIL);
+                        switch (retour) {
+                            case 1:
+                                connectionB.setField(ErrorField.PASSWORD);
+                                connectionB.setErrorMessage("Le mot de passe entré est incorrect");
+                                break;
+                            case 2:
+                                connectionB.setField(ErrorField.EMAIL);
+                                connectionB.setErrorMessage("L'adresse mail entrée n'existe pas");
+                                break;
+                        }
+                        connectionB.setPlace(Form.LOGIN);
+                    }
                         break;
                     case "signup":
                         if (Sgbd.InsertUser(username, pass, email)) {
-                            Status = "success";
+                            connectionB.setResult(ConnectionResult.SUCCES);
                             User = username;
                         } else
-                            Status = "fail";
+                            connectionB.setResult(ConnectionResult.FAIL);
+                        connectionB.setPlace(Form.SIGNIN);
                         break;
                 }
             } catch (SQLException e) {
@@ -84,14 +102,14 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
-            session.setAttribute("type", Status);
+            session.setAttribute("Result", connectionB);
             session.setAttribute("user", User);
             session.setAttribute("mail", request.getParameter("mail"));
             doGet(request, response);
         }
     }
 
-    public boolean checkUser(String mail, String pass) throws SQLException {
+    public int checkUser(String mail, String pass) throws SQLException {
         String userbd;
         String passbd;
         String mailbd;
@@ -101,11 +119,13 @@ public class LoginServlet extends HttpServlet {
             userbd = rs.getString(1);
             passbd = rs.getString(2);
             mailbd = rs.getString(5);
-            if (mailbd.equals(mail) && passbd.equals(pass)) {
-                User = userbd;
-                return true;
-            }
+            if (mailbd.equals(mail))
+                if (passbd.equals(pass)) {
+                    User = userbd;
+                    return 0;
+                } else
+                    return 1;
         }
-        return false;
+        return 2;
     }
 }
