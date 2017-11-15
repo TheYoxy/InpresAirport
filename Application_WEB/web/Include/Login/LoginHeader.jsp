@@ -68,10 +68,10 @@
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD && Result.place == Form.LOGIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
-                <p class="fieldset">
-                    <input type="checkbox" id="remember-me" checked>
-                    <label for="remember-me">Remember me</label>
-                </p>
+                <%--<p class="fieldset">--%>
+                    <%--<input type="checkbox" id="remember-me" checked>--%>
+                    <%--<label for="remember-me">Remember me</label>--%>
+                <%--</p>--%>
 
                 <p class="fieldset">
                     <input id="type" type="hidden" name="type" value="signin">
@@ -79,7 +79,7 @@
                 </p>
             </form>
 
-            <p class="cd-form-bottom-message"><a href="#">Forgot your password?</a></p>
+            <%--<p class="cd-form-bottom-message"><a href="#">Forgot your password?</a></p>--%>
             <!-- <a href="#0" class="cd-close-form">Close</a> -->
         </div> <!-- cd-login -->
 
@@ -109,10 +109,10 @@
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
-                <p class="fieldset">
-                    <input type="checkbox" id="accept-terms">
-                    <label for="accept-terms">I agree to the <a href="#">Terms</a></label>
-                </p>
+                <%--<p class="fieldset">--%>
+                    <%--<input type="checkbox" id="accept-terms">--%>
+                    <%--<label for="accept-terms">I agree to the <a href="#">Terms</a></label>--%>
+                <%--</p>--%>
 
                 <p class="fieldset">
                     <input id="typeSignup" type="hidden" name="type" value="signup">
@@ -133,7 +133,6 @@
                     <label class="image-replace cd-email" for="reset-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="reset-email" type="email"
                            placeholder="E-mail">
-                    <span class="cd-error-message">Error message here!</span>
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL ? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
