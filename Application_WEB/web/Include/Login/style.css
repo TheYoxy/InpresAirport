@@ -16,7 +16,7 @@ html * {
 
 body {
     font-size: 100%;
-    font-family: "PT Sans", sans-serif;
+    /*font-family: "PT Sans", sans-serif;*/
     color: #505260;
     background-color: white;
 }
@@ -53,6 +53,7 @@ header[role=banner] {
 
 header[role=banner] h1 {
     color: white;
+    font-size: 45px;
 }
 
 header[role=banner] h1,
@@ -92,6 +93,17 @@ header[role=banner]::after {
         height: 80px;
     }
 
+    header[role=banner] a {
+        left: 20%;
+        position: relative;
+    }
+
+    header[role=banner] a h1 {
+        font-size: 70px;
+        left: 0;
+        width: 100%;
+    }
+
     header[role=banner] #cd-logo {
         margin: 20px 0 0 5%;
         -webkit-transform: scale(1);
@@ -107,7 +119,7 @@ header[role=banner]::after {
     margin-right: 5%;
     width: 44px;
     height: 100%;
-    background: url("../../Style/img/cd-icon-menu.svg") no-repeat center center;
+    background: url("/Include/Login/img/cd-icon-menu.svg") no-repeat center center;
     cursor: pointer;
 }
 

@@ -202,5 +202,28 @@ div.ticket p {
 
 div.ticket .prix {
     float: right;
-    font-size: 20px;
+    font-size: 17px;
+}
+
+@media only screen and (max-width: 768px) {
+    h1 {
+        font-size: 36px;
+    }
+
+    h2, div.ticket h2.title {
+        font-size: 24px;
+    }
+
+    div.ticket .prix {
+        font-size: 15px;
+    }
+
+    div.ticket h2.title + span.date {
+        font-size: 18px;
+        padding: 0 .2em;
+    }
+
+    div.ticket p {
+        font-size: 12px;
+    }
 }
