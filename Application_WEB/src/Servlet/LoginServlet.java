@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-@WebServlet(name = "Servlet.LoginServlet", value = "/Caddie")
+@WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 
 public class LoginServlet extends HttpServlet {
     private String User = "admin";
@@ -49,7 +49,7 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("/error.jsp").forward(request, response);
             return;
         }
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        request.getRequestDispatcher("/main.jsp").forward(request, response);
     }
 
     @Override

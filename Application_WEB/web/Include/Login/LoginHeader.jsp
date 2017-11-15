@@ -3,7 +3,7 @@
 <%@ page import="Enums.Form" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
-    <a href="${pageContext.request.contextPath}/Caddie"><h1>Inpres Airport</h1></a>
+    <a href="${pageContext.request.contextPath}/Main"><h1>Inpres Airport</h1></a>
     <nav class="main-nav">
         <%
             ConnectionResult cr = Result.getResult();
@@ -21,7 +21,7 @@
                 out.println("<ul>");
                 out.println("<li><p class=\"user\">Connect\u00e9 : " + user + " </p></li>");
                 //request.setAttribute("type", "logout");
-                out.println("<li><form method=\"post\" action=\"Caddie\" id=\"DC\">");
+                out.println("<li><form method=\"post\" action=\"Main\" id=\"DC\">");
                 out.println("<a class=\"logout\" onClick=\"post()\" href='#'>Deconnexion</a>");
                 out.println("<input type='hidden' value='logout' name='type'/>");
                 out.println("</form></li>");
@@ -51,7 +51,7 @@
         </ul>
 
         <div id="cd-login" ${Result.place == Form.LOGIN ? "class='is-selected'" : ""}> <!-- log in form -->
-            <form method="post" action="Caddie" class="cd-form">
+            <form method="post" action="Main" class="cd-form">
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signin-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signin-email" type="email" name="mail"
@@ -84,7 +84,7 @@
         </div> <!-- cd-login -->
 
         <div id="cd-signup" ${Result.place == Form.SIGNIN ? "class='is-selected'" : ""}> <!-- sign up form -->
-            <form method="post" class="cd-form" action="Caddie">
+            <form method="post" class="cd-form" action="Main">
                 <p class="fieldset">
                     <label class="image-replace cd-username" for="signup-username">Username</label>
                     <input class="full-width has-padding has-border" id="signup-username" type="text"
