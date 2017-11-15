@@ -26,6 +26,12 @@
                 out.println("<input type='hidden' value='logout' name='type'/>");
                 out.println("</form></li>");
                 out.println("</ul>");
+                out.println("<script type=\"text/javascript\">");
+                out.println("    function post() {");
+                out.println("        var d = document.getElementById(\"DC\");");
+                out.println("        d.submit();");
+                out.println("    }");
+                out.println("</script>");
             }
         %>
         <!-- <ul> -->
@@ -35,12 +41,6 @@
         </ul> -->
     </nav>
 </header>
-<script type="text/javascript">
-    function post() {
-        var d = document.getElementById("DC");
-        d.submit();
-    }
-</script>
 <!-- LOG IN -->
 <div class="cd-user-modal ${Result.place != null ? "is-visible" : ""}">
     <!-- this is the entire modal form, including the background -->
@@ -55,8 +55,8 @@
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signin-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signin-email" type="email" name="mail"
-                           placeholder="E-mail">
-                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL ? "is-visible" : ""}">${Result.errorMessage}</span>
+                           placeholder="E-mail" value="${param["mail"]}">
+                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.LOGIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
@@ -65,7 +65,7 @@
                            name="pass"
                            placeholder="Password">
                     <a href="#" class="hide-password">Show</a>
-                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD ? "is-visible" : ""}">${Result.errorMessage}</span>
+                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD && Result.place == Form.LOGIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
@@ -89,15 +89,15 @@
                     <label class="image-replace cd-username" for="signup-username">Username</label>
                     <input class="full-width has-padding has-border" id="signup-username" type="text"
                            name="username"
-                           placeholder="Username">
-                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.LOGIN ? "is-visible" : ""}">${Result.errorMessage}</span>
+                           placeholder="Username" value="${param["username"]}">
+                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.LOGIN && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signup-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signup-email" type="email" name="mail"
-                           placeholder="E-mail">
-                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL ? "is-visible" : ""}">${Result.errorMessage}</span>
+                           placeholder="E-mail" value="${param["email"]}">
+                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
@@ -106,7 +106,7 @@
                            name="pass"
                            placeholder="Password">
                     <a href="#" class="hide-password">Show</a>
-                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD ? "is-visible" : ""}">${Result.errorMessage}</span>
+                    <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.PASSWORD && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
@@ -115,7 +115,7 @@
                 </p>
 
                 <p class="fieldset">
-                    <input id="typeSignup" name="type" type="hidden" name="type" value="signup">
+                    <input id="typeSignup" type="hidden" name="type" value="signup">
                     <input class="full-width has-padding" type="submit" value="Create account">
                 </p>
             </form>
@@ -147,4 +147,5 @@
         <a href="#" class="cd-close-form">Close</a>
     </div> <!-- cd-user-modal-container -->
 </div>
+${Result.place = null}
 <!-- cd-user-modal -->

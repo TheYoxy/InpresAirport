@@ -102,6 +102,8 @@ public class LoginServlet extends HttpServlet {
                 request.getRequestDispatcher("/error.jsp").forward(request, response);
                 return;
             }
+            if (connectionB.getResult() == ConnectionResult.SUCCES)
+                connectionB.setPlace(null);
             session.setAttribute("Result", connectionB);
             session.setAttribute("user", User);
             session.setAttribute("mail", request.getParameter("mail"));
