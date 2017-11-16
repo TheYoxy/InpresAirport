@@ -11,6 +11,7 @@
                 out.println("<ul>");
                 out.println("<li><a class=\"cd-signin\" href=\"#\">Sign in</a></li>");
                 out.println("<li><a class=\"cd-signup\" href=\"#\">Sign up</a></li>");
+                out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"img/shopping-cart.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier</a></li>");
                 out.println("</ul>");
                 //TODO Message d'erreur lorsque le login foire
             /*if(type!=null && type.equals("fail")){
@@ -148,3 +149,18 @@
 </div>
 ${Result.place = null}
 <!-- cd-user-modal -->
+
+<!------ CADDIE ------->
+<div id="volet_clos">
+    <div id="volet">
+        <h3>Liste de vos articles</h3>
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <br />
+        <a href="#volet_clos" class="fermer">fermer !</a>
+    </div>
+</div>
+
+<!---- FIN CADDIE ----->

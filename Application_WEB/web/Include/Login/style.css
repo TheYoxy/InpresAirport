@@ -202,6 +202,15 @@ header[role=banner]::after {
         border-radius: 50em;
     }
 
+    .main-nav a.panier{
+        padding: .6em 1em;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 50em;
+        /*background: url(img/shopping-cart.svg) no-repeat left;
+        /background-size: 35px 35px;
+        text-align: right;*/
+    }
+
     /*.main-nav a.cd-signup {*/
     /*background: #2f889a;*/
     /*border: none;*/
@@ -220,7 +229,73 @@ header[role=banner]::after {
         background: #2f889a;
         color: white;
     }
+
 }
+
+
+/*------------ PANIER --------------*/
+#volet {
+    height: 0;
+    overflow: hidden;
+    transition: height 1.5s;
+}
+
+#volet:target{
+    height: 250px;
+    width: 270px;
+    border:solid 3px #34343d;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright:5px;
+    -moz-border-radius-bottomleft:5px;
+    -moz-border-radius-bottomright:5px;
+    -webkit-border-top-left-radius:5px;
+    -webkit-border-top-right-radius:5px;
+    -webkit-border-bottom-left-radius:5px;
+    -webkit-border-bottom-right-radius:5px;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    border-bottom-left-radius:5px;
+    border-bottom-right-radius:5px;
+    background-color: grey;
+    opacity: 0.7;
+    float : right;
+}
+
+#volet_clos:target #volet {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    transition: height 1.5s;
+}
+
+a.fermer{
+    background: #3498db;
+    background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+    background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+    background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+    background-image: -o-linear-gradient(top, #3498db, #2980b9);
+    background-image: linear-gradient(to bottom, #3498db, #2980b9);
+    -webkit-border-radius: 28;
+    -moz-border-radius: 28;
+    border-radius: 28px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 20px;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+    float : right;
+}
+
+a.fermer:hover {
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
+}
+
 
 /* -------------------------------- 
 
