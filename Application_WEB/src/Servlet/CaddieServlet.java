@@ -23,8 +23,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-@WebServlet(name = "Servlet.LoginServlet", value = "/Main")
-
 public class CaddieServlet extends HttpServlet {
     private String User = "admin";
     private Bd Sgbd;
@@ -42,12 +40,36 @@ public class CaddieServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        request.getRequestDispatcher("/main.jsp").forward(request, response);
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
+        ConnectionB connectionB = new ConnectionB();
         String type = request.getParameter("type"); //signin or signup
+        String numVol;
+        String username;
+        String qt;
+        String time ="";
         //ConnectionB connectionB = new ConnectionB();
 
         if(type != null){
-            if(type.equals("add")){
+            if(type.equals("add")){//Ajout d'un tuple dans la table reservation
+                username = (String)session.getAttribute("user");
+                numVol = request.getParameter("numVol");
+                qt = request.getParameter("nbrPlaces");
+                try {
+                    if (Sgbd.InsertReservation(username, numVol, qt, time)) {
+                        connectionB.setResult(ConnectionResult.SUCCES);
+                        User = username;
+                    } else
+                        connectionB.setResult(ConnectionResult.FAIL);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                connectionB.setPlace(Form.SIGNIN);
 
             }
             if(type.equals("remove")){
@@ -64,11 +86,6 @@ public class CaddieServlet extends HttpServlet {
             }
 
         }
-        request.getRequestDispatcher("/main.jsp").forward(request, response);
-    }
-
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     }
 
 

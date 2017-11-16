@@ -279,6 +279,19 @@ public class Bd {
         return false;
     }
 
+    public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException{
+        PreparedStatement ps = Connection.prepareStatement("insert into reservation(Username, NumeroVol, nbPlaces, timeReservation) values (?,?,?,?)");
+        ps.setString(1,username);
+        ps.setString(2,vol);
+        ps.setString(3,nbrPlaces);//a mettre en int !
+        ps.setString(4,time); //A mettre en time
+        if (ps.execute()) {
+            commit();
+            return true;
+        }
+        return false;
+    }
+
     public Connection getConnection() {
         return Connection;
     }

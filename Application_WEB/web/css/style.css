@@ -205,6 +205,12 @@ div.ticket .prix {
     font-size: 17px;
 }
 
+div.ticket input {
+    position: relative ;
+    right: 15px;
+    bottom: 15px;
+}
+
 @media only screen and (max-width: 768px) {
     h1 {
         font-size: 36px;
