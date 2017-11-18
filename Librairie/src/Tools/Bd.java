@@ -281,11 +281,13 @@ public class Bd {
 
     public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException{
         PreparedStatement ps = Connection.prepareStatement("insert into reservation(Username, NumeroVol, nbPlaces, timeReservation) values (?,?,?,?)");
+        Timestamp ts = Timestamp.valueOf(time);
+
         ps.setString(1,username);
         ps.setString(2,vol);
         ps.setString(3,nbrPlaces);//a mettre en int !
         ps.setString(4,time); //A mettre en time
-        if (ps.execute()) {
+        if (ps.executeUpdate()!= 0) {
             commit();
             return true;
         }

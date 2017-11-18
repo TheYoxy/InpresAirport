@@ -1,4 +1,5 @@
-<%--
+<%@ page import="java.sql.ResultSet" %>
+<%@ page import="java.sql.SQLException" %><%--
   Created by IntelliJ IDEA.
   User: Nicolas
   Date: 16-11-17
@@ -19,8 +20,8 @@
 
 <body>
     <%@include file="Include/Login/LoginHeader.jsp" %>
-    <% int nbrArticles = 3 ; %>
-    <h1>Shopping Cart</h1>
+    <% ReservationB reservation; %>
+    <h1>Vos billets </h1>
 
     <div class="shopping-cart">
 
@@ -34,32 +35,40 @@
         </div>
 
         <%
-            if ( nbrArticles != 0) {
-                int i = nbrArticles;
-                    while (i !=0) {
-                        out.println("<div class=\"product\">");
-                        out.println("<div class=\"product-image\">");
-                        out.println("<img src=\"https://s.cdpn.io/3/dingo-dog-bones.jpg\">");
-                        out.println("</div>");
-                        out.println("<div class=\"product-details\">");
-                        out.println("<div class=\"product-title\">Dingo Dog Bones</div>");
-                        out.println("<p class=\"product-description\">The best dog bones of all time. Holy crap. Your dog will be begging for these things! I got curious once and ate one myself. I'm a fan.</p>");
-                        out.println("</div>");
-                        out.println("<div class=\"product-price\">12.99</div>");
-                        out.println("<div class=\"product-quantity\">");
-                        out.println("<input type=\"number\" value=\"2\" min=\"1\">");
-                        out.println("</div>");
-                        out.println("<div class=\"product-removal\">");
-                        out.println("<button class=\"remove-product\">");
-                        out.println("Remove");
-                        out.println("</button>");
-                        out.println("</div>");
-                        out.println("<div class=\"product-line-price\">25.98</div>");
-                        out.println("</div>");
+            ResultSet rs = (ResultSet) request.getAttribute("Vols");
 
-                        i--;
+            if(session.getAttribute("reservation") != null){
+                reservation = (ReservationB) session.getAttribute("reservation");
+                if ( (Integer.parseInt(reservation.getNbrReservation())) != 0 ) {
+                    int i;
+                    try{
+                        for (i = 0; i < Integer.parseInt(reservation.getNbrReservation()); i++) {
+                            out.println("<div class=\"product\">");
+                            out.println("<div class=\"product-image\">");
+                            out.println("<img src=\"https://s.cdpn.io/3/dingo-dog-bones.jpg\">");
+                            out.println("</div>");
+                            out.println("<div class=\"product-details\">");
+                            out.println("<div class=\"product-title\">Vol numero " + reservation.getReservation(i).getNumVol() + " | " + rs.getString("Lieu") + "</div>");
+                            out.println("<p class=\"product-description\">"+rs.getString("Description")+"</p>");
+                            out.println("</div>");
+                            out.println("<div class=\"product-price\">"+rs.getBigDecimal("Prix")+"</div>");
+                            out.println("<div class=\"product-quantity\">");
+                            out.println("<input type=\"number\" value=\"" + reservation.getReservation(i).getNbrPlaces() + "\" min=\"1\">");
+                            out.println("</div>");
+                            out.println("<div class=\"product-removal\">");
+                            out.println("<button class=\"remove-product\">");
+                            out.println("Remove");
+                            out.println("</button>");
+                            out.println("</div>");
+                            out.println("<div class=\"product-line-price\">25.98</div>");
+                            out.println("</div>");
+                        }
+                    }catch(SQLException e){
+
                     }
-            } else
+                } else
+                    out.println("<h2>Aucun articles dans le caddie</h2>");
+            }else
                 out.println("<h2>Aucun articles dans le caddie</h2>");
         %>
 

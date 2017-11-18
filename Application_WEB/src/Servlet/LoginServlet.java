@@ -26,6 +26,7 @@ import java.sql.SQLException;
 @WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 
 public class LoginServlet extends HttpServlet {
+    HttpSession session;
     private String User = "admin";
     private Bd Sgbd;
 
@@ -43,6 +44,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            //session = request.getSession();
             request.setAttribute("Vols", Sgbd.Select("VolReservable"));
         } catch (SQLException e) {
             request.setAttribute("Exception", e);
@@ -54,7 +56,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
+        session = request.getSession();
         String email;
         String pass;
         String username;

@@ -159,7 +159,7 @@ a.lachat {
     color: black;
     display: block;
     margin: 1.5em 15%;
-    height: 15%;
+    height: 25%;
 }
 
 div.body {
@@ -172,7 +172,7 @@ div.ticket {
     box-shadow: 0 0 3px 2px #606060;
     background-color: #e8e8e8;
     padding: 1.5em;
-    height: 90%;
+    height: 100%;
 }
 
 div.ticket:hover {
@@ -192,7 +192,7 @@ div.ticket h2.title + span.date {
 }
 
 div.ticket h2.title,
-div.ticket h2.title + span.date {
+div.ticket h2.title + span.date + form{
     display: inline;
 }
 
@@ -206,7 +206,7 @@ div.ticket .prix {
 }
 
 div.ticket input {
-    position: relative ;
+    float : left;
     right: 15px;
     bottom: 15px;
 }
