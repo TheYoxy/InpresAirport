@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -27,7 +29,7 @@ import Tools.BdType;
 @WebServlet(name = "Servlet.CaddieServlet", value = "/Caddie")
 
 public class CaddieServlet extends HttpServlet {
-    private ReservationB reservation;
+    private List<ReservationB> LReservation;
     private String User = "admin";
     private Bd Sgbd;
     private String numVol;
@@ -41,7 +43,7 @@ public class CaddieServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        reservation = new ReservationB();
+        LReservation = new LinkedList<>();
         try {
             Sgbd = new Bd(BdType.MySql);
         } catch (Exception e) {
@@ -58,12 +60,10 @@ public class CaddieServlet extends HttpServlet {
         if (type != null) {
             if (type.equals("add")) {//Ajout d'un tuple dans la table reservation
                 //username = (String)session.getAttribute("user");
-                if (session.getAttribute("reservation") != null) {
-                    reservation = (ReservationB) session.getAttribute("reservation");
-                }
-                reservation.addReservation(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces")));
-                session.setAttribute("reservation", reservation);
-
+                if (session.getAttribute("reservation") != null)
+                    LReservation = (List<ReservationB>) session.getAttribute("reservation");
+                LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
+                session.setAttribute("reservation", LReservation);
                 /*try {;
                     if (Sgbd.InsertReservation(username, numVol, qt, getCurrentTimeStamp() )) {
                         connectionB.setResult(ConnectionResult.SUCCES);

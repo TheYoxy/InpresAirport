@@ -1,6 +1,6 @@
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="java.sql.SQLException" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <title>Mon caddie</title>
@@ -32,27 +32,27 @@
     <%
         ResultSet rs = (ResultSet) request.getAttribute("Vols");
         if (session.getAttribute("reservation") != null) {
-            ReservationB reservation = (ReservationB) session.getAttribute("reservation");
-            if ((reservation.getNbrReservation()) != 0) {
+            List<ReservationB> reservation = (List<ReservationB>) session.getAttribute("reservation");
+            if (reservation.size() != 0) {
                 int i;
                 try {
-                    for (i = 0, rs.next(); i < reservation.getNbrReservation(); i++, rs.next()) {
+                    for (i = 0, rs.next(); i < reservation.size(); i++, rs.next()) {
                         out.println("<div class=\"product\">");
                         out.println("   <div class=\"product-image\">");
                         out.println("       <img src=\"https://s.cdpn.io/3/dingo-dog-bones.jpg\">");
                         out.println("   </div>");
                         out.println("   <div class=\"product-details\">");
-                        out.println("       <div class=\"product-title\">Vol numero " + reservation.getReservation(i).getNumVol() + " | " + rs.getString("Lieu") + "</div>");
+                        out.println("       <div class=\"product-title\">Vol numero " + reservation.get(i).getNumVol() + " | " + rs.getString("Lieu") + "</div>");
                         out.println("           <p class=\"product-description\">" + rs.getString("Description") + "</p>");
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.getReservation(i).getNbrPlaces() + "\" min=\"1\">");
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\">");
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <button class=\"remove-product\">Remove</button>");
                         out.println("   </div>");
-                        out.println("   <div class=\"product-line-price\">" + (rs.getDouble("Prix") * reservation.getReservation(i).getNbrPlaces()) + "</div>");
+                        out.println("   <div class=\"product-line-price\">" + (rs.getDouble("Prix") * reservation.get(i).getNbrPlaces()) + "</div>");
                         out.println("</div>");
                     }
                 } catch (SQLException e) {

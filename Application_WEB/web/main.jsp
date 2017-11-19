@@ -10,7 +10,7 @@
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <%@ include file="Include/Login/Head.jsp" %>
     <%@ include file="Include/Login/Script.jsp" %>
-    <meta charset="UTF-16BE">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>

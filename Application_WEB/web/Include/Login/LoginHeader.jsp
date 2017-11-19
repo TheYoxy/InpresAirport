@@ -1,7 +1,9 @@
+<%@ page import="java.util.List" %>
 <%@ page import="Beans.ReservationB" %>
 <%@ page import="Enums.ConnectionResult" %>
 <%@ page import="Enums.ErrorField" %>
 <%@ page import="Enums.Form" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
     <a href="${pageContext.request.contextPath}/" class="title"><h1>Inpres Airport</h1></a>
@@ -13,10 +15,10 @@
                 if (cr == null || cr == ConnectionResult.FAIL) {
                     out.println("<li><a class=\"cd-signin nav-menu\" href=\"#\">Sign in</a></li>");
                     out.println("<li><a class=\"cd-signup nav-menu\" href=\"#\">Sign up</a></li>");
-                    if (session.getAttribute("reservation") != null) {
-                        tempreser = (ReservationB) session.getAttribute("reservation");
-                        out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"" + request.getContextPath() + "/Include/Login/img/cd-icon-caddie.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier : " + tempreser.getNbrReservation() + " tickets</a></li>");
-                    }
+//                    if (session.getAttribute("reservation") != null) {
+//                        tempreser = (ReservationB) session.getAttribute("reservation");
+//                        out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"" + request.getContextPath() + "/Include/Login/img/cd-icon-caddie.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier : " + tempreser.getNbrReservation() + " tickets</a></li>");
+//                    }
                     //TODO Message d'erreur lorsque le login foire
                     /*if(type!=null && type.equals("fail")){
                         out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
@@ -38,26 +40,41 @@
             </ul> -->
             <li id="caddie">
                 <a href="#" class="nav-menu cd-caddie">
-                    <img id="img-caddie" src="${pageContext.request.contextPath}/Include/Login/img/cd-icon-caddie.svg" alt="Caddie"/>
+                    <img id="img-caddie"
+                         src="${pageContext.request.contextPath}/Include/Login/img/cd-icon-caddie.svg"
+                         alt="Caddie"/>
                 </a>
                 <div class="cd-caddie-menu">
                     <table class="cd-caddie-resume">
                         <thead>
                         <tr>
-                            <th>AA</th>
-                            <th>BB</th>
+                            <th>Vol</th>
+                            <th>Nombre de places</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th colspan="2">PIED DE PAGE</th>
+                            <th colspan="2">PIED DE PAGE(On va mettre le button ici, aligné à
+                                gauche)
+                            </th>
                         </tr>
                         </tfoot>
                         <tbody>
-                        <tr>
-                            <td>Objet</td>
-                            <td>Prix</td>
-                        </tr>
+                        <%
+                            List<ReservationB> lb = (List<ReservationB>) session.getAttribute("reservation");
+                            System.out.println("lb = " + lb);
+                            if (lb != null)
+                                for (ReservationB rb : lb) {
+                                    out.println("<tr>");
+                                    out.println("   <td>" + rb.getNumVol() + "</td>");
+                                    out.println("   <td>" + rb.getNbrPlaces() + "</td>");
+                                    out.println("</tr>");
+                                }
+                        %>
+                        <%--<tr>--%>
+                        <%--<td>Objet</td>--%>
+                        <%--<td>Prix</td>--%>
+                        <%--</tr>--%>
                         </tbody>
                     </table>
                     <form method="post" action="Caddie">

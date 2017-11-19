@@ -1,60 +1,44 @@
 package Beans;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ReservationB implements Serializable {
 
-    private String sessionId;
-    private String numVol;
-    private int nbrPlaces;
-    private List<ReservationB> listReser;
+    private String SessionId = "";
+    private String NumVol = "";
+    private int NbrPlaces = 0;
 
     public ReservationB() {
-        listReser = new ArrayList<>();
     }
 
     public ReservationB(String id, String vol, int places) {
         this();
-        sessionId = id;
-        numVol = vol;
-        nbrPlaces = places;
+        SessionId = id;
+        NumVol = vol;
+        NbrPlaces = places;
     }
 
     public String getNumVol() {
-        return numVol;
+        return NumVol;
     }
 
     public void setNumVol(String num) {
-        numVol = num;
+        NumVol = num;
     }
 
     public String getSessionId() {
-        return sessionId;
+        return SessionId;
     }
 
     public void setSessionId(String id) {
-        sessionId = id;
+        SessionId = id;
     }
 
     public int getNbrPlaces() {
-        return nbrPlaces;
+        return NbrPlaces;
     }
 
     public void setNbrPlaces(int nbr) {
-        nbrPlaces = nbr;
-    }
-
-    public ReservationB getReservation(int position) {
-        return listReser.get(position);
-    }
-
-    public int getNbrReservation() {
-        return listReser.size();
-    }
-
-    public void addReservation(String id, String vol, int places) {
-        listReser.add(new ReservationB(id, vol, places));
+        NbrPlaces = nbr;
     }
 }

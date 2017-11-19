@@ -266,7 +266,7 @@ header[role=banner]::after {
         top: 0;
         right: 0;
         z-index: 1;
-        padding-top: 80px;
+        padding: 80px .5em 0 .5em;
 
         background-color: #303238;
         color: #ffffff;
@@ -320,6 +320,16 @@ header[role=banner]::after {
         transform: translate3d(0, 0, 0);
     }
 
+    .cd-caddie-menu tr th:nth-child(1),
+    .cd-caddie-menu tr td:nth-child(1) {
+        text-align: left;
+    }
+
+    .cd-caddie-menu tr th:nth-child(2),
+    .cd-caddie-menu tr td:nth-child(2) {
+        text-align: right;
+    }
+
     .cd-caddie-resume {
         width: 100%;
         color: white;
@@ -359,10 +369,10 @@ a.fermer {
     background-image: -ms-linear-gradient(top, #3498db, #2980b9);
     background-image: -o-linear-gradient(top, #3498db, #2980b9);
     background-image: linear-gradient(to bottom, #3498db, #2980b9);
-    -webkit-border-radius: 28;
-    -moz-border-radius: 28;
+    -webkit-border-radius: 28px;
+    -moz-border-radius: 28px;
     border-radius: 28px;
-    font-family: Arial;
+    font-family: Arial, serif;
     color: #ffffff;
     font-size: 20px;
     padding: 10px 20px 10px 20px;
