@@ -4,12 +4,10 @@ package Servlet;/*
  * and open the template in the editor.
  */
 
-import Beans.ConnectionB;
-import Enums.ConnectionResult;
-import Enums.ErrorField;
-import Enums.Form;
-import Tools.Bd;
-import Tools.BdType;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -18,10 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+
+import Beans.ConnectionB;
+import Enums.ConnectionResult;
+import Enums.ErrorField;
+import Enums.Form;
+import Tools.Bd;
+import Tools.BdType;
 
 @WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 
@@ -54,6 +55,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("Post");
         HttpSession session = request.getSession();
         String email;
         String pass;

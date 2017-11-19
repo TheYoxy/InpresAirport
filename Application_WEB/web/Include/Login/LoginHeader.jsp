@@ -3,42 +3,50 @@
 <%@ page import="Enums.Form" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
-    <a href="${pageContext.request.contextPath}/Main"><h1>Inpres Airport</h1></a>
+    <a href="${pageContext.request.contextPath}/Main" class="title"><h1>Inpres Airport</h1></a>
     <nav class="main-nav">
-        <%
-            ConnectionResult cr = Result.getResult();
-            if (cr == null || cr == ConnectionResult.FAIL) {
-                out.println("<ul>");
-                out.println("<li><a class=\"cd-signin\" href=\"#\">Sign in</a></li>");
-                out.println("<li><a class=\"cd-signup\" href=\"#\">Sign up</a></li>");
-                out.println("</ul>");
-                //TODO Message d'erreur lorsque le login foire
+        <ul>
+            <%
+                ConnectionResult cr = Result.getResult();
+                if (cr == null || cr == ConnectionResult.FAIL) {
+                    out.println("<li><a class=\"cd-signin nav-menu\" href=\"#\">Sign in</a></li>");
+                    out.println("<li><a class=\"cd-signup nav-menu\" href=\"#\">Sign up</a></li>");
+                    //TODO Message d'erreur lorsque le login foire
             /*if(type!=null && type.equals("fail")){
                 out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
             }*/
-            } else {
-                String user = (String) session.getAttribute("user");
-                out.println("<ul>");
-                out.println("<li><p class=\"user\">Connect\u00e9 : " + user + " </p></li>");
-                //request.setAttribute("type", "logout");
-                out.println("<li><form method=\"post\" action=\"Main\" id=\"DC\">");
-                out.println("<a class=\"logout\" onClick=\"post()\" href='#'>Deconnexion</a>");
-                out.println("<input type='hidden' value='logout' name='type'/>");
-                out.println("</form></li>");
-                out.println("</ul>");
-                out.println("<script type=\"text/javascript\">");
-                out.println("    function post() {");
-                out.println("        var d = document.getElementById(\"DC\");");
-                out.println("        d.submit();");
-                out.println("    }");
-                out.println("</script>");
-            }
-        %>
-        <!-- <ul> -->
-        <!-- inser more links here -->
-        <!-- <li><a class="cd-signin" href="#0">Sign in</a></li>
-        <li><a class="cd-signup" href="#0">Sign up</a></li>
-        </ul> -->
+                } else {
+                    String user = (String) session.getAttribute("user");
+                    out.println("<li><p class=\"user\">Connect\u00e9 : " + user + " </p></li>");
+                    //request.setAttribute("type", "logout");
+                    out.println("<li><form method=\"post\" action=\"Main\" id=\"DC\">");
+                    out.println("<a class=\"logout\" onClick=\"doPost(this)\" href='#'>Deconnexion</a>");
+                    out.println("<input type='hidden' value='logout' name='type'/>");
+                    out.println("</form></li>");
+                }
+            %>
+            <!-- <ul> -->
+            <!-- inser more links here -->
+            <!-- <li><a class="cd-signin" href="#0">Sign in</a></li>
+            <li><a class="cd-signup" href="#0">Sign up</a></li>
+            </ul> -->
+            <li id="caddie">
+                <a href="#" class="nav-menu cd-caddie"><img src="" alt="Caddie"/></a>
+                <div class="cd-caddie-menu">
+                    <table>
+                        <thead>
+                            <tr><th>AA</th><th>BB</th></tr>
+                        </thead>
+                        <tfoot>
+                            <tr><th colspan="2"></th></tr>
+                        </tfoot>
+                        <tbody>
+                            <tr><td>Objet</td><td>Prix</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </li>
+        </ul>
     </nav>
 </header>
 <!-- LOG IN -->
@@ -47,21 +55,25 @@
     <div class="cd-user-modal-container"> <!-- this is the container wrapper -->
         <ul class="cd-switcher">
             <li><a href="#" ${Result.place == Form.LOGIN ? "class='selected'" : ""}>Sign in</a></li>
-            <li><a href="#" ${Result.place == Form.SIGNIN ? "class='selected'" : ""}>New account</a></li>
+            <li><a href="#" ${Result.place == Form.SIGNIN ? "class='selected'" : ""}>New account</a>
+            </li>
         </ul>
 
-        <div id="cd-login" ${Result.place == Form.LOGIN ? "class='is-selected'" : ""}> <!-- log in form -->
+        <div id="cd-login" ${Result.place == Form.LOGIN ? "class='is-selected'" : ""}>
+            <!-- log in form -->
             <form method="post" action="Main" class="cd-form">
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signin-email">E-mail</label>
-                    <input class="full-width has-padding has-border" id="signin-email" type="email" name="mail"
+                    <input class="full-width has-padding has-border" id="signin-email" type="email"
+                           name="mail"
                            placeholder="E-mail" value="${param["mail"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.LOGIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
                     <label class="image-replace cd-password" for="signin-password">Password</label>
-                    <input class="full-width has-padding has-border" id="signin-password" type="password"
+                    <input class="full-width has-padding has-border" id="signin-password"
+                           type="password"
                            name="pass"
                            placeholder="Password">
                     <a href="#" class="hide-password">Show</a>
@@ -69,8 +81,8 @@
                 </p>
 
                 <%--<p class="fieldset">--%>
-                    <%--<input type="checkbox" id="remember-me" checked>--%>
-                    <%--<label for="remember-me">Remember me</label>--%>
+                <%--<input type="checkbox" id="remember-me" checked>--%>
+                <%--<label for="remember-me">Remember me</label>--%>
                 <%--</p>--%>
 
                 <p class="fieldset">
@@ -83,11 +95,13 @@
             <!-- <a href="#0" class="cd-close-form">Close</a> -->
         </div> <!-- cd-login -->
 
-        <div id="cd-signup" ${Result.place == Form.SIGNIN ? "class='is-selected'" : ""}> <!-- sign up form -->
+        <div id="cd-signup" ${Result.place == Form.SIGNIN ? "class='is-selected'" : ""}>
+            <!-- sign up form -->
             <form method="post" class="cd-form" action="Main">
                 <p class="fieldset">
                     <label class="image-replace cd-username" for="signup-username">Username</label>
-                    <input class="full-width has-padding has-border" id="signup-username" type="text"
+                    <input class="full-width has-padding has-border" id="signup-username"
+                           type="text"
                            name="username"
                            placeholder="Username" value="${param["username"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.LOGIN && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
@@ -95,14 +109,16 @@
 
                 <p class="fieldset">
                     <label class="image-replace cd-email" for="signup-email">E-mail</label>
-                    <input class="full-width has-padding has-border" id="signup-email" type="email" name="mail"
+                    <input class="full-width has-padding has-border" id="signup-email" type="email"
+                           name="mail"
                            placeholder="E-mail" value="${param["email"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
                 <p class="fieldset">
                     <label class="image-replace cd-password" for="signup-password">Password</label>
-                    <input class="full-width has-padding has-border" id="signup-password" type="password"
+                    <input class="full-width has-padding has-border" id="signup-password"
+                           type="password"
                            name="pass"
                            placeholder="Password">
                     <a href="#" class="hide-password">Show</a>
@@ -110,8 +126,8 @@
                 </p>
 
                 <%--<p class="fieldset">--%>
-                    <%--<input type="checkbox" id="accept-terms">--%>
-                    <%--<label for="accept-terms">I agree to the <a href="#">Terms</a></label>--%>
+                <%--<input type="checkbox" id="accept-terms">--%>
+                <%--<label for="accept-terms">I agree to the <a href="#">Terms</a></label>--%>
                 <%--</p>--%>
 
                 <p class="fieldset">
@@ -124,7 +140,8 @@
         </div> <!-- cd-signup -->
 
         <div id="cd-reset-password"> <!-- reset password form -->
-            <p class="cd-form-message">Lost your password? Please enter your email address. You will receive a link
+            <p class="cd-form-message">Lost your password? Please enter your email address. You will
+                receive a link
                 to
                 create a new password.</p>
 

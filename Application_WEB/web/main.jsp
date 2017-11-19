@@ -1,15 +1,15 @@
-<%@ page import="Tools.Procedural" %>
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="Tools.Procedural" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <title>InpresAirport</title>
-    <%@ include file="Include/Login/Head.jsp" %>
-    <%@include file="Include/Login/Script.jsp" %>
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"/>
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
+    <%@ include file="Include/Login/Head.jsp" %>
+    <%@ include file="Include/Login/Script.jsp" %>
     <meta charset="UTF-16BE">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>

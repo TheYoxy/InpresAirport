@@ -49,6 +49,7 @@ header[role=banner] {
     position: relative;
     height: 50px;
     background: #343642;
+    z-index: 5;
 }
 
 header[role=banner] h1 {
@@ -93,7 +94,7 @@ header[role=banner]::after {
         height: 80px;
     }
 
-    header[role=banner] a {
+    header[role=banner] a.title {
         left: 20%;
         position: relative;
     }
@@ -114,9 +115,12 @@ header[role=banner]::after {
     }
 }
 
+/*
+    NAVBAR
+*/
 .main-nav {
     float: right;
-    margin-right: 5%;
+    /*margin-right: 5%;*/
     width: 44px;
     height: 100%;
     background: url("/Include/Login/img/cd-icon-menu.svg") no-repeat center center;
@@ -135,15 +139,7 @@ header[role=banner]::after {
     transform: translateY(-100%);
 }
 
-.main-nav ul.is-visible {
-    -webkit-transform: translateY(50px);
-    -moz-transform: translateY(50px);
-    -ms-transform: translateY(50px);
-    -o-transform: translateY(50px);
-    transform: translateY(50px);
-}
-
-.main-nav a {
+.main-nav a, .main-nav p, .main-nav button {
     display: block;
     height: 50px;
     line-height: 50px;
@@ -153,23 +149,47 @@ header[role=banner]::after {
     color: #FFF;
 }
 
+.main-nav ul.is-visible {
+    -webkit-transform: translateY(50px);
+    -moz-transform: translateY(50px);
+    -ms-transform: translateY(50px);
+    -o-transform: translateY(50px);
+    transform: translateY(50px);
+}
+
+.main-nav button {
+    font-size: 100%;
+}
+
+nav.main-nav .nav-menu {
+    padding: .6em 1em;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50em;
+}
+
+nav.main-nav .nav-menu:hover,
+nav.main-nav .nav-menu:active {
+    background-color: #606060;
+}
+
 @media only screen and (min-width: 768px) {
     .main-nav {
         width: auto;
         height: auto;
         background: none;
         cursor: auto;
+        position: relative;
     }
 
     .main-nav ul {
         position: static;
         width: auto;
+        line-height: 80px;
         -webkit-transform: translateY(0);
         -moz-transform: translateY(0);
         -ms-transform: translateY(0);
         -o-transform: translateY(0);
         transform: translateY(0);
-        line-height: 80px;
     }
 
     .main-nav ul.is-visible {
@@ -182,42 +202,118 @@ header[role=banner]::after {
 
     .main-nav li {
         display: inline-block;
-        margin-left: 1em;
+        margin: 0 .5em;
     }
 
-    .main-nav li:nth-last-child(2) {
-        margin-left: 2em;
-    }
-
-    .main-nav a {
-        display: inline-block;
-        height: auto;
+    /*.main-nav li:nth-last-child(2) {*/
+    /*margin-left: 2em;*/
+    /*}*/
+    .main-nav .nav-menu {
+        height: 2.8em;
         line-height: normal;
         background: transparent;
+        transition: background .5s;
     }
 
     .main-nav a.cd-signin, .main-nav a.cd-signup {
-        padding: .6em 1em;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        border-radius: 50em;
+
     }
 
     /*.main-nav a.cd-signup {*/
     /*background: #2f889a;*/
     /*border: none;*/
     /*}*/
-    .main-nav p {
-        display: inline-block;
-        height: auto;
-        line-height: normal;
-        background: transparent;
-    }
-
     .main-nav a.logout, .main-nav p.user {
         padding: .6em 1em;
         border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 50em;
-        background: #2f889a;
+        /*background: #2add98;*/
+        /*color: black;*/
+    }
+
+    #caddie {
+        display: inline-block;
+        cursor: pointer;
+        position: relative;
+    }
+
+    #caddie .cd-caddie {
+        z-index: 2;
+        position: inherit;
+        -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+        transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    #caddie:hover .cd-caddie {
+        cursor: default;
+
+        -webkit-transform: translate3d(-350%, 0, 0);
+        transform: translate3d(-350%, 0, 0);
+    }
+
+    #caddie:hover .cd-caddie:hover {
+        background-color: transparent;
+    }
+
+    .cd-caddie-menu {
+        opacity: 0;
+        position: absolute;
+        top: -18px;
+        right: -8px;
+        z-index: 1;
+        padding-top: 80px;
+
+        background-color: #303238;
+        color: #ffffff;
+
+        overflow: hidden;
+        max-width: 100vw;
+
+        width: 0;
+        height: 0;
+
+        -webkit-transform: translate3d(0, -100px, 0);
+        transform: translate3d(0, -100px, 0);
+
+        -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    .cd-caddie-menu::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    #caddie:hover .cd-caddie-menu {
+        opacity: 1;
+
+        width: 400px;
+        height: auto;
+
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    .cd-caddie-menu tr {
+        opacity: 0;
+        -webkit-transform: translate3d(0, 100px, 0);
+        transform: translate3d(0, 100px, 0);
+
+        -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    #caddie:hover .cd-caddie-menu tr {
+        opacity: 1;
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
+
+    .cd-caddie-menu table {
         color: white;
     }
 }
@@ -579,4 +675,3 @@ xsigin/signup popup
 #cd-login.is-selected, #cd-signup.is-selected, #cd-reset-password.is-selected {
     display: block;
 }
-

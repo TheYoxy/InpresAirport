@@ -159,7 +159,7 @@ a.lachat {
     color: black;
     display: block;
     margin: 1.5em 15%;
-    height: 15%;
+    height: 20%;
 }
 
 div.body {
@@ -214,6 +214,10 @@ div.ticket .prix {
         font-size: 24px;
     }
 
+    div.ticket {
+        height: 100%;
+    }
+
     div.ticket .prix {
         font-size: 15px;
     }
@@ -221,6 +225,10 @@ div.ticket .prix {
     div.ticket h2.title + span.date {
         font-size: 18px;
         padding: 0 .2em;
+    }
+
+    a.lachat {
+        height: 20%;
     }
 
     div.ticket p {
