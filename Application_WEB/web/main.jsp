@@ -23,12 +23,19 @@
                 while (rs.next()) {
                     if (rs.getInt("PlacesDisponible") > 0) {
                         out.println("<a href=\"#\" class=\"lachat\">\n");
-                        out.println("    <div class=\"ticket\">");
-                        out.println("        <span class=\"prix\">" + Procedural.round(rs.getDouble("Prix"), 2) + "&euro;</span>");
-                        out.println("        <h2 class=\"title\">" + rs.getString("Lieu") + "</h2>");
-                        out.println("        <span class=\"date\">" + new SimpleDateFormat("EEEEE dd MMMMM yyyy").format(rs.getDate("Date")) + "</span>");
+                        out.println("<div class=\"ticket\">");
+                        out.println("<span class=\"prix\">" + Procedural.round(rs.getDouble("Prix"), 2) + "&euro;</span>");
+                        out.println("<h2 class=\"title\">" + rs.getString("Lieu") + "</h2>");
+                        out.println("<span class=\"date\">" + new SimpleDateFormat("EEEEE dd MMMMM yyyy").format(rs.getDate("Date")) + "</span>");
                         String arg = rs.getString("Description");
                         if (arg != null) out.println("        <p>" + arg + "</p>");
+                        out.println("<form method=\"post\" action=\"Caddie\">");
+                        out.println("<input id=\"numVol\" type=\"hidden\" name=\"numVol\" value=\""+ rs.getString("NumeroVol")+"\">\n");
+                        out.println("<input id=\"nbrPlaces\" type=\"text\" name=\"nbrPlaces\" value=\"1\">\n");
+                        out.println("<input id=\"type\" type=\"hidden\" name=\"type\" value=\"add\">\n");
+                        out.println("<input class=\"buyBtn\" type=\"submit\" value=\"Ajouter au panier\">");
+                        //<img src="Include/Login/img/add.png"  />
+                        out.println("</form>");
                         out.println("    </div>");
                         out.println("</a>");
                     }

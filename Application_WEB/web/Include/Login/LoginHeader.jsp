@@ -1,6 +1,7 @@
 <%@ page import="Enums.ConnectionResult" %>
 <%@ page import="Enums.ErrorField" %>
 <%@ page import="Enums.Form" %>
+<%@ page import="Beans.ReservationB" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
     <a href="${pageContext.request.contextPath}/Main" class="title"><h1>Inpres Airport</h1></a>
@@ -8,9 +9,14 @@
         <ul>
             <%
                 ConnectionResult cr = Result.getResult();
+                ReservationB tempreser;
                 if (cr == null || cr == ConnectionResult.FAIL) {
                     out.println("<li><a class=\"cd-signin nav-menu\" href=\"#\">Sign in</a></li>");
                     out.println("<li><a class=\"cd-signup nav-menu\" href=\"#\">Sign up</a></li>");
+                    if(session.getAttribute("reservation") != null) {
+                        tempreser = (ReservationB) session.getAttribute("reservation");
+                        out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"img/shopping-cart.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier : " + tempreser.getNbrReservation() + " tickets</a></li>");
+                    }
                     //TODO Message d'erreur lorsque le login foire
             /*if(type!=null && type.equals("fail")){
                 out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
@@ -165,3 +171,22 @@
 </div>
 ${Result.place = null}
 <!-- cd-user-modal -->
+
+<!------ CADDIE ------->
+<div id="volet_clos">
+    <div id="volet">
+        <h3>Liste de vos articles</h3>
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <p>Article 1</p><br />
+        <br />
+        <a href="#volet_clos" class="fermer">fermer !</a>
+        <form method="post" action="Caddie">
+            <input id="get" type="hidden" name="type" value="get">
+            <input class="buyBtn" type="submit" value="Details">
+        </form>
+    </div>
+</div>
+
+<!---- FIN CADDIE ----->
