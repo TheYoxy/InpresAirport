@@ -49,7 +49,7 @@ header[role=banner] {
     position: relative;
     height: 50px;
     background: #343642;
-    z-index: 5;
+    z-index: 1;
 }
 
 header[role=banner] h1 {
@@ -91,7 +91,7 @@ header[role=banner]::after {
 
 @media only screen and (min-width: 768px) {
     header[role=banner] {
-        height: 80px;
+        height: 90px;
     }
 
     header[role=banner] a.title {
@@ -139,13 +139,13 @@ header[role=banner]::after {
     transform: translateY(-100%);
 }
 
-.main-nav a, .main-nav p, .main-nav button {
+.main-nav .nav-menu {
     display: block;
     height: 50px;
     line-height: 50px;
     padding-left: 5%;
     background: #292a34;
-    border-top: 1px solid #3b3d4b;
+    /*border-top: 1px solid #3b3d4b;*/
     color: #FFF;
 }
 
@@ -161,17 +161,6 @@ header[role=banner]::after {
     font-size: 100%;
 }
 
-nav.main-nav .nav-menu {
-    padding: .6em 1em;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 50em;
-}
-
-nav.main-nav .nav-menu:hover,
-nav.main-nav .nav-menu:active {
-    background-color: #606060;
-}
-
 @media only screen and (min-width: 768px) {
     .main-nav {
         width: auto;
@@ -182,9 +171,11 @@ nav.main-nav .nav-menu:active {
     }
 
     .main-nav ul {
+        display: inline-flex;
         position: static;
         width: auto;
-        line-height: 80px;
+        /*line-height: 80px;*/
+        text-align: center;
         -webkit-transform: translateY(0);
         -moz-transform: translateY(0);
         -ms-transform: translateY(0);
@@ -201,43 +192,43 @@ nav.main-nav .nav-menu:active {
     }
 
     .main-nav li {
-        display: inline-block;
-        margin: 0 .5em;
+        display: inline;
+        /*margin-left: -5px;*/
+        width: 90px;
+        height: 90px;
+    }
+
+    .main-nav #img-caddie {
+        padding: 20px;
     }
 
     /*.main-nav li:nth-last-child(2) {*/
     /*margin-left: 2em;*/
     /*}*/
     .main-nav .nav-menu {
-        height: 2.8em;
-        line-height: normal;
+        height: 100%;
+        line-height: 350%;
         background: transparent;
         transition: background .5s;
+        padding: .6em 1em;
+        height: 90px;
+        width: 90px;
+        /*border: 1px solid rgba(255, 0, 0, 0.6);*/
+        /*border-radius: 0;*/
     }
 
-    .main-nav a.cd-signin, .main-nav a.cd-signup {
-
+    nav.main-nav .nav-menu:hover,
+    nav.main-nav .nav-menu:active {
+        background-color: #606060;
     }
 
-    .main-nav a.panier{
+    .main-nav a.panier {
         padding: .6em 1em;
         border: 1px solid rgba(255, 255, 255, 0.6);
         border-radius: 50em;
         /*background: url(img/shopping-cart.svg) no-repeat left;
         /background-size: 35px 35px;
         text-align: right;*/
-    }
-
-    /*.main-nav a.cd-signup {*/
-    /*background: #2f889a;*/
-    /*border: none;*/
-    /*}*/
-    .main-nav a.logout, .main-nav p.user {
-        padding: .6em 1em;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        border-radius: 50em;
-        /*background: #2add98;*/
-        /*color: black;*/
     }
 
     #caddie {
@@ -251,13 +242,14 @@ nav.main-nav .nav-menu:active {
         position: inherit;
         -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
         transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+        padding: 0;
     }
 
     #caddie:hover .cd-caddie {
         cursor: default;
 
-        -webkit-transform: translate3d(-350%, 0, 0);
-        transform: translate3d(-350%, 0, 0);
+        -webkit-transform: translate3d(-344%, 0, 0);
+        transform: translate3d(-344%, 0, 0);
     }
 
     #caddie:hover .cd-caddie:hover {
@@ -266,9 +258,13 @@ nav.main-nav .nav-menu:active {
 
     .cd-caddie-menu {
         opacity: 0;
+
+        border: 1px solid #303238;
+        border-radius: 5px;
+
         position: absolute;
-        top: -18px;
-        right: -8px;
+        top: 0;
+        right: 0;
         z-index: 1;
         padding-top: 80px;
 
@@ -300,6 +296,8 @@ nav.main-nav .nav-menu:active {
     #caddie:hover .cd-caddie-menu {
         opacity: 1;
 
+        cursor: default;
+
         width: 400px;
         height: auto;
 
@@ -322,12 +320,11 @@ nav.main-nav .nav-menu:active {
         transform: translate3d(0, 0, 0);
     }
 
-    .cd-caddie-menu table {
+    .cd-caddie-resume {
+        width: 100%;
         color: white;
     }
-
 }
-
 
 /*------------ PANIER --------------*/
 #volet {
@@ -336,25 +333,16 @@ nav.main-nav .nav-menu:active {
     transition: height 1.5s;
 }
 
-#volet:target{
+#volet:target {
     height: 250px;
     width: 270px;
-    border:solid 3px #34343d;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright:5px;
-    -moz-border-radius-bottomleft:5px;
-    -moz-border-radius-bottomright:5px;
-    -webkit-border-top-left-radius:5px;
-    -webkit-border-top-right-radius:5px;
-    -webkit-border-bottom-left-radius:5px;
-    -webkit-border-bottom-right-radius:5px;
-    border-top-left-radius:5px;
-    border-top-right-radius:5px;
-    border-bottom-left-radius:5px;
-    border-bottom-right-radius:5px;
+    border: solid 3px #34343d;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
     background-color: grey;
     opacity: 0.7;
-    float : right;
+    float: right;
 }
 
 #volet_clos:target #volet {
@@ -364,7 +352,7 @@ nav.main-nav .nav-menu:active {
     transition: height 1.5s;
 }
 
-a.fermer{
+a.fermer {
     background: #3498db;
     background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
     background-image: -moz-linear-gradient(top, #3498db, #2980b9);
@@ -379,7 +367,7 @@ a.fermer{
     font-size: 20px;
     padding: 10px 20px 10px 20px;
     text-decoration: none;
-    float : right;
+    float: right;
 }
 
 a.fermer:hover {
@@ -392,8 +380,7 @@ a.fermer:hover {
     text-decoration: none;
 }
 
-
-/* -------------------------------- 
+/* --------------------------------
 
 xsigin/signup popup 
 

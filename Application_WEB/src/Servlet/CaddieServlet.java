@@ -4,13 +4,11 @@ package Servlet;/*
  * and open the template in the editor.
  */
 
-import Beans.ConnectionB;
-import Beans.ReservationB;
-import Enums.ConnectionResult;
-import Enums.ErrorField;
-import Enums.Form;
-import Tools.Bd;
-import Tools.BdType;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -19,13 +17,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import Beans.ConnectionB;
+import Beans.ReservationB;
+import Tools.Bd;
+import Tools.BdType;
 
 
 @WebServlet(name = "Servlet.CaddieServlet", value = "/Caddie")
@@ -36,7 +32,11 @@ public class CaddieServlet extends HttpServlet {
     private Bd Sgbd;
     private String numVol;
     private String username = "temp";
-    private String time ="";
+    private String time = "";
+
+    public static String getCurrentTimeStamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());//dd/MM/yyyy
+    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -47,22 +47,6 @@ public class CaddieServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        try {
-            //session = request.getSession();
-            request.setAttribute("Vols", Sgbd.Select("VolReservable"));
-
-        } catch (SQLException e) {
-            request.setAttribute("Exception", e);
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-            return;
-        }
-        request.getRequestDispatcher("/main.jsp").forward(request, response);
     }
 
     @Override
@@ -71,11 +55,11 @@ public class CaddieServlet extends HttpServlet {
         ConnectionB connectionB = new ConnectionB();
         String type = request.getParameter("type"); //signin or signup
 
-        if(type != null){
-            if(type.equals("add")){//Ajout d'un tuple dans la table reservation
+        if (type != null) {
+            if (type.equals("add")) {//Ajout d'un tuple dans la table reservation
                 //username = (String)session.getAttribute("user");
-                if(session.getAttribute("reservation") != null ){
-                    reservation = (ReservationB)session.getAttribute("reservation");
+                if (session.getAttribute("reservation") != null) {
+                    reservation = (ReservationB) session.getAttribute("reservation");
                 }
                 reservation.addReservation(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces")));
                 session.setAttribute("reservation", reservation);
@@ -92,35 +76,25 @@ public class CaddieServlet extends HttpServlet {
                 connectionB.setPlace(Form.SIGNIN);*/
 
             }
-            if(type.equals("remove")){
+            if (type.equals("remove")) {
 
             }
-            if(type.equals("get")){
+            if (type.equals("get")) {
                 ResultSet rs;
                 try {
                     //session = request.getSession();
                     request.setAttribute("Vols", Sgbd.Select("VolReservable"));
-                    rs = Sgbd.Select("VolReservable");
                 } catch (SQLException e) {
                     request.setAttribute("Exception", e);
                     request.getRequestDispatcher("/error.jsp").forward(request, response);
                     return;
                 }
                 request.getRequestDispatcher("/caddie.jsp").forward(request, response);
+                return;
             }
-
         }
-
-        doGet(request, response);
+        request.getRequestDispatcher("/").forward(request, response);
     }
-    public static String getCurrentTimeStamp() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//dd/MM/yyyy
-        Date now = new Date();
-        String strDate = sdfDate.format(now);
-        return strDate;
-    }
-
-
 }
 
 

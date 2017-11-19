@@ -1,10 +1,10 @@
+<%@ page import="Beans.ReservationB" %>
 <%@ page import="Enums.ConnectionResult" %>
 <%@ page import="Enums.ErrorField" %>
 <%@ page import="Enums.Form" %>
-<%@ page import="Beans.ReservationB" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
-    <a href="${pageContext.request.contextPath}/Main" class="title"><h1>Inpres Airport</h1></a>
+    <a href="${pageContext.request.contextPath}/" class="title"><h1>Inpres Airport</h1></a>
     <nav class="main-nav">
         <ul>
             <%
@@ -13,20 +13,20 @@
                 if (cr == null || cr == ConnectionResult.FAIL) {
                     out.println("<li><a class=\"cd-signin nav-menu\" href=\"#\">Sign in</a></li>");
                     out.println("<li><a class=\"cd-signup nav-menu\" href=\"#\">Sign up</a></li>");
-                    if(session.getAttribute("reservation") != null) {
+                    if (session.getAttribute("reservation") != null) {
                         tempreser = (ReservationB) session.getAttribute("reservation");
-                        out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"img/shopping-cart.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier : " + tempreser.getNbrReservation() + " tickets</a></li>");
+                        out.println("<li><a class=\"panier\" href=\"#volet\"><img id=\"panierimg\" src=\"" + request.getContextPath() + "/Include/Login/img/cd-icon-caddie.svg\" style=\"border: 0; float: left; margin-right: 15px\" />Mon panier : " + tempreser.getNbrReservation() + " tickets</a></li>");
                     }
                     //TODO Message d'erreur lorsque le login foire
-            /*if(type!=null && type.equals("fail")){
-                out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
-            }*/
+                    /*if(type!=null && type.equals("fail")){
+                        out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
+                    }*/
                 } else {
                     String user = (String) session.getAttribute("user");
-                    out.println("<li><p class=\"user\">Connect\u00e9 : " + user + " </p></li>");
+                    out.println("<li><p class=\"user nav-menu\">Connect\u00e9 : " + user + " </p></li>");
                     //request.setAttribute("type", "logout");
                     out.println("<li><form method=\"post\" action=\"Main\" id=\"DC\">");
-                    out.println("<a class=\"logout\" onClick=\"doPost(this)\" href='#'>Deconnexion</a>");
+                    out.println("<a class=\"logout nav-menu\" onClick=\"doPost(this)\" href='#'>Deconnexion</a>");
                     out.println("<input type='hidden' value='logout' name='type'/>");
                     out.println("</form></li>");
                 }
@@ -37,19 +37,33 @@
             <li><a class="cd-signup" href="#0">Sign up</a></li>
             </ul> -->
             <li id="caddie">
-                <a href="#" class="nav-menu cd-caddie"><img src="" alt="Caddie"/></a>
+                <a href="#" class="nav-menu cd-caddie">
+                    <img id="img-caddie" src="${pageContext.request.contextPath}/Include/Login/img/cd-icon-caddie.svg" alt="Caddie"/>
+                </a>
                 <div class="cd-caddie-menu">
-                    <table>
+                    <table class="cd-caddie-resume">
                         <thead>
-                            <tr><th>AA</th><th>BB</th></tr>
+                        <tr>
+                            <th>AA</th>
+                            <th>BB</th>
+                        </tr>
                         </thead>
                         <tfoot>
-                            <tr><th colspan="2"></th></tr>
+                        <tr>
+                            <th colspan="2">PIED DE PAGE</th>
+                        </tr>
                         </tfoot>
                         <tbody>
-                            <tr><td>Objet</td><td>Prix</td></tr>
+                        <tr>
+                            <td>Objet</td>
+                            <td>Prix</td>
+                        </tr>
                         </tbody>
                     </table>
+                    <form method="post" action="Caddie">
+                        <input type="hidden" name="type" value="get">
+                        <input class="buyBtn" type="submit" value="Details">
+                    </form>
                 </div>
             </li>
         </ul>
@@ -176,11 +190,11 @@ ${Result.place = null}
 <div id="volet_clos">
     <div id="volet">
         <h3>Liste de vos articles</h3>
-        <p>Article 1</p><br />
-        <p>Article 1</p><br />
-        <p>Article 1</p><br />
-        <p>Article 1</p><br />
-        <br />
+        <p>Article 1</p><br/>
+        <p>Article 1</p><br/>
+        <p>Article 1</p><br/>
+        <p>Article 1</p><br/>
+        <br/>
         <a href="#volet_clos" class="fermer">fermer !</a>
         <form method="post" action="Caddie">
             <input id="get" type="hidden" name="type" value="get">

@@ -8,8 +8,31 @@ jQuery(document).ready(function ($) {
         tabSignup = formModalTab.children('li').eq(1).children('a'),
         forgotPasswordLink = formLogin.find('.cd-form-bottom-message a'),
         backToLoginLink = formForgotPassword.find('.cd-form-bottom-message a'),
-        mainNav = $('.main-nav');
+        mainNav = $('.main-nav'),
+        nbPlace = $('.product .product-quantity').children(),
+        total = $('.product .product-line-price');
 
+    total.on('DOMSubtreeModified', function () {
+        var t = 0,
+            Sub = $('#cart-subtotal'),
+            Tax = $('#cart-tax'),
+            Ship = $('#cart-shipping'),
+            Tt = $('#cart-total');
+        for (var i = 0; i < total.length; i++)
+            t += parseFloat(total[i].innerText);
+        Sub.text(t.toFixed(2));
+        Tax.text((t * 0.05).toFixed(2));
+        Ship.text('42.00');
+        Tt.text((t + (t * 0.05)).toFixed(2));
+    });
+
+    nbPlace.change(function (e) {
+        var div = e.originalEvent.path[2],
+            prix = $(div).find('.product-price'),
+            total = $(div).find('.product-line-price'),
+            nb = $(div).find('.product-quantity').children();
+        total.text((parseFloat(prix.text()) * nb.val()).toFixed(2));
+    });
     //open modal
     mainNav.on('click', function (event) {
         $(event.target).is(mainNav) && mainNav.children('ul').toggleClass('is-visible');

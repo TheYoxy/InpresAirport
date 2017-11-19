@@ -295,14 +295,14 @@ div.ticket input {
 
 /* Apply clearfix in a few places */
 /* Apply dollar signs */
-.product .product-price:before, .product .product-line-price:before, .totals-value:before {
-    content: '$';
+.product .product-price:after, .product .product-line-price:after, .totals-value:after {
+    content: '€';
 }
 
 /* Body/Header stuff */
 body {
-    padding: 0px 30px 30px 20px;
-    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /*padding: 0px 30px 30px 20px;*/
+    /*font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, sans-serif;*/
     font-weight: 100;
 }
 
