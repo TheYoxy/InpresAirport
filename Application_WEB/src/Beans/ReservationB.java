@@ -4,18 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservationB implements Serializable{
+public class ReservationB implements Serializable {
 
     private String sessionId;
     private String numVol;
     private int nbrPlaces;
     private List<ReservationB> listReser;
 
-    public ReservationB(){
+    public ReservationB() {
         listReser = new ArrayList<>();
     }
 
-    public ReservationB(String id, String vol, int places){
+    public ReservationB(String id, String vol, int places) {
+        this();
         sessionId = id;
         numVol = vol;
         nbrPlaces = places;
@@ -29,23 +30,31 @@ public class ReservationB implements Serializable{
         numVol = num;
     }
 
-    public String getSessionId() { return sessionId; }
+    public String getSessionId() {
+        return sessionId;
+    }
 
-    public void setSessionId(String id) { sessionId = id; }
+    public void setSessionId(String id) {
+        sessionId = id;
+    }
 
-    public int getNbrPlaces() { return nbrPlaces;}
+    public int getNbrPlaces() {
+        return nbrPlaces;
+    }
 
-    public void setNbrPlaces(int nbr){ nbrPlaces = nbr;}
+    public void setNbrPlaces(int nbr) {
+        nbrPlaces = nbr;
+    }
 
-    public ReservationB getReservation(int position){
+    public ReservationB getReservation(int position) {
         return listReser.get(position);
     }
 
-    public String getNbrReservation(){
-        return Integer.toString(listReser.size());
+    public int getNbrReservation() {
+        return listReser.size();
     }
 
-    public void addReservation(String id, String vol, int places){
+    public void addReservation(String id, String vol, int places) {
         listReser.add(new ReservationB(id, vol, places));
     }
 }
