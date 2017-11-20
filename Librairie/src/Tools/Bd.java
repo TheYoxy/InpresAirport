@@ -1,13 +1,23 @@
 package Tools;
 
-import LUGAP.NetworkObject.Table;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
+import LUGAP.NetworkObject.Table;
 
 public class Bd {
 
@@ -71,6 +81,27 @@ public class Bd {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Fonction qui va prendre toutes les valeurs d'un noeud d'un résultset, et les mettre dans une liste
+     *
+     * @param rs Resultset à analyser
+     * @return null si le RésultSet est fermé<br/>
+     * List des valeurs du noeud sur lequel pointe le résultset
+     * @throws SQLException Toute exceptions pouvant être lancée
+     */
+    public static List ToList(ResultSet rs) throws SQLException {
+        List l = new LinkedList();
+        if (rs.isClosed())
+            return null;
+        else if (rs.isBeforeFirst())
+            rs.next();
+        else if (rs.isAfterLast())
+            return null;
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) l.add(rs.getObject(i));
+        return l;
     }
 
     /**
@@ -203,6 +234,12 @@ public class Bd {
         return s.executeQuery();
     }
 
+    public synchronized ResultSet SelectVolReservable(String numVol) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ?");
+        ps.setString(1, numVol);
+        return ps.executeQuery();
+    }
+
     /**
      * @param champ
      * @param value
@@ -269,9 +306,9 @@ public class Bd {
 
     public synchronized boolean InsertUser(String username, String password, String mail) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("insert into Users(Username, Password, Mail) values (?,?,?)");
-        ps.setString(1,username);
-        ps.setString(2,password);
-        ps.setString(3,mail);
+        ps.setString(1, username);
+        ps.setString(2, password);
+        ps.setString(3, mail);
         if (ps.execute()) {
             commit();
             return true;
@@ -279,15 +316,15 @@ public class Bd {
         return false;
     }
 
-    public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException{
+    public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("insert into reservation(Username, NumeroVol, nbPlaces, timeReservation) values (?,?,?,?)");
         Timestamp ts = Timestamp.valueOf(time);
 
-        ps.setString(1,username);
-        ps.setString(2,vol);
-        ps.setString(3,nbrPlaces);//a mettre en int !
-        ps.setString(4,time); //A mettre en time
-        if (ps.executeUpdate()!= 0) {
+        ps.setString(1, username);
+        ps.setString(2, vol);
+        ps.setString(3, nbrPlaces);//a mettre en int !
+        ps.setString(4, time); //A mettre en time
+        if (ps.executeUpdate() != 0) {
             commit();
             return true;
         }
