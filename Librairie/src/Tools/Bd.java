@@ -260,7 +260,7 @@ public class Bd {
     }
 
     public synchronized int AjoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("Update VolReservable set PlacesDisponible = PlacesDisponible + ? where NumeroVol like ");
+        PreparedStatement ps = Connection.prepareStatement("Update VolReservable set PlacesDisponible = PlacesDisponible + ? where NumeroVol like ?");
         ps.setInt(1, nbPlaces);
         ps.setString(2, numVol);
         return ps.executeUpdate();
@@ -365,8 +365,21 @@ public class Bd {
         ps.setString(2,username);
         ps.setString(3,vol);
         ps.setString(4,places);//a mettre en int !
-        if (ps.executeUpdate()!= 0) {
-            //commit();
+        if (ps.execute()) {
+            commit();
+            return true;
+        }
+        return false;
+    }
+
+    public synchronized  boolean InsertBillet(String numVol) throws SQLException{
+        int randomNum = 1 + (int)(Math.random() * 999);
+        String numbillet = numVol + "X" + Integer.toString(randomNum) ;
+        PreparedStatement ps = Connection.prepareStatement("insert into billets(NumeroBillet, NumeroVol) values (?,?)");
+        ps.setString(1,numbillet);
+        ps.setString(2, numVol);
+        if (ps.execute()) {
+            commit();
             return true;
         }
         return false;

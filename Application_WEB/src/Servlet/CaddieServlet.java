@@ -125,8 +125,10 @@ public class CaddieServlet extends HttpServlet {
                 try {
                     if (session.getAttribute("reservation") != null) {
                         LReservation = (List<ReservationB>) session.getAttribute("reservation");
-                        for (int i = 0; i < LReservation.size(); i++) {
-                            Sgbd.InsertAchat((String)session.getAttribute("user"), LReservation.get(i).getNumVol() , Integer.toString(LReservation.get(i).getNbrPlaces()) );
+                        for (ReservationB aLReservation : LReservation) {
+                            Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
+                            /***GENERATION DES BILLETS ****/
+                            Sgbd.InsertBillet(aLReservation.getNumVol());
                         }
                         LReservation = null;
                         session.setAttribute("payment", "success");

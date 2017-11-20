@@ -46,7 +46,7 @@
                     for (i = 0, rs.next(); i < reservation.size(); i++, rs.next()) {
                         out.println("<div class=\"product\">");
                         out.println("   <div class=\"product-image\">");
-                        out.println("       <img src=\"https://s.cdpn.io/3/dingo-dog-bones.jpg\">");
+                        out.println("       <img src=\"img/billet-avion.jpg\">");
                         out.println("   </div>");
                         out.println("   <div class=\"product-details\">");
                         out.println("       <div class=\"product-title\">Vol numero " + reservation.get(i).getNumVol() + " | " + rs.getString("Lieu") + "</div>");
@@ -103,7 +103,7 @@
         else{
             out.println("<form method=\"post\" action=\"Caddie\">");
             out.println("<input type='hidden' value=\"payment\" name='type'/>");
-            out.println("<button class=\"checkout\">Payement</button>");
+            out.println("<button class=\"checkout\">Paiement</button>");
             out.println("</form>");
         }
     %>
