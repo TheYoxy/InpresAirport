@@ -63,7 +63,6 @@ public class CaddieServlet extends HttpServlet {
 //                if (numVol == null)
                 //TODO REDIRECT
                 // /Ajout d'un tuple dans la table reservation
-                //username = (String)session.getAttribute("user");
                 if (session.getAttribute("reservation") != null)
                     LReservation = (List<ReservationB>) session.getAttribute("reservation");
                 else
@@ -105,23 +104,35 @@ public class CaddieServlet extends HttpServlet {
 
             }
             if (type.equals("remove")) {
-
+                numVol = request.getParameter("vol");
+                if (session.getAttribute("reservation") != null){
+                    LReservation = (List<ReservationB>) session.getAttribute("reservation");
+                    for(int i=0; i<LReservation.size() ; i++){
+                        if(LReservation.get(i).getNumVol().equals(numVol))
+                            LReservation.remove(i);
+                    }
+                }
+                getVols(request,response);
+                request.getRequestDispatcher("/caddie.jsp").forward(request, response);
             }
             if (type.equals("get")) {
-                ResultSet rs;
-                try {
-                    //session = request.getSession();
-                    request.setAttribute("Vols", Sgbd.Select("VolReservable"));
-                } catch (SQLException e) {
-                    request.setAttribute("Exception", e);
-                    request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    return;
-                }
+
+                getVols(request,response);
                 request.getRequestDispatcher("/caddie.jsp").forward(request, response);
                 return;
             }
         }
         request.getRequestDispatcher("/").forward(request, response);
+    }
+
+    public void getVols(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
+
+        try {
+            request.setAttribute("Vols", Sgbd.Select("VolReservable"));
+        } catch (SQLException e) {
+            request.setAttribute("Exception", e);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        }
     }
 }
 

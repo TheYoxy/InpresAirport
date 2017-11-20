@@ -36,7 +36,7 @@
                         out.println("<input class=\"buyBtn\" type=\"submit\" value=\"Ajouter au panier\">");
                         //<img src="Include/Login/img/add.png"  />
                         out.println("</form>");
-                        out.println("    </div>");
+                        out.println("</div>");
                         out.println("</a>");
                     }
                 }
