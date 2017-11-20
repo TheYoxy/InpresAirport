@@ -29,11 +29,10 @@ import Tools.BdType;
 @WebServlet(name = "Servlet.CaddieServlet", value = "/Caddie")
 
 public class CaddieServlet extends HttpServlet {
-    private List<ReservationB> LReservation;
-    private String User = "admin";
+    private List<ReservationB> LReservation= null;
     private Bd Sgbd;
     private String numVol;
-    private String username = "temp";
+    private int nbrPlaces;
     private String time = "";
 
     public static String getCurrentTimeStamp() {
@@ -120,6 +119,24 @@ public class CaddieServlet extends HttpServlet {
                 getVols(request,response);
                 request.getRequestDispatcher("/caddie.jsp").forward(request, response);
                 return;
+            }
+
+            if(type.equals("payment")) {
+                try {
+                    if (session.getAttribute("reservation") != null) {
+                        LReservation = (List<ReservationB>) session.getAttribute("reservation");
+                        for (int i = 0; i < LReservation.size(); i++) {
+                            Sgbd.InsertAchat((String)session.getAttribute("user"), LReservation.get(i).getNumVol() , Integer.toString(LReservation.get(i).getNbrPlaces()) );
+                        }
+                        LReservation = null;
+                        session.setAttribute("payment", "success");
+                    }
+                }catch(SQLException e){
+                    request.setAttribute("Exception", e);
+                    request.getRequestDispatcher("/error.jsp").forward(request, response);
+                }
+                session.setAttribute("reservation", LReservation);
+                request.getRequestDispatcher("/caddie.jsp").forward(request, response);
             }
         }
         request.getRequestDispatcher("/").forward(request, response);

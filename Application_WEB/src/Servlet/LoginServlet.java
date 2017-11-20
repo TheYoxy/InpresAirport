@@ -43,9 +43,9 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(User.equals("admin")) {
+        if(User == null) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", User);
+            session.setAttribute("connected", "no");
         }
         try {
             request.setAttribute("Vols", Sgbd.Select("VolReservable"));
@@ -88,6 +88,7 @@ public class LoginServlet extends HttpServlet {
                                 break;
                         }
                         connectionB.setPlace(Form.LOGIN);
+                        session.setAttribute("connected", "yes");
                     }
                         break;
                     case "signup":
@@ -97,6 +98,7 @@ public class LoginServlet extends HttpServlet {
                         } else
                             connectionB.setResult(ConnectionResult.FAIL);
                         connectionB.setPlace(Form.SIGNIN);
+                        session.setAttribute("connected", "yes");
                         break;
                 }
             } catch (SQLException e) {

@@ -97,7 +97,7 @@
 
 
     <%
-        if(session.getAttribute("user").equals("admin")) {
+        if(session.getAttribute("connected").equals("no")) {
             out.println("<button class=\"checkout\" onclick = \"alert('Veuillez vous identifier'); \">Payement</button>");
         }
         else{
