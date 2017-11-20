@@ -32,6 +32,11 @@
         recalculateCart();
     </script>
     <%
+        if(session.getAttribute("payment") != null && session.getAttribute("payment").equals("success")){
+           out.println(" <script type=\"text/javascript\">");
+           out.println("alert(\"Payement effectue avec succes !\");");
+            out.println("</script>");
+        }
         ResultSet rs = (ResultSet) request.getAttribute("Vols");
         if (session.getAttribute("reservation") != null) {
             List<ReservationB> reservation = (List<ReservationB>) session.getAttribute("reservation");
@@ -90,7 +95,18 @@
         </div>
     </div>
 
-    <button class="checkout">Payement</button>
+
+    <%
+        if(session.getAttribute("user").equals("admin")) {
+            out.println("<button class=\"checkout\" onclick = \"alert('Veuillez vous identifier'); \">Payement</button>");
+        }
+        else{
+            out.println("<form method=\"post\" action=\"Caddie\">");
+            out.println("<input type='hidden' value=\"payment\" name='type'/>");
+            out.println("<button class=\"checkout\">Payement</button>");
+            out.println("</form>");
+        }
+    %>
 
 </div>
 </body>

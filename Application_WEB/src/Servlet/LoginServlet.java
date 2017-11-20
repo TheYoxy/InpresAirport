@@ -43,6 +43,10 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if(User.equals("admin")) {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", User);
+        }
         try {
             request.setAttribute("Vols", Sgbd.Select("VolReservable"));
         } catch (SQLException e) {

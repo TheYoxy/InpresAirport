@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Vector;
 
 public class Bd {
@@ -289,6 +290,21 @@ public class Bd {
         ps.setString(4,time); //A mettre en time
         if (ps.executeUpdate()!= 0) {
             commit();
+            return true;
+        }
+        return false;
+    }
+
+    public synchronized boolean InsertAchat(String username, String vol, String places) throws SQLException{
+        int randomNum = 1 + (int)(Math.random() * 999999);
+
+        PreparedStatement ps = Connection.prepareStatement("insert into acheter(id,Username, NumeroVol, nbPlaces) values (?,?,?,?)");
+        ps.setString(1, Integer.toString(randomNum));
+        ps.setString(2,username);
+        ps.setString(3,vol);
+        ps.setString(4,places);//a mettre en int !
+        if (ps.executeUpdate()!= 0) {
+            //commit();
             return true;
         }
         return false;
