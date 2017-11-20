@@ -59,10 +59,20 @@ public class CaddieServlet extends HttpServlet {
 
         if (type != null) {
             if (type.equals("add")) {//Ajout d'un tuple dans la table reservation
-                //username = (String)session.getAttribute("user");
+                int tempPlaces;
+                boolean exist = false;
                 if (session.getAttribute("reservation") != null)
                     LReservation = (List<ReservationB>) session.getAttribute("reservation");
-                LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
+
+                for(int i=0; i<LReservation.size() ; i++) {
+                    if (LReservation.get(i).getNumVol().equals(request.getParameter("numVol"))){
+                        tempPlaces = LReservation.get(i).getNbrPlaces();
+                        LReservation.get(i).setNbrPlaces(tempPlaces + Integer.parseInt(request.getParameter("nbrPlaces")));
+                        exist = true;
+                    }
+                }
+                if(!exist)
+                    LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
                 session.setAttribute("reservation", LReservation);
                 /*try {;
                     if (Sgbd.InsertReservation(username, numVol, qt, getCurrentTimeStamp() )) {
@@ -77,23 +87,35 @@ public class CaddieServlet extends HttpServlet {
 
             }
             if (type.equals("remove")) {
-
+                numVol = request.getParameter("vol");
+                if (session.getAttribute("reservation") != null){
+                    LReservation = (List<ReservationB>) session.getAttribute("reservation");
+                    for(int i=0; i<LReservation.size() ; i++){
+                        if(LReservation.get(i).getNumVol().equals(numVol))
+                            LReservation.remove(i);
+                    }
+                }
+                getVols(request,response);
+                request.getRequestDispatcher("/caddie.jsp").forward(request, response);
             }
             if (type.equals("get")) {
-                ResultSet rs;
-                try {
-                    //session = request.getSession();
-                    request.setAttribute("Vols", Sgbd.Select("VolReservable"));
-                } catch (SQLException e) {
-                    request.setAttribute("Exception", e);
-                    request.getRequestDispatcher("/error.jsp").forward(request, response);
-                    return;
-                }
+
+                getVols(request,response);
                 request.getRequestDispatcher("/caddie.jsp").forward(request, response);
                 return;
             }
         }
         request.getRequestDispatcher("/").forward(request, response);
+    }
+
+    public void getVols(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException{
+
+        try {
+            request.setAttribute("Vols", Sgbd.Select("VolReservable"));
+        } catch (SQLException e) {
+            request.setAttribute("Exception", e);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        }
     }
 }
 

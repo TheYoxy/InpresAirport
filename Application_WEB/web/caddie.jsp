@@ -28,7 +28,9 @@
         <label class="product-removal">Rerirer</label>
         <label class="product-line-price">Total</label>
     </div>
-
+    <script>
+        recalculateCart();
+    </script>
     <%
         ResultSet rs = (ResultSet) request.getAttribute("Vols");
         if (session.getAttribute("reservation") != null) {
@@ -47,10 +49,14 @@
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\">");
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" >");
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
-                        out.println("       <button class=\"remove-product\">Remove</button>");
+                        out.println("       <form method=\"post\" action=\"Caddie\">");
+                        out.println("       <input type='hidden' value='"+reservation.get(i).getNumVol()+"' name=\"vol\"/>");
+                        out.println("       <input type='hidden' value=\"remove\" name='type'/>");
+                        out.println("       <input class=\"remove-product\" type=\"submit\" value=\"Remove\" onclick=\"removeItem(this)\">");
+                        out.println("       </form>");
                         out.println("   </div>");
                         out.println("   <div class=\"product-line-price\">" + (rs.getDouble("Prix") * reservation.get(i).getNbrPlaces()) + "</div>");
                         out.println("</div>");
@@ -67,24 +73,24 @@
 
     <div class="totals">
         <div class="totals-item">
-            <label>Subtotal</label>
-            <div class="totals-value" id="cart-subtotal">71.97</div>
+            <label>Sous-total</label>
+            <div class="totals-value" id="cart-subtotal">0.0</div>
         </div>
         <div class="totals-item">
-            <label>Tax (5%)</label>
-            <div class="totals-value" id="cart-tax">3.60</div>
+            <label>TVA (21%)</label>
+            <div class="totals-value" id="cart-tax">0.0</div>
         </div>
         <div class="totals-item">
             <label>Shipping</label>
-            <div class="totals-value" id="cart-shipping">15.00</div>
+            <div class="totals-value" id="cart-shipping">0.0</div>
         </div>
         <div class="totals-item totals-item-total">
-            <label>Grand Total</label>
-            <div class="totals-value" id="cart-total">90.57</div>
+            <label>Total</label>
+            <div class="totals-value" id="cart-total">0.0</div>
         </div>
     </div>
 
-    <button class="checkout">Checkout</button>
+    <button class="checkout">Payement</button>
 
 </div>
 </body>
