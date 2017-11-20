@@ -7,7 +7,7 @@
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"/>
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <%@ include file="Include/Login/Head.jsp" %>
-    <%@include file="Include/Login/Script.jsp" %>
+    <%@ include file="Include/Login/Script.jsp" %>
     <script src="js/caddie.js"></script>
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <meta charset="UTF-16BE">
@@ -54,7 +54,7 @@
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" >");
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" max='\" + rs.getInt(\"PlacesDisponible\") + \"'>");
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <form method=\"post\" action=\"Caddie\">");

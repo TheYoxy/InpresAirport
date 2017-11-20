@@ -35,7 +35,7 @@ VALUES ('1', 40, TRUE, '1'),
   ('11', 10.10, TRUE, '7'),
   ('12', 3.59, TRUE, '6');
 
-INSERT INTO VolReservable VALUES ('1', 'Paris', current_date, 502.45, 'Vol en amoureux pour visiter Paris', 100);
+INSERT INTO VolReservable VALUES ('1', 'Paris', current_date, 502.45, 'Vol en amoureux pour visiter Paris', 1);
 INSERT INTO VolReservable VALUES ('2', 'Liège', current_date, 40.52, 'Voyage direct vers le carré de Liège', 100);
 INSERT INTO VolReservable VALUES ('3', 'Londres', current_date, 69.42, 'Insert a French description here', 100);
 COMMIT;

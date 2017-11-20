@@ -27,7 +27,7 @@ import Tools.BdType;
 @WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 
 public class LoginServlet extends HttpServlet {
-    private String User = "admin";
+    private String User = null;
     private Bd Sgbd;
 
     @Override
@@ -59,11 +59,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("Post");
         HttpSession session = request.getSession();
-        String email;
-        String pass;
-        String username;
         String type = request.getParameter("type"); //signin or signup
         ConnectionB connectionB = new ConnectionB();
         if (type != null) {
@@ -72,9 +68,9 @@ public class LoginServlet extends HttpServlet {
                 doGet(request, response);
                 return;
             }
-            username = request.getParameter("username");
-            pass = request.getParameter("pass");
-            email = request.getParameter("mail");
+            String email= request.getParameter("mail");
+            String pass = request.getParameter("pass");
+            String username = request.getParameter("username");
             try {
                 switch (type) {
                     case "signin":
