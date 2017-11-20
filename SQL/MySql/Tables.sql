@@ -56,7 +56,7 @@ CREATE TABLE VolReservable (
   Date             DATE,
   Prix             DECIMAL(15, 2),
   Description      VARCHAR(1000),
-  PlacesDisponible INTEGER
+  PlacesDisponible INTEGER CHECK (PlacesDisponible >= 0)
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Users;

@@ -30,6 +30,7 @@ public class Bd {
      */
     public Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
+        this.Connection.setAutoCommit(false);
     }
 
     /**
@@ -238,6 +239,30 @@ public class Bd {
         PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ?");
         ps.setString(1, numVol);
         return ps.executeQuery();
+    }
+
+    public synchronized ResultSet SelectVolReservableNbPlaces(String numVol, int nbPlaces) throws SQLException {
+        //Il est directement incrémenté
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ? AND PlacesDisponible >= ? for UPDATE");
+        ps.setString(1, numVol);
+        ps.setInt(2, nbPlaces);
+        ResultSet rs = ps.executeQuery();
+        if (rs != null) SuppPlacesReservables(numVol, nbPlaces);
+        return rs;
+    }
+
+    public synchronized int SuppPlacesReservables(String numVol, int nbPlaces) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE VolReservable set PlacesDisponible = PlacesDisponible - ? where NumeroVol like ?");
+        ps.setInt(1, nbPlaces);
+        ps.setString(2, numVol);
+        return ps.executeUpdate();
+    }
+
+    public synchronized int AjoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("Update VolReservable set PlacesDisponible = PlacesDisponible + ? where NumeroVol like ");
+        ps.setInt(1, nbPlaces);
+        ps.setString(2, numVol);
+        return ps.executeUpdate();
     }
 
     /**

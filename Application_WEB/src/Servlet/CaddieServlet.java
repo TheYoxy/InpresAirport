@@ -56,21 +56,40 @@ public class CaddieServlet extends HttpServlet {
         HttpSession session = request.getSession();
         ConnectionB connectionB = new ConnectionB();
         String type = request.getParameter("type"); //signin or signup
-
         if (type != null) {
             if (type.equals("add")) {
+                String numVol = request.getParameter("numVol");
+                int nbPlaces = Integer.parseInt(request.getParameter("nbrPlaces"));
+//                if (numVol == null)
+                //TODO REDIRECT
                 // /Ajout d'un tuple dans la table reservation
                 //username = (String)session.getAttribute("user");
                 if (session.getAttribute("reservation") != null)
                     LReservation = (List<ReservationB>) session.getAttribute("reservation");
+                else
+                    LReservation = new LinkedList<>();
+
                 boolean found = false;
                 for (ReservationB rb : LReservation)
-                    if (rb.getNumVol().equals(request.getParameter("numVol"))) {
+                    if (rb.getNumVol().equals(numVol)) {
                         found = true;
-                        rb.setNbrPlaces(rb.getNbrPlaces() + Integer.parseInt(request.getParameter("nbrPlaces")));
+                        rb.setNbrPlaces(rb.getNbrPlaces() + nbPlaces);
                     }
+
                 if (!found)
-                    LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
+                    try {
+                        ResultSet rs = Sgbd.SelectVolReservableNbPlaces(numVol, nbPlaces);
+                        if (rs != null)
+                            LReservation.add(new ReservationB(numVol, nbPlaces, Bd.ToList(rs)));
+                        else {
+                            //TODO Info que le nombre de vol sélectionné est supérieur au nombre restant de tickets
+                            return;
+                        }
+                    } catch (SQLException e) {
+                        request.setAttribute("Exception", e);
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
+                        return;
+                    }
                 session.setAttribute("reservation", LReservation);
 
                 /*try {;

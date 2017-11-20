@@ -7,7 +7,7 @@
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"/>
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <%@ include file="Include/Login/Head.jsp" %>
-    <%@include file="Include/Login/Script.jsp" %>
+    <%@ include file="Include/Login/Script.jsp" %>
     <script src="js/caddie.js"></script>
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <meta charset="UTF-16BE">
@@ -47,7 +47,7 @@
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\">");
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" max='" + rs.getInt("PlacesDisponible") + "'>");
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <button class=\"remove-product\">Remove</button>");
@@ -83,7 +83,6 @@
             <div class="totals-value" id="cart-total">90.57</div>
         </div>
     </div>
-
     <button class="checkout">Checkout</button>
 
 </div>

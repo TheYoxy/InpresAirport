@@ -1,21 +1,30 @@
 package Beans;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ReservationB implements Serializable {
 
-    private String SessionId = "";
     private String NumVol = "";
     private int NbrPlaces = 0;
+    private List InfosVol = new LinkedList<>();
 
     public ReservationB() {
     }
 
-    public ReservationB(String id, String vol, int places) {
-        this();
-        SessionId = id;
-        NumVol = vol;
-        NbrPlaces = places;
+    public ReservationB(String numVol, int nbrPlaces, List infosVol) {
+        NumVol = numVol;
+        NbrPlaces = nbrPlaces;
+        InfosVol = infosVol;
+    }
+
+    public List getInfosVol() {
+        return InfosVol;
+    }
+
+    public void setInfosVol(List infosVol) {
+        InfosVol = infosVol;
     }
 
     public String getNumVol() {
@@ -24,14 +33,6 @@ public class ReservationB implements Serializable {
 
     public void setNumVol(String num) {
         NumVol = num;
-    }
-
-    public String getSessionId() {
-        return SessionId;
-    }
-
-    public void setSessionId(String id) {
-        SessionId = id;
     }
 
     public int getNbrPlaces() {

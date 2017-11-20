@@ -10,9 +10,9 @@
     <nav class="main-nav">
         <ul>
             <%
-                ConnectionResult cr = Result.getResult();
-                ReservationB tempreser;
-                if (cr == null || cr == ConnectionResult.FAIL) {
+                String user = (String) session.getAttribute("user");
+                //TODO Fix si tu reviens d'une autre page => Forcément nouvel utilisateur
+                if (user == null) {
                     out.println("<li><a class=\"cd-signin nav-menu\" href=\"#\">Connexion</a></li>");
                     out.println("<li><a class=\"cd-signup nav-menu\" href=\"#\">Nouveau compte</a></li>");
 //                    if (session.getAttribute("reservation") != null) {
@@ -24,10 +24,7 @@
                         out.println("<h1 style = \" text-align : center\">Correspondance mot de passe / email incorrect </h1>");
                     }*/
                 } else {
-                    String user = (String) session.getAttribute("user");
                     out.println("<li><p class=\"user nav-menu\">Connect\u00e9 : " + user + " </p></li>");
-                    //request.setAttribute("type", "logout");
-
                     out.println("<li><form method=\"post\" action=\"Main\" id=\"DC\">");
                     out.println("<button class=\"logout nav-menu\" type='submit'>Deconnexion</button>");
                     out.println("<input type='hidden' value='logout' name='type'/>");
@@ -65,19 +62,14 @@
                             <tbody>
                             <%
                                 List<ReservationB> lb = (List<ReservationB>) session.getAttribute("reservation");
-                                System.out.println("lb = " + lb);
                                 if (lb != null)
                                     for (ReservationB rb : lb) {
                                         out.println("<tr>");
-                                        out.println("   <td>" + rb.getNumVol() + "</td>");
+                                        out.println("   <td>" + rb.getNumVol() + "   (<span class='b'>" + rb.getInfosVol().get(1) + "</span>)</td>");
                                         out.println("   <td>" + rb.getNbrPlaces() + "</td>");
                                         out.println("</tr>");
                                     }
                             %>
-                            <%--<tr>--%>
-                            <%--<td>Objet</td>--%>
-                            <%--<td>Prix</td>--%>
-                            <%--</tr>--%>
                             </tbody>
                         </table>
                     </form>
