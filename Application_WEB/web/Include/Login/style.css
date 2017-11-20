@@ -284,6 +284,11 @@ header[role=banner]::after {
         transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
     }
 
+    .cd-caddie-menu .buyBtn{
+        width:130px;
+        position: relative;
+    }
+
     .cd-caddie-menu::before {
         content: '';
         position: absolute;
