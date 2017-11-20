@@ -15,6 +15,7 @@ import Tools.BdType;
 @WebListener("/")
 public class SessionListener implements HttpSessionListener {
     private Bd Sgbd = null;
+
     // Public constructor is required by servlet spec
     public SessionListener() {
         try {
@@ -30,6 +31,7 @@ public class SessionListener implements HttpSessionListener {
     @Override
     public void sessionCreated(HttpSessionEvent se) {
       /* Session is created. */
+        se.getSession().setMaxInactiveInterval(30 * 60);
     }
 
     @Override
@@ -39,7 +41,7 @@ public class SessionListener implements HttpSessionListener {
         HttpSession s = se.getSession();
         List<ReservationB> list = (List<ReservationB>) s.getAttribute("reservation");
         if (list != null)
-            for(ReservationB rb : list)
+            for (ReservationB rb : list)
                 try {
                     Sgbd.AjoutPlacesLibres((String) rb.getInfosVol().get(0), rb.getNbrPlaces());
                 } catch (SQLException e) {
