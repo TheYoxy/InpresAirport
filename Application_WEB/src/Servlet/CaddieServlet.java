@@ -58,12 +58,21 @@ public class CaddieServlet extends HttpServlet {
         String type = request.getParameter("type"); //signin or signup
 
         if (type != null) {
-            if (type.equals("add")) {//Ajout d'un tuple dans la table reservation
+            if (type.equals("add")) {
+                // /Ajout d'un tuple dans la table reservation
                 //username = (String)session.getAttribute("user");
                 if (session.getAttribute("reservation") != null)
                     LReservation = (List<ReservationB>) session.getAttribute("reservation");
-                LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
+                boolean found = false;
+                for (ReservationB rb : LReservation)
+                    if (rb.getNumVol().equals(request.getParameter("numVol"))) {
+                        found = true;
+                        rb.setNbrPlaces(rb.getNbrPlaces() + Integer.parseInt(request.getParameter("nbrPlaces")));
+                    }
+                if (!found)
+                    LReservation.add(new ReservationB(session.getId(), request.getParameter("numVol"), Integer.parseInt(request.getParameter("nbrPlaces"))));
                 session.setAttribute("reservation", LReservation);
+
                 /*try {;
                     if (Sgbd.InsertReservation(username, numVol, qt, getCurrentTimeStamp() )) {
                         connectionB.setResult(ConnectionResult.SUCCES);

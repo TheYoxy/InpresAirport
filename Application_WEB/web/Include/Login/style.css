@@ -194,8 +194,8 @@ header[role=banner]::after {
     .main-nav li {
         display: inline;
         /*margin-left: -5px;*/
-        width: 90px;
-        height: 90px;
+        /*width: 90px;*/
+        height: 100%;
     }
 
     .main-nav #img-caddie {
@@ -211,8 +211,8 @@ header[role=banner]::after {
         background: transparent;
         transition: background .5s;
         padding: .6em 1em;
-        height: 90px;
-        width: 90px;
+        /*height: 90px;*/
+        /*width: 90px;*/
         /*border: 1px solid rgba(255, 0, 0, 0.6);*/
         /*border-radius: 0;*/
     }
@@ -235,13 +235,15 @@ header[role=banner]::after {
         display: inline-block;
         cursor: pointer;
         position: relative;
+        height: 100%;
+        width: 90px;
     }
 
     #caddie .cd-caddie {
         z-index: 2;
         position: inherit;
-        -webkit-transition: -webkit-transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
-        transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+        -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
         padding: 0;
     }
 
@@ -277,11 +279,11 @@ header[role=banner]::after {
         width: 0;
         height: 0;
 
-        -webkit-transform: translate3d(0, -100px, 0);
-        transform: translate3d(0, -100px, 0);
+        -webkit-transform: translate3d(100px, 0, 0);
+        transform: translate3d(100px, 0, 0);
 
-        -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
-        transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        -webkit-transition: -webkit-transform 0.45s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+        transition: transform 0.45s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
     }
 
     .cd-caddie-menu::before {
@@ -307,8 +309,8 @@ header[role=banner]::after {
 
     .cd-caddie-menu tr {
         opacity: 0;
-        -webkit-transform: translate3d(0, 100px, 0);
-        transform: translate3d(0, 100px, 0);
+        -webkit-transform: translate3d(100px, 0, 0);
+        transform: translate3d(100px, 0, 0);
 
         -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
         transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.2, 1, 0.3, 1);
@@ -328,6 +330,26 @@ header[role=banner]::after {
     .cd-caddie-menu tr th:nth-child(2),
     .cd-caddie-menu tr td:nth-child(2) {
         text-align: right;
+    }
+
+    .cd-caddie-menu tr {
+        transition: transform 1s;
+    }
+
+    .cd-caddie-menu tr:nth-child(1) {
+        transition: transform 0.6s;
+    }
+
+    .cd-caddie-menu tr:nth-child(2) {
+        transition: transform 0.70s;
+    }
+
+    .cd-caddie-menu tr:nth-child(3) {
+        transition: transform 0.8s;
+    }
+
+    .cd-caddie-menu tr:nth-child(4) {
+        transition: transform 0.9s;
     }
 
     .cd-caddie-resume {
