@@ -31,13 +31,7 @@
     <script>
         recalculateCart();
     </script>
-    <%
-        if(session.getAttribute("payment") != null && session.getAttribute("payment").equals("success")){
-           out.println(" <script type=\"text/javascript\">");
-           out.println("alert(\"Payement effectue avec succes !\");");
-            out.println("</script>");
-        }
-        ResultSet rs = (ResultSet) request.getAttribute("Vols");
+    <% ResultSet rs = (ResultSet) request.getAttribute("Vols");
         if (session.getAttribute("reservation") != null) {
             List<ReservationB> reservation = (List<ReservationB>) session.getAttribute("reservation");
             if (reservation.size() != 0) {
@@ -58,7 +52,7 @@
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <form method=\"post\" action=\"Caddie\">");
-                        out.println("       <input type='hidden' value='"+reservation.get(i).getNumVol()+"' name=\"vol\"/>");
+                        out.println("       <input type='hidden' value='" + reservation.get(i).getNumVol() + "' name=\"vol\"/>");
                         out.println("       <input type='hidden' value=\"remove\" name='type'/>");
                         out.println("       <input class=\"remove-product\" type=\"submit\" value=\"Remove\" onclick=\"removeItem(this)\">");
                         out.println("       </form>");
@@ -97,10 +91,9 @@
 
 
     <%
-        if(session.getAttribute("connected").equals("no")) {
+        if (session.getAttribute("connected").equals("no")) {
             out.println("<button class=\"checkout\" onclick = \"alert('Veuillez vous identifier'); \">Payement</button>");
-        }
-        else{
+        } else {
             out.println("<form method=\"post\" action=\"Caddie\">");
             out.println("<input type='hidden' value=\"payment\" name='type'/>");
             out.println("<button class=\"checkout\">Paiement</button>");

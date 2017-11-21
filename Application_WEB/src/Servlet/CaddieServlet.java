@@ -129,8 +129,6 @@ public class CaddieServlet extends HttpServlet {
             }
             //Todo fix de l'origine
             response.sendRedirect(request.getHeader("referer"));
-//            request.getRequestDispatcher().forward(request,response);
-            //request.getRequestDispatcher("/caddie.jsp").forward(request, response);
             return;
         }
         response.sendRedirect("/");

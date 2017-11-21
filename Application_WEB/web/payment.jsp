@@ -18,7 +18,7 @@
 
 <body>
 <%@include file="Include/Login/LoginHeader.jsp" %>
-
+<p>Votre payement à bien été effectué</p>
 
 </body>
 </html>
