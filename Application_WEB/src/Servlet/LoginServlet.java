@@ -111,7 +111,8 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("Result", connectionB);
             session.setAttribute("user", User);
             session.setAttribute("mail", request.getParameter("mail"));
-            doGet(request, response);
+//            doGet(request, response);
+            response.sendRedirect(request.getHeader("referer"));
         }
     }
 
