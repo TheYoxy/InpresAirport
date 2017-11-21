@@ -40,6 +40,12 @@ public class CaddieServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        getVols(request, response);
+        request.getRequestDispatcher("/caddie.jsp").forward(request, response);
+    }
+
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         ConnectionB connectionB = new ConnectionB();
@@ -49,8 +55,11 @@ public class CaddieServlet extends HttpServlet {
                 case "add":
                     String numVol = request.getParameter("numVol");
                     int nbPlaces = Integer.parseInt(request.getParameter("nbrPlaces"));
-                    //TODO REDIRECT
-                    // /Ajout d'un tuple dans la table reservation
+                    if (nbPlaces <= 0) {
+                        request.setAttribute("From", "CaddieServlet.doPost 2");
+                        request.setAttribute("Exception", new Exception("Veuillez sélectionner un nombre de places strictement positif"));
+                        request.getRequestDispatcher("/error.jsp").forward(request, response);
+                    }
                     if (session.getAttribute("reservation") != null)
                         LReservation = (List<ReservationB>) session.getAttribute("reservation");
                     else
@@ -70,9 +79,12 @@ public class CaddieServlet extends HttpServlet {
                                 LReservation.add(new ReservationB(numVol, nbPlaces, Bd.ToList(rs)));
                             else {
                                 //TODO Info que le nombre de vol sélectionné est supérieur au nombre restant de tickets
+                                request.setAttribute("From", "CaddieServlet.doPost 2");
+                                request.setAttribute("Exception", new Exception("Le nombre de tickets disponibles est inférieur au nombre de tickets demandés."));
+                                request.getRequestDispatcher("/error.jsp").forward(request, response);
                                 return;
                             }
-                       } catch (SQLException e) {
+                        } catch (SQLException e) {
                             request.setAttribute("From", "CaddieServlet.doPost 1");
                             request.setAttribute("Exception", e);
                             request.getRequestDispatcher("/error.jsp").forward(request, response);
@@ -92,8 +104,7 @@ public class CaddieServlet extends HttpServlet {
                     getVols(request, response);
                     break;
                 case "get":
-                    getVols(request, response);
-                    response.sendRedirect("/caddie.jsp");
+                    doGet(request,response);
                     return;
                 case "payment":
                     try {
@@ -122,7 +133,7 @@ public class CaddieServlet extends HttpServlet {
             //request.getRequestDispatcher("/caddie.jsp").forward(request, response);
             return;
         }
-        response.sendRedirect("/index.jsp");
+        response.sendRedirect("/");
     }
 
     public void getVols(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
