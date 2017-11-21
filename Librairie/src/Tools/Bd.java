@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Vector;
 
 import LUGAP.NetworkObject.Table;
@@ -343,7 +342,7 @@ public class Bd {
     }
 
     public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("insert into reservation(Username, NumeroVol, nbPlaces, timeReservation) values (?,?,?,?)");
+        PreparedStatement ps = Connection.prepareStatement("insert into Reservation(Username, NumeroVol, nbPlaces, timeReservation) values (?,?,?,?)");
         Timestamp ts = Timestamp.valueOf(time);
 
         ps.setString(1, username);
@@ -360,7 +359,7 @@ public class Bd {
     public synchronized boolean InsertAchat(String username, String vol, String places) throws SQLException{
         int randomNum = 1 + (int)(Math.random() * 999999);
 
-        PreparedStatement ps = Connection.prepareStatement("insert into acheter(id,Username, NumeroVol, nbPlaces) values (?,?,?,?)");
+        PreparedStatement ps = Connection.prepareStatement("insert into Acheter(id,Username, NumeroVol, nbPlaces) values (?,?,?,?)");
         ps.setString(1, Integer.toString(randomNum));
         ps.setString(2,username);
         ps.setString(3,vol);
@@ -375,7 +374,8 @@ public class Bd {
     public synchronized  boolean InsertBillet(String numVol) throws SQLException{
         int randomNum = 1 + (int)(Math.random() * 999);
         String numbillet = numVol + "X" + Integer.toString(randomNum) ;
-        PreparedStatement ps = Connection.prepareStatement("insert into billets(NumeroBillet, NumeroVol) values (?,?)");
+        //TODO Fix du numéro
+        PreparedStatement ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol) values (?,?)");
         ps.setString(1,numbillet);
         ps.setString(2, numVol);
         if (ps.execute()) {
