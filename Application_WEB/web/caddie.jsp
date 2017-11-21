@@ -11,10 +11,13 @@
     <script src="js/caddie.js"></script>
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
     <meta charset="UTF-16BE">
+    <script>
+        recalculateCart();
+    </script>
 </head>
 
 
-<body>
+<body onload='recalculateCart();'>
 <%@include file="Include/Login/LoginHeader.jsp" %>
 <h1>Vos billets </h1>
 
@@ -28,9 +31,7 @@
         <label class="product-removal">Rerirer</label>
         <label class="product-line-price">Total</label>
     </div>
-    <script>
-        recalculateCart();
-    </script>
+
     <% ResultSet rs = (ResultSet) request.getAttribute("Vols");
         if (session.getAttribute("reservation") != null) {
             List<ReservationB> reservation = (List<ReservationB>) session.getAttribute("reservation");
@@ -48,7 +49,7 @@
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" max='\" + rs.getInt(\"PlacesDisponible\") + \"'>");
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" max='\" + rs.getInt(\"PlacesDisponible\") + \"'readonly>");
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <form method=\"post\" action=\"Caddie\">");
@@ -60,6 +61,9 @@
                         out.println("   <div class=\"product-line-price\">" + (rs.getDouble("Prix") * reservation.get(i).getNbrPlaces()) + "</div>");
                         out.println("</div>");
                     }
+                    out.println("<script> ");
+                    out.println("recalculateCart();");
+                    out.println("</script>");
                 } catch (SQLException e) {
 
                 }

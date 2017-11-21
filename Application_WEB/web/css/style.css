@@ -211,6 +211,26 @@ div.ticket input {
     bottom: 15px;
 }
 
+div.ticket .buyBtn{
+    width:130px;
+}
+
+div.ticket .buyBtn{
+    position: relative;
+    background-color: #343642;
+    color: white;
+    border: solid 1px #292a34;
+    transition: background-color .5s;
+    border-radius: 1em;
+    width: 30%;
+    margin-left: 6%;
+    margin-top : 2%;
+}
+
+div.ticket .buyBtn:hover{
+    background-color: #2f889a;
+}
+
 @media only screen and (max-width: 768px) {
     h1 {
         font-size: 36px;
