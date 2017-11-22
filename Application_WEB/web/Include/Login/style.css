@@ -379,7 +379,8 @@ header[role=banner]::after {
         -webkit-transition-duration: 1.1s;
         transition-duration: 1.1s;
     }
-    .cd-caddie-menu tfoot th{
+
+    .cd-caddie-menu tfoot th {
         padding: 1em;
     }
 
@@ -390,6 +391,16 @@ header[role=banner]::after {
 
     .logout {
         border: none;
+    }
+
+    .tablepayement,
+    .tablepayement tr {
+        width: 100%;
+        text-align: center;
+    }
+
+    .tablepayement tr td:nth-child(1) {
+        border-right: solid .5px;
     }
 }
 
