@@ -27,8 +27,18 @@ import Tools.BdType;
 @WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 
 public class LoginServlet extends HttpServlet {
-    private String User = null;
     private Bd Sgbd;
+    private String User = null;
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        try {
+            Sgbd.Close(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -43,7 +53,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(User == null) {
+        if (User == null) {
             HttpSession session = request.getSession();
             session.setAttribute("connected", "no");
         }
@@ -68,13 +78,12 @@ public class LoginServlet extends HttpServlet {
                 doGet(request, response);
                 return;
             }
-            String email= request.getParameter("mail");
+            String email = request.getParameter("mail");
             String pass = request.getParameter("pass");
             String username = request.getParameter("username");
             try {
                 switch (type) {
-                    case "signin":
-                    {
+                    case "signin": {
                         int retour;
                         connectionB.setResult((retour = checkUser(email, pass)) == 0 ? ConnectionResult.SUCCES : ConnectionResult.FAIL);
                         switch (retour) {
@@ -90,7 +99,7 @@ public class LoginServlet extends HttpServlet {
                         connectionB.setPlace(Form.LOGIN);
                         session.setAttribute("connected", "yes");
                     }
-                        break;
+                    break;
                     case "signup":
                         if (Sgbd.InsertUser(username, pass, email)) {
                             connectionB.setResult(ConnectionResult.SUCCES);

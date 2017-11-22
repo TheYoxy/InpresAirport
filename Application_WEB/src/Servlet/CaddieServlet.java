@@ -9,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -31,12 +33,30 @@ import Tools.BdType;
 public class CaddieServlet extends HttpServlet {
     private List<ReservationB> LReservation = null;
     private Bd Sgbd;
-    private int nbrPlaces;
-    private String numVol;
-    private String time = "";
 
     public static String getCurrentTimeStamp() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());//dd/MM/yyyy
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        try {
+            Sgbd.Close(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        LReservation = new LinkedList<>();
+        try {
+            Sgbd = new Bd(BdType.MySql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -44,6 +64,7 @@ public class CaddieServlet extends HttpServlet {
         getVols(request, response);
         request.getRequestDispatcher("/caddie.jsp").forward(request, response);
     }
+
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -104,18 +125,23 @@ public class CaddieServlet extends HttpServlet {
                     getVols(request, response);
                     break;
                 case "get":
-                    doGet(request,response);
+                    doGet(request, response);
                     return;
                 case "payment":
                     try {
                         if (session.getAttribute("reservation") != null) {
+                            Map<Integer,List<String>> map = new HashMap<>();
                             LReservation = (List<ReservationB>) session.getAttribute("reservation");
                             for (ReservationB aLReservation : LReservation) {
-                                Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
+                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
                                 /* **GENERATION DES BILLETS ****/
-                                Sgbd.InsertBillet(aLReservation.getNumVol());
+                                List<String> l = new LinkedList<>();
+                                for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
+                                    l.add(Sgbd.InsertBillet(aLReservation.getNumVol()));
+                                map.put(id,l);
                             }
                             LReservation = null;
+                            session.setAttribute("Payement",map);
                             session.setAttribute("reservation", null);
                             response.sendRedirect("/payment.jsp");
                             return;
@@ -143,16 +169,7 @@ public class CaddieServlet extends HttpServlet {
         }
     }
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LReservation = new LinkedList<>();
-        try {
-            Sgbd = new Bd(BdType.MySql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 }
 
 
