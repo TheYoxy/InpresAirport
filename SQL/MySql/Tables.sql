@@ -18,7 +18,8 @@ CREATE TABLE Vols (
 DROP TABLE IF EXISTS Billets;
 CREATE TABLE Billets (
   NumeroBillet VARCHAR(40) PRIMARY KEY,
-  NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vols (NumeroVol)
+  NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vols (NumeroVol),
+  idFacture    INTEGER     NOT NULL REFERENCES Acheter (id)
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Bagages;

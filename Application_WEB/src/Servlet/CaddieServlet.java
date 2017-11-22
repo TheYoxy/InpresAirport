@@ -145,7 +145,7 @@ public class CaddieServlet extends HttpServlet {
                                 /* **GENERATION DES BILLETS ****/
                                 List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
-                                    l.add(Sgbd.InsertBillet(aLReservation.getNumVol()));
+                                    l.add(Sgbd.InsertBillet(aLReservation.getNumVol(),id));
                                 map.put(id, l);
                             }
                             LReservation = null;

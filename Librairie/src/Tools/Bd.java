@@ -253,7 +253,7 @@ public class Bd {
         }
     }
 
-    public synchronized String InsertBillet(String numVol) throws SQLException {
+    public synchronized String InsertBillet(String numVol,int idFacture) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("select NumeroBillet from Billets WHERE NumeroVol LIKE ?");
         ps.setString(1, numVol);
         ResultSet r = ps.executeQuery();
@@ -265,9 +265,10 @@ public class Bd {
         String numbillet = (l.size() != 0 ?
                 String.format("%06d", Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
                 : "000001-" + numVol);
-        ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol) values (?,?)");
+        ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol,idFacture) values (?,?,?)");
         ps.setString(1, numbillet);
         ps.setString(2, numVol);
+        ps.setInt(3,idFacture);
         return ps.executeUpdate() != 0 ? numbillet : null;
     }
 
