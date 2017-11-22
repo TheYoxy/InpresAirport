@@ -49,7 +49,9 @@
                         out.println("       </div>");
                         out.println("   <div class=\"product-price\">" + rs.getDouble("Prix") + "</div>");
                         out.println("   <div class=\"product-quantity\">");
-                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" onclick=\"updateQuantity(this)\" max='\" + rs.getInt(\"PlacesDisponible\") + \"'readonly>");
+                        //out.println("Nombre de billets : " + reservation.get(i).getNbrPlaces());
+                        out.println("       <input type=\"number\" value=\"" + reservation.get(i).getNbrPlaces() + "\" min=\"1\" max='\" + rs.getInt(\"PlacesDisponible\") + \"'readonly>");
+                        // onclick="updateQuantity(this)"
                         out.println("   </div>");
                         out.println("   <div class=\"product-removal\">");
                         out.println("       <form method=\"post\" action=\"Caddie\">");
