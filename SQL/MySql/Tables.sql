@@ -82,6 +82,7 @@ CREATE TABLE Acheter (
   id        INTEGER PRIMARY KEY AUTO_INCREMENT,
   Username  VARCHAR(20) REFERENCES Users (Username),
   NumeroVol VARCHAR(15) REFERENCES Vols (NumeroVol),
-  nbPlaces  INTEGER NOT NULL
+  nbPlaces  INTEGER NOT NULL,
+  prix      DOUBLE  NOT NULL
 )
   ENGINE = INNODB;

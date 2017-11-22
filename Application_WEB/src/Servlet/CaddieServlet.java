@@ -137,11 +137,11 @@ public class CaddieServlet extends HttpServlet {
                     return;
                 case "payment":
                     try {
-                        if (session.getAttribute("reservation") != null) {
+                        if (session.getAttribute("reservation") != null && request.getParameter("prix") != null) {
                             Map<Integer, List<String>> map = new HashMap<>();
                             LReservation = (List<ReservationB>) session.getAttribute("reservation");
                             for (ReservationB aLReservation : LReservation) {
-                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
+                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()), Double.parseDouble(request.getParameter("prix")));
                                 /* **GENERATION DES BILLETS ****/
                                 List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)

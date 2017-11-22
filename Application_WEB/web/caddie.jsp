@@ -100,6 +100,7 @@
         } else {
             out.println("<form method=\"post\" action=\"Caddie\">");
             out.println("<input type='hidden' value=\"payment\" name='type'/>");
+            out.println("<input id='prix' type='hidden' value='' name='prix'/>");
             out.println("<button class=\"checkout\">Paiement</button>");
             out.println("</form>");
         }

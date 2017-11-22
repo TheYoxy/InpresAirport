@@ -237,11 +237,12 @@ public class Bd {
         Connection.close();
     }
 
-    public synchronized int InsertAchat(String username, String vol, String places) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("insert into Acheter(Username, NumeroVol, nbPlaces) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+    public synchronized int InsertAchat(String username, String vol, String places, double prix) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("insert into Acheter(Username, NumeroVol, nbPlaces,prix) values (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, username);
         ps.setString(2, vol);
         ps.setInt(3, Integer.parseInt(places));//a mettre en int !
+        ps.setDouble(4, prix);
         int i = ps.executeUpdate();
         if (i == 0)
             return 0;
