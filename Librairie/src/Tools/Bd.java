@@ -262,7 +262,7 @@ public class Bd {
         l.sort(Comparator.naturalOrder());
 
         String numbillet = (l.size() != 0 ?
-                String.format("%06d",Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
+                String.format("%06d", Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
                 : "000001-" + numVol);
         ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol) values (?,?)");
         ps.setString(1, numbillet);
@@ -322,12 +322,16 @@ public class Bd {
 
     public synchronized ResultSet SelectVolReservableNbPlaces(String numVol, int nbPlaces) throws SQLException {
         //Il est directement incrémenté
-        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ? AND PlacesDisponible >= ? for UPDATE");
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ? AND PlacesDisponible >= ?");
         ps.setString(1, numVol);
         ps.setInt(2, nbPlaces);
         ResultSet rs = ps.executeQuery();
-        if (rs != null) SuppPlacesReservables(numVol, nbPlaces);
-        return rs;
+        if (rs.next()) {
+            SuppPlacesReservables(numVol, nbPlaces);
+            rs.beforeFirst();
+            return rs;
+        }
+        return null;
     }
 
     public synchronized int SuppPlacesReservables(String numVol, int nbPlaces) throws SQLException {
