@@ -138,8 +138,10 @@ public class CaddieServlet extends HttpServlet {
                                 List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
                                     l.add(Sgbd.InsertBillet(aLReservation.getNumVol()));
+                                map.put(id,l);
                             }
                             LReservation = null;
+                            session.setAttribute("Payement",map);
                             session.setAttribute("reservation", null);
                             response.sendRedirect("/payment.jsp");
                             return;

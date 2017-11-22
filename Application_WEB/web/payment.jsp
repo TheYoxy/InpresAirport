@@ -1,3 +1,4 @@
+<%@ page import="java.util.Map" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -14,6 +15,32 @@
 <body>
 <%@include file="Include/Login/LoginHeader.jsp" %>
 <p>Votre payement à bien été effectué</p>
-
+<h2>Information à propos de votre commande:</h2>
+<table class="tablepayement">
+    <thead>
+    <tr>
+        <th>Numéro du vol</th>
+        <th>Numéro du billet</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        Map<Integer, List<String>> map = (Map<Integer, List<String>>) session.getAttribute("Payement");
+        if (map != null) {
+            for (Map.Entry<Integer, List<String>> e : map.entrySet()) {
+                out.println("<tr><td>");
+                out.println(e.getKey());
+                out.println("</td>");
+                if (e.getValue().size() != 0)
+                    out.println(e.getValue().get(0));
+                out.println("</tr>");
+                for (String s : e.getValue()) {
+                    out.println("<tr><td/><td>" + s + "</td></tr>");
+                }
+            }
+        }
+    %>
+    </tbody>
+</table>
 </body>
 </html>
