@@ -79,7 +79,7 @@ CREATE TABLE Reservation (
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Acheter;
 CREATE TABLE Acheter (
-  id        VARCHAR(20) PRIMARY KEY,
+  id        INTEGER PRIMARY KEY AUTO_INCREMENT,
   Username  VARCHAR(20) REFERENCES Users (Username),
   NumeroVol VARCHAR(15) REFERENCES Vols (NumeroVol),
   nbPlaces  INTEGER NOT NULL

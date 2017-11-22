@@ -9,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -128,12 +130,14 @@ public class CaddieServlet extends HttpServlet {
                 case "payment":
                     try {
                         if (session.getAttribute("reservation") != null) {
+                            Map<Integer,List<String>> map = new HashMap<>();
                             LReservation = (List<ReservationB>) session.getAttribute("reservation");
                             for (ReservationB aLReservation : LReservation) {
-                                Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
+                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
                                 /* **GENERATION DES BILLETS ****/
+                                List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
-                                    Sgbd.InsertBillet(aLReservation.getNumVol());
+                                    l.add(Sgbd.InsertBillet(aLReservation.getNumVol()));
                             }
                             LReservation = null;
                             session.setAttribute("reservation", null);
