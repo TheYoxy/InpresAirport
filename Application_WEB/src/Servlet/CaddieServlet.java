@@ -106,7 +106,7 @@ public class CaddieServlet extends HttpServlet {
                                 return;
                             }
                         } catch (SQLException e) {
-                            request.setAttribute("From", "CaddieServlet.doPost 1");
+                            request.setAttribute("From", "CaddieServlet.doPost");
                             request.setAttribute("Exception", e);
                             request.getRequestDispatcher("/error.jsp").forward(request, response);
                             return;
@@ -129,8 +129,16 @@ public class CaddieServlet extends HttpServlet {
                     if (session.getAttribute("reservation") != null) {
                         LReservation = (List<ReservationB>) session.getAttribute("reservation");
                         for (int i = 0; i < LReservation.size(); i++)
-                            if (LReservation.get(i).getNumVol().equals(numVol))
+                            if (LReservation.get(i).getNumVol().equals(numVol)) {
+                                try {
+                                    Sgbd.AjoutPlacesLibres((String) LReservation.get(i).getInfosVol().get(0), LReservation.get(i).getNbrPlaces());
+                                } catch (SQLException e) {
+                                    request.setAttribute("From", "CaddieServlet.doPost");
+                                    request.setAttribute("Exception", e);
+                                    request.getRequestDispatcher("/error.jsp").forward(request, response);
+                                }
                                 LReservation.remove(i);
+                            }
                     }
                     getVols(request, response);
                     break;
@@ -139,19 +147,19 @@ public class CaddieServlet extends HttpServlet {
                     return;
                 case "payment":
                     try {
-                        if (session.getAttribute("reservation") != null) {
-                            Map<Integer,List<String>> map = new HashMap<>();
+                        if (session.getAttribute("reservation") != null && request.getParameter("prix") != null) {
+                            Map<Integer, List<String>> map = new HashMap<>();
                             LReservation = (List<ReservationB>) session.getAttribute("reservation");
                             for (ReservationB aLReservation : LReservation) {
-                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
+                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()), Double.parseDouble(request.getParameter("prix")));
                                 /* **GENERATION DES BILLETS ****/
                                 List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
                                     l.add(Sgbd.InsertBillet(aLReservation.getNumVol()));
-                                map.put(id,l);
+                                map.put(id, l);
                             }
                             LReservation = null;
-                            session.setAttribute("Payement",map);
+                            session.setAttribute("Payement", map);
                             session.setAttribute("reservation", null);
                             response.sendRedirect("/payment.jsp");
                             return;

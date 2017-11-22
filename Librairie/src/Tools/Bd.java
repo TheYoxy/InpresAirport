@@ -237,11 +237,12 @@ public class Bd {
         Connection.close();
     }
 
-    public synchronized int InsertAchat(String username, String vol, String places) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("insert into Acheter(Username, NumeroVol, nbPlaces) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+    public synchronized int InsertAchat(String username, String vol, String places, double prix) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("insert into Acheter(Username, NumeroVol, nbPlaces,prix) values (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, username);
         ps.setString(2, vol);
         ps.setInt(3, Integer.parseInt(places));//a mettre en int !
+        ps.setDouble(4, prix);
         int i = ps.executeUpdate();
         if (i == 0)
             return 0;
@@ -262,7 +263,7 @@ public class Bd {
         l.sort(Comparator.naturalOrder());
 
         String numbillet = (l.size() != 0 ?
-                String.format("%06d",Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
+                String.format("%06d", Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
                 : "000001-" + numVol);
         ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol) values (?,?)");
         ps.setString(1, numbillet);
@@ -322,12 +323,16 @@ public class Bd {
 
     public synchronized ResultSet SelectVolReservableNbPlaces(String numVol, int nbPlaces) throws SQLException {
         //Il est directement incrémenté
-        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ? AND PlacesDisponible >= ? for UPDATE");
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ? AND PlacesDisponible >= ?");
         ps.setString(1, numVol);
         ps.setInt(2, nbPlaces);
         ResultSet rs = ps.executeQuery();
-        if (rs != null) SuppPlacesReservables(numVol, nbPlaces);
-        return rs;
+        if (rs.next()) {
+            SuppPlacesReservables(numVol, nbPlaces);
+            rs.beforeFirst();
+            return rs;
+        }
+        return null;
     }
 
     public synchronized int SuppPlacesReservables(String numVol, int nbPlaces) throws SQLException {
