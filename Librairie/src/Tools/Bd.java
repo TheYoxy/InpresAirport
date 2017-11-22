@@ -30,7 +30,6 @@ public class Bd {
      */
     public Bd(BdType type) throws IOException, SQLException {
         this.Connection = createConnection(type);
-        this.Connection.setAutoCommit(false);
     }
 
     /**
@@ -363,12 +362,9 @@ public class Bd {
         ps.setString(1, Integer.toString(randomNum));
         ps.setString(2,username);
         ps.setString(3,vol);
-        ps.setString(4,places);//a mettre en int !
-        if (ps.execute()) {
-            commit();
-            return true;
-        }
-        return false;
+        ps.setInt(4, Integer.parseInt(places));//a mettre en int !
+        int i = ps.executeUpdate();
+        return  i != 0;
     }
 
     public synchronized  boolean InsertBillet(String numVol) throws SQLException{
@@ -378,11 +374,7 @@ public class Bd {
         PreparedStatement ps = Connection.prepareStatement("insert into Billets(NumeroBillet, NumeroVol) values (?,?)");
         ps.setString(1,numbillet);
         ps.setString(2, numVol);
-        if (ps.execute()) {
-            commit();
-            return true;
-        }
-        return false;
+        return ps.executeUpdate() != 0;
     }
 
     public Connection getConnection() {

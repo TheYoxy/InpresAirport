@@ -31,12 +31,30 @@ import Tools.BdType;
 public class CaddieServlet extends HttpServlet {
     private List<ReservationB> LReservation = null;
     private Bd Sgbd;
-    private int nbrPlaces;
-    private String numVol;
-    private String time = "";
 
     public static String getCurrentTimeStamp() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());//dd/MM/yyyy
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        try {
+            Sgbd.Close(true);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        LReservation = new LinkedList<>();
+        try {
+            Sgbd = new Bd(BdType.MySql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -44,6 +62,7 @@ public class CaddieServlet extends HttpServlet {
         getVols(request, response);
         request.getRequestDispatcher("/caddie.jsp").forward(request, response);
     }
+
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -104,7 +123,7 @@ public class CaddieServlet extends HttpServlet {
                     getVols(request, response);
                     break;
                 case "get":
-                    doGet(request,response);
+                    doGet(request, response);
                     return;
                 case "payment":
                     try {
@@ -113,7 +132,8 @@ public class CaddieServlet extends HttpServlet {
                             for (ReservationB aLReservation : LReservation) {
                                 Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()));
                                 /* **GENERATION DES BILLETS ****/
-                                Sgbd.InsertBillet(aLReservation.getNumVol());
+                                for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
+                                    Sgbd.InsertBillet(aLReservation.getNumVol());
                             }
                             LReservation = null;
                             session.setAttribute("reservation", null);
@@ -143,16 +163,7 @@ public class CaddieServlet extends HttpServlet {
         }
     }
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        LReservation = new LinkedList<>();
-        try {
-            Sgbd = new Bd(BdType.MySql);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+
 }
 
 
