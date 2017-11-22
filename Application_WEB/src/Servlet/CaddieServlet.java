@@ -113,6 +113,16 @@ public class CaddieServlet extends HttpServlet {
                         }
                     session.setAttribute("reservation", LReservation);
 
+                    /*try {
+                        if (Sgbd.InsertReservation(username, numVol, qt, time)) {
+                            connectionB.setResult(ConnectionResult.SUCCES);
+                            User = username;
+                        } else
+                            connectionB.setResult(ConnectionResult.FAIL);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }*/
+
                     break;
                 case "remove":
                     numVol = request.getParameter("vol");
