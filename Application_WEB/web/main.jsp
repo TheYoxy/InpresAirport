@@ -31,7 +31,7 @@
                         if (arg != null) out.println("        <p>" + arg + "</p>");
                         out.println("<form method=\"post\" action=\"Caddie\">");
                         out.println("<input id=\"numVol\" type=\"hidden\" name=\"numVol\" value=\""+ rs.getString("NumeroVol")+"\">\n");
-                        out.println("<input id=\"nbrPlaces\" type=\"text\" name=\"nbrPlaces\" value=\"1\">\n");
+                        out.println("<input id=\"nbrPlaces\" type=\"number\" name=\"nbrPlaces\" style=\"width:50px;\" value=\"1\">\n ");
                         out.println("<input id=\"type\" type=\"hidden\" name=\"type\" value=\"add\">\n");
                         out.println("<input class=\"buyBtn\" type=\"submit\" value=\"Ajouter au panier\">");
                         //<img src="Include/Login/img/add.png"  />
