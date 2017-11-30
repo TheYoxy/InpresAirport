@@ -15,6 +15,7 @@
  */
 package Frame;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,6 +32,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
@@ -44,8 +46,8 @@ import Tools.PropertiesReader;
 import Tools.TextAreaOutputStream;
 
 public class Main extends javax.swing.JFrame {
-    private final static int PORT_JOUR = new Random().nextInt(65535 - 1024) + 1024;
     private final static int PORT_CHAT = Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT"));
+    private final static int PORT_JOUR = /*new Random().nextInt(65535 - 1024) + 1024*/ PORT_CHAT;
     private InetAddress group;
     private Bd mysql;
     private Thread Ecoute;
@@ -132,20 +134,35 @@ public class Main extends javax.swing.JFrame {
                 }
             }
         });
+        Chat.setName("Thread d'écoute des messages envoyés");
         Chat.start();
 
         Ecoute = new Thread(() -> {
-            ServerSocket ss;
-            try {
+            ServerSocket ss = null;
+            try{
                 ss = new ServerSocket(PORT_CHAT);
-                while (!Ecoute.isInterrupted()) {
+            } catch (IOException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Impossible de bind le serveur de réception.\nFin de l'application", "Erreur", JOptionPane.ERROR_MESSAGE);
+                System.exit(-1);
+            }
+
+
+            while (!Ecoute.isInterrupted()) {
+                try
+                {
                     Socket s = ss.accept();
+                    System.out.println("Connexion de " + s.getLocalSocketAddress().toString().substring(1));
                     ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
                     TypeRequeteIACOP type = (TypeRequeteIACOP) ois.readObject();
                     ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
                     if (type == TypeRequeteIACOP.LOGIN_GROUP) {
-                        byte[] nb = new SecureRandom().generateSeed(10);
-                        oos.write(nb);
+                        Integer seedSize = 10;
+                        byte[] nb = new SecureRandom().generateSeed(seedSize);
+                        System.out.println("seedSize = " + seedSize);
+                        oos.writeObject(seedSize);
+                        System.out.println("Arrays.toString(nb) = " + Arrays.toString(nb));
+                        s.getOutputStream().write(nb);
                         Object o = ois.readObject();
                         if (o instanceof Login) {
                             Login l = (Login) o;
@@ -154,18 +171,18 @@ public class Main extends javax.swing.JFrame {
                                 if (rs.next()) {
                                     byte[] pass = DigestCalculator.hashPassword(rs.getString(1), nb);
                                     if (MessageDigest.isEqual(l.getPassword(), pass)){
-                                        oos.writeInt(PORT_JOUR);
+                                        oos.writeObject(PORT_JOUR);
                                         oos.writeObject(group);
                                         String user = rs.getString(2);
                                     }
                                     else
-                                        oos.writeInt(-1);
+                                        oos.writeObject(-1);
                                 } else {
-                                    oos.writeInt(-1);
+                                    oos.writeObject(-1);
                                 }
                             } catch (SQLException e) {
                                 e.printStackTrace(System.out);
-                                oos.writeInt(-1);
+                                oos.writeObject(-1);
                             }
                         }
                         else if (o instanceof String) {
@@ -173,26 +190,30 @@ public class Main extends javax.swing.JFrame {
                             try {
                                 ResultSet rs = mysql.SelectUserBillet(billet);
                                 if(rs.next()) {
-                                    oos.writeInt(PORT_JOUR);
+                                    oos.writeObject(PORT_JOUR);
                                     oos.writeObject(group);
                                     String user = rs.getString(1);
                                 }
                                 else
-                                    oos.writeInt(-1);
+                                    oos.writeObject(-1);
                             } catch (SQLException e) {
                                 e.printStackTrace(System.out);
-                                oos.writeInt(-1);
+                                oos.writeObject(-1);
                             }
                         }
                         else
-                            oos.writeInt(-1);
+                            oos.writeObject(-1);
                     } else
-                        oos.writeInt(-1);
+                        oos.writeObject(-1);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (ClassNotFoundException e1) {
+                    e1.printStackTrace();
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
             }
+
         });
+        Ecoute.setName("Thread d'écoute TCP");
         Ecoute.start();
     }
 

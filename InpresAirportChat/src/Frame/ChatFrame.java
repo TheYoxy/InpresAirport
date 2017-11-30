@@ -1,33 +1,30 @@
-/*
- * Copyright 2017 floryan.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package Frame;
 
-/**
- *
- * @author floryan
- */
+import java.net.InetAddress;
+
 public class ChatFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form ChatFrame
      */
+    private LoginFram lf;
+    private int UdpPort;
+    private InetAddress group;
+    private Thread Chat;
     public ChatFrame() {
         initComponents();
+        lf = new LoginFram(this,true);
     }
 
+    public void Login() {
+        lf.setVisible(true);
+        UdpPort = lf.getPort();
+        group = lf.getInetAddress();
+
+        Chat = new Thread(() -> {});
+        Chat.setName("Thread de gestion des message venant du serveur");
+        Chat.start();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -50,6 +47,7 @@ public class ChatFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1280, 720));
 
+        msgTa.setEditable(false);
         msgTa.setColumns(20);
         msgTa.setRows(5);
         jScrollPane1.setViewportView(msgTa);
@@ -111,15 +109,21 @@ public class ChatFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void sendMessage()
+    {
+        
+    }
+
     private void msgTfKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msgTfKeyTyped
         // TODO add your handling code here:
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-
+        if (evt.getKeyChar() == '\n') {
+            sendMessage();
         }
     }//GEN-LAST:event_msgTfKeyTyped
 
     private void envoyerBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoyerBActionPerformed
         // TODO add your handling code here:
+        sendMessage();
     }//GEN-LAST:event_envoyerBActionPerformed
 
     /**
