@@ -1,6 +1,6 @@
 package Application_Bagages;
 
-import LUGAP.NetworkObject.Table;
+import NetworkObject.Table;
 import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;

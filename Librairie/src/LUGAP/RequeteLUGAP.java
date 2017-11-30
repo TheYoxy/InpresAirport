@@ -1,18 +1,9 @@
 package LUGAP;
 
-import LUGAP.NetworkObject.Login;
-import LUGAP.NetworkObject.Table;
-import ServeurClientLog.Interfaces.Requete;
-import Tools.Bd;
-import Tools.BdType;
-import Tools.VolField;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -21,26 +12,19 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
+import NetworkObject.Login;
+import NetworkObject.Table;
+import ServeurClientLog.Interfaces.Requete;
+import Tools.Bd;
+import Tools.BdType;
+import Tools.DigestCalculator;
+import Tools.VolField;
+
 public class RequeteLUGAP implements Requete {
     private static final ThreadLocal<Integer> CHALLENGE = ThreadLocal.withInitial(() -> 0);
     private static final ThreadLocal<Boolean> LOG_STATUS = ThreadLocal.withInitial(() -> false);
     private static final ThreadLocal<Bd> BD_THREAD_LOCAL = ThreadLocal.withInitial(() -> null);
     private static final ThreadLocal<ResultSet> RESULT_SET_UPDATE = ThreadLocal.withInitial(() -> null);
-    private static MessageDigest Md;
-
-    static {
-        //addProvider en local, car on travaille sur différentes machines
-        Security.addProvider(new BouncyCastleProvider());
-        try {
-            Md = MessageDigest.getInstance("SHA-1", "BC");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace(System.out);
-            System.exit(-1);
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace(System.out);
-            System.exit(-1);
-        }
-    }
 
     private TypeRequeteLUGAP Type = null;
     private Serializable Param = null;
@@ -63,14 +47,6 @@ public class RequeteLUGAP implements Requete {
     public RequeteLUGAP(TypeRequeteLUGAP type, Serializable param, String from) {
         this(type, from);
         Param = param;
-    }
-
-    public static byte[] hashPassword(String password, int challenge) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
-        dos.writeUTF(password);
-        dos.writeInt(challenge);
-        return Md.digest(baos.toByteArray());
     }
 
     public Serializable getParam() {
@@ -121,7 +97,7 @@ public class RequeteLUGAP implements Requete {
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {
                                 byte envoye[] = ((Login) Param).getPassword();
-                                byte pass[] = hashPassword(rs.getString(password), CHALLENGE.get());
+                                byte pass[] = DigestCalculator.hashPassword(rs.getString(password), CHALLENGE.get());
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
 
                                 System.out.println("-------------------------------------------------------------------");
@@ -237,10 +213,7 @@ public class RequeteLUGAP implements Requete {
                         RESULT_SET_UPDATE.set(null);
                         BD_THREAD_LOCAL.get().commit();
                         rep = new ReponseLUGAP(TypeReponseLUGAP.OK);
-                    } catch (SQLException e) {
-                        e.printStackTrace(System.out);
-                        rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
-                    } catch (UpdateException e) {
+                    } catch (SQLException | UpdateException e) {
                         e.printStackTrace(System.out);
                         rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }

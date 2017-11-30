@@ -4,6 +4,7 @@ import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;
 import LUGAP.TypeRequeteLUGAP;
+import Tools.DigestCalculator;
 import Tools.Procedural;
 
 import javax.swing.*;
@@ -200,7 +201,7 @@ public class Login extends javax.swing.JDialog {
         System.out.println("Challenge: " + challenge);
         //Login
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, new LUGAP.NetworkObject.Login(LoginTF.getText(), RequeteLUGAP.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, new NetworkObject.Login(LoginTF.getText(), DigestCalculator.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();

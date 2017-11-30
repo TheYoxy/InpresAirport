@@ -1,4 +1,4 @@
-package LUGAP.NetworkObject;
+package NetworkObject;
 
 import java.util.Vector;
 

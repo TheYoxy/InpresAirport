@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS Billets;
 CREATE TABLE Billets (
   NumeroBillet VARCHAR(40) PRIMARY KEY,
   NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vols (NumeroVol),
-  idFacture    INTEGER     NOT NULL REFERENCES Acheter (id)
+  idFacture    INTEGER     NOT NULL REFERENCES Facture (idFacture)
 )
   ENGINE = INNODB;
 DROP TABLE IF EXISTS Bagages;
@@ -78,9 +78,9 @@ CREATE TABLE Reservation (
   PRIMARY KEY (Username, NumeroVol, timeReservation)
 )
   ENGINE = INNODB;
-DROP TABLE IF EXISTS Acheter;
-CREATE TABLE Acheter (
-  id        INTEGER PRIMARY KEY AUTO_INCREMENT,
+DROP TABLE IF EXISTS Facture;
+CREATE TABLE Facture (
+  idFacture INTEGER PRIMARY KEY AUTO_INCREMENT,
   Username  VARCHAR(20) REFERENCES Users (Username),
   NumeroVol VARCHAR(15) REFERENCES Vols (NumeroVol),
   nbPlaces  INTEGER NOT NULL,

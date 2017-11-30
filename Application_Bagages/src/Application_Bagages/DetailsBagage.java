@@ -15,7 +15,7 @@
  */
 package Application_Bagages;
 
-import LUGAP.NetworkObject.Bagage;
+import NetworkObject.Bagage;
 
 public class DetailsBagage extends javax.swing.JDialog {
 

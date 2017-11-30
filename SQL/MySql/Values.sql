@@ -6,12 +6,12 @@ DELETE FROM Bagages;
 DELETE FROM VolReservable;
 DELETE FROM Users;
 DELETE FROM Reservation;
-DELETE FROM Acheter;
+DELETE FROM Facture;
 -- Delete les valeurs existante et remet des valeurs 'bidon'
 INSERT INTO Login VALUES ('floryan', '1234'), ('nico', '1234');
 INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar', 'Floryan', 'Bagagiste', 'floryan');
-INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date + 1, 42);
-INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date + 1, current_date + 2, 42);
+INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date, 42);
+INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date, current_date, 42);
 INSERT INTO Vols VALUES ('3', 'Londres', current_date - 1, current_date, current_date, 43);
 # INSERT INTO Billets VALUES ('1', '1');
 # INSERT INTO Billets VALUES ('2', '1');
@@ -38,4 +38,7 @@ VALUES ('1', 40, TRUE, '1'),
 INSERT INTO VolReservable VALUES ('1', 'Paris', current_date, 502.45, 'Vol en amoureux pour visiter Paris', 1);
 INSERT INTO VolReservable VALUES ('2', 'Liège', current_date, 40.52, 'Voyage direct vers le carré de Liège', 100);
 INSERT INTO VolReservable VALUES ('3', 'Londres', current_date, 69.42, 'Insert a French description here', 100);
+
+insert into Users value ('floryan','Flofredsim','Floryan','Simar','floryansimar@gmail.com');
+insert into Facture(Username, NumeroVol, nbPlaces, prix) values ('floryan','1','10','50245');
 COMMIT;

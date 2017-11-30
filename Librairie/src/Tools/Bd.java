@@ -18,8 +18,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 
-import LUGAP.NetworkObject.Table;
+import NetworkObject.Table;
 
+@SuppressWarnings("ALL")
 public class Bd {
 
     private Connection Connection;
@@ -296,6 +297,16 @@ public class Bd {
         return Connection.createStatement().executeQuery("select * from " + table);
     }
 
+    public synchronized ResultSet SelectUserPassword(String user) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("select password,Prenom from Login natural join Agents where Username like ?");
+        ps.setString(1,user);
+        return ps.executeQuery();
+    }
+    public synchronized ResultSet SelectUserBillet(String billet) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("select Prenom from Users NATURAL JOIN Facture NATURAL JOIN Billets where NumeroBillet like ?");
+        ps.setString(1,billet);
+        return ps.executeQuery();
+    }
     /**
      * @param User
      * @return
