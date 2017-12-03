@@ -1,18 +1,3 @@
-/*
- * Copyright 2017 floryan.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package Frame;
 
 import java.io.IOException;
@@ -29,25 +14,28 @@ import NetworkObject.Login;
 import Tools.DigestCalculator;
 import Tools.PropertiesReader;
 
-/**
- *
- * @author floryan
- */
 public class LoginFram extends javax.swing.JDialog {
-    /**
-     * Creates new form LoginFram
-     */
     private static final int User = 0x100;
     private static final int Billet = 0x200;
     private Integer port = -1;
-    private InetAddress inetAddress = null;
+    private InetAddress inetAddressMulticast = null;
+    private String username = null;
+    private boolean connected = false;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
 
     public int getPort() {
         return port;
     }
 
-    public InetAddress getInetAddress() {
-        return inetAddress;
+    public InetAddress getInetAddressMulticast() {
+        return inetAddressMulticast;
     }
 
     public LoginFram(java.awt.Frame parent, boolean modal) {
@@ -183,17 +171,13 @@ public class LoginFram extends javax.swing.JDialog {
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
             oos.writeObject(TypeRequeteIACOP.LOGIN_GROUP);
             ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-            System.out.println("Début read");
             Integer seed = (Integer) ois.readObject();
-            System.out.println("seed = " + seed);
             byte[] b = new byte[seed];
             int i = s.getInputStream().read(b);
-            System.out.println("Arrays.toString(b) = " + Arrays.toString(b));
             switch (type)
             {
                 case User:
                     oos.writeObject(new Login(UsernameTF.getText(), DigestCalculator.hashPassword(new String(passwordPF.getPassword()), b)));
-                    System.out.println("Digest: " + Arrays.toString(DigestCalculator.hashPassword(new String(passwordPF.getPassword()), b)));
                     break;
                 case Billet:
                     oos.writeObject(BilletTF.getText());
@@ -201,7 +185,8 @@ public class LoginFram extends javax.swing.JDialog {
             }
             port = (Integer) ois.readObject();
             if (port != -1) {
-                inetAddress = (InetAddress) ois.readObject();
+                inetAddressMulticast = (InetAddress) ois.readObject();
+                username = (String) ois.readObject();
                 return true;
             } else
                 JOptionPane.showMessageDialog(this,"La combinaison login/password est incorrecte","Erreur",JOptionPane.ERROR_MESSAGE);
@@ -212,12 +197,12 @@ public class LoginFram extends javax.swing.JDialog {
     }
 
     private void connectButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButton1ActionPerformed
-        if (connect(User))
+        if (connected = connect(User))
             setVisible(false);
     }//GEN-LAST:event_connectButton1ActionPerformed
 
     private void connectButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButton2ActionPerformed
-        if (connect(Billet))
+        if (connected = connect(Billet))
             setVisible(false);
     }//GEN-LAST:event_connectButton2ActionPerformed
 
@@ -227,7 +212,7 @@ public class LoginFram extends javax.swing.JDialog {
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced inetAddress Java SE 6) is not available, stay with the default look and feel.
+        /* If Nimbus (introduced inetAddressMulticast Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
