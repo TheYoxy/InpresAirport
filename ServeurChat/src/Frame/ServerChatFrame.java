@@ -40,6 +40,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 import IACOP.TypeRequeteIACOP;
+import IACOP.TypeSpecialRequest;
 import NetworkObject.Login;
 import Tools.Bd;
 import Tools.BdType;
@@ -136,16 +137,16 @@ public class ServerChatFrame extends javax.swing.JFrame {
             }
             while (!Chat.isInterrupted()) {
                 try {
-                    envoiMulticast(Procedural.ReadUdp(ds));
+                    envoiMulticast(ds,Procedural.ReadUdp(ds));
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.err.println("Réseau: " + group.toString().substring(1));
                 }
             }
         });
-        Chat.setName("Thread d'écoute des messages envoyés");
+        Chat.setName("Thread d'écoute des messages UDP");
         Chat.start();
-        new Thread(() -> {
+        /*new Thread(() -> {
             MulticastSocket ms = null;
             try {
                 ms = new MulticastSocket(PORT_JOUR + 1);
@@ -156,7 +157,7 @@ public class ServerChatFrame extends javax.swing.JFrame {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        }).start();*/
         Ecoute = new Thread(() -> {
             ServerSocket ss = null;
             try {
@@ -201,8 +202,9 @@ public class ServerChatFrame extends javax.swing.JFrame {
                                 if (!Connecter.contains(user)) {
                                     oos.writeObject(PORT_JOUR);
                                     oos.writeObject(group);
-                                    oos.writeObject(user);
                                     ajoutConnecte(user, s.getRemoteSocketAddress());
+                                    oos.writeObject(user);
+                                    oos.writeObject(Connecter);
                                 }
                                 else
                                     oos.writeObject(-1);
@@ -311,15 +313,19 @@ public class ServerChatFrame extends javax.swing.JFrame {
      *
      * @param username Nom de l'utilisateur
      */
-    private void ajoutConnecte(String username, SocketAddress s) {
+    private void ajoutConnecte(String username, SocketAddress s) throws IOException {
         listModelUser.addElement(username + " (" + s.toString().substring(1) + ")");
+        Connecter.add(username);
+        List l = new LinkedList();
+        l.add(TypeRequeteIACOP.POST_EVENT.getValue());
+        l.add(TypeSpecialRequest.NEW_CONNECTED.getValue());
+        l.add(username);
+        byte[] b = Procedural.ListObjectToBytes(l);
+        DatagramPacket dp = new DatagramPacket(b,b.length,group,PORT_JOUR + 1);
+        ds.send(dp);
     }
 
-    private void envoiMulticast(TypeRequeteIACOP type, String message) throws IOException {
-        envoiMulticast(ByteBuffer.allocate(Integer.BYTES + message.length()).putInt(type.getValue()).put(message.getBytes()).array());
-    }
-
-    private void envoiMulticast(byte[] data) throws IOException {
+    private void envoiMulticast(DatagramSocket ds,byte[] data) throws IOException {
         DatagramPacket dp = new DatagramPacket(data, data.length, group, PORT_JOUR + 1);
         System.out.println("Envoi à " + dp.getSocketAddress().toString().substring(1));
         ds.send(dp);

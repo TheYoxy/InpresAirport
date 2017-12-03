@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -21,7 +21,11 @@ public class LoginFram extends javax.swing.JDialog {
     private InetAddress inetAddressMulticast = null;
     private String username = null;
     private boolean connected = false;
+    private List<String> ListConnectes = null;
 
+    public List<String> getListConnectes() {
+        return ListConnectes;
+    }
     public String getUsername() {
         return username;
     }
@@ -187,6 +191,7 @@ public class LoginFram extends javax.swing.JDialog {
             if (port != -1) {
                 inetAddressMulticast = (InetAddress) ois.readObject();
                 username = (String) ois.readObject();
+                ListConnectes = (List<String>) ois.readObject();
                 return true;
             } else
                 JOptionPane.showMessageDialog(this,"La combinaison login/password est incorrecte","Erreur",JOptionPane.ERROR_MESSAGE);

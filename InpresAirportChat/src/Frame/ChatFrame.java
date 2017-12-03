@@ -3,21 +3,20 @@ package Frame;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 import IACOP.TypeRequeteIACOP;
+import IACOP.TypeSpecialRequest;
 import Tools.Procedural;
 import Tools.PropertiesReader;
 import Tools.TextAreaOutputStream;
@@ -29,23 +28,16 @@ public class ChatFrame extends javax.swing.JFrame {
     private MulticastSocket ms;
     private SocketAddress server;
     private String username;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> ListQuestion;
-    private javax.swing.JList<String> connectList;
-    private javax.swing.JButton envoyerB;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea msgTa;
-    private javax.swing.JTextField msgTf;
+    private DefaultListModel<String> Users;
+
     public ChatFrame() {
         initComponents();
         lf = new LoginFram(this, true);
+        Users = new DefaultListModel<>();
+        connectList.setModel(Users);
         Login();
         System.setOut(new PrintStream(new TextAreaOutputStream(msgTa)));
+
     }
 
     /**
@@ -76,17 +68,14 @@ public class ChatFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ChatFrame().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new ChatFrame().setVisible(true));
     }
 
     public void Login() {
         lf.setVisible(true);
         if (lf.isConnected()) {
             username = lf.getUsername();
+
             Chat = new Thread(() -> {
                 try {
                     ms = new MulticastSocket(lf.getPort() + 1);
@@ -94,20 +83,37 @@ public class ChatFrame extends javax.swing.JFrame {
 //                    ms.setReuseAddress(true);
                     /*Pour le débug sur une seule machine*/
 //                    ms.setInterface(InetAddress.getByName(PropertiesReader.getProperties("Servername")));
+
+                    NetworkInterface n = NetworkInterface.getByInetAddress(InetAddress.getByName(PropertiesReader.getProperties("Servername")));
+                    if (!n.isLoopback())
+                        ms.setNetworkInterface(n);
+//                    ms.setLoopbackMode(!n.isLoopback());
                     ms.joinGroup(lf.getInetAddressMulticast());
                     while (!Chat.isInterrupted()) {
                         byte[] b = Procedural.ReadUdp(ms);
                         List l = Procedural.DivParametersUdp(b);
                         /* Traitement uniquement des packets ne provenant pas du client lui même */
-                        for(int i = 0; i < l.size(); i++) {
-                            System.err.println(i);
-                            System.err.println("Classe: " + l.get(i).getClass());
-                            System.err.println("toString(): " + l.get(i).toString());
-                            System.err.println();
-                        }
-
-                        if (!l.get(0).toString().startsWith(username)) {
-                            System.out.println(l.get(0) + ": " + l.get(2));
+                        System.err.println("Message reçu");
+                        TypeRequeteIACOP t = TypeRequeteIACOP.fromInt((Integer) l.get(0));
+                        System.out.print(t.name() + " ");
+                        switch (t)
+                        {
+                            case POST_QUESTION:
+                                break;
+                            case ANSWER_QUESTION:
+                                if (!l.get(1).toString().startsWith(username))
+                                    System.out.println(l.get(1) + ": " + l.get(2));
+                                break;
+                            case POST_EVENT:
+                            {
+                                TypeSpecialRequest tsr = TypeSpecialRequest.fromInt((Integer) l.get(1));
+                                switch (tsr){
+                                    case NEW_CONNECTED:
+                                        Users.addElement((String) l.get(2));
+                                        break;
+                                }
+                            }
+                                break;
                         }
                     }
                 } catch (IOException e) {
@@ -116,6 +122,9 @@ public class ChatFrame extends javax.swing.JFrame {
             });
             Chat.setName("Thread de gestion des message venant du serveur");
             Chat.start();
+
+            for(String s: lf.getListConnectes())
+                Users.addElement(s);
 
             try {
                 server = new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("SERVER_NAME")), lf.getPort());
@@ -265,8 +274,8 @@ public class ChatFrame extends javax.swing.JFrame {
 
     private void sendMessage(TypeRequeteIACOP type, String message) throws IOException {
         List l = new LinkedList();
-        l.add(username);
         l.add(type.getValue());
+        l.add(username);
         l.add(message);
         byte[] b = Procedural.ListObjectToBytes(l);
 
@@ -274,5 +283,22 @@ public class ChatFrame extends javax.swing.JFrame {
         ms.send(dp);
         System.out.println("La question à bien été posée");
     }
+
+    private void sendSpecialMessage(){
+
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList<String> ListQuestion;
+    private javax.swing.JList<String> connectList;
+    private javax.swing.JButton envoyerB;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea msgTa;
+    private javax.swing.JTextField msgTf;
     // End of variables declaration//GEN-END:variables
 }
