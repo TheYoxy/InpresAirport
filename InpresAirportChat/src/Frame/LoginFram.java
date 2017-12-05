@@ -170,8 +170,9 @@ public class LoginFram extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
     private boolean connect(int type)
     {
+        Socket s = null;
         try {
-            Socket s = new Socket(InetAddress.getByName(PropertiesReader.getProperties("SERVER_NAME")),Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT")));
+            s = new Socket(InetAddress.getByName(PropertiesReader.getProperties("Servername")),Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT")));
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
             oos.writeObject(TypeRequeteIACOP.LOGIN_GROUP);
             ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
@@ -192,11 +193,20 @@ public class LoginFram extends javax.swing.JDialog {
                 inetAddressMulticast = (InetAddress) ois.readObject();
                 username = (String) ois.readObject();
                 ListConnectes = (List<String>) ois.readObject();
+                s.close();
                 return true;
             } else
                 JOptionPane.showMessageDialog(this,"La combinaison login/password est incorrecte","Erreur",JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
+        }finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return false;
     }
@@ -222,7 +232,7 @@ public class LoginFram extends javax.swing.JDialog {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("GTK+".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }

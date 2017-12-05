@@ -15,6 +15,8 @@
  */
 package Frame;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -33,6 +35,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +55,7 @@ import Tools.TextAreaOutputStream;
 public class ServerChatFrame extends javax.swing.JFrame {
     private final static int PORT_CHAT = Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT"));
     private final static int PORT_JOUR = /*new Random().nextInt(65535 - 1024) + 1024*/ PORT_CHAT;
-    private static int nbQuestion;
+    private static Integer nbQuestion = 1;
     private InetAddress group;
     private SocketAddress groupAddress;
     private Bd mysql;
@@ -82,7 +85,7 @@ public class ServerChatFrame extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("GTK+".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -125,27 +128,34 @@ public class ServerChatFrame extends javax.swing.JFrame {
         }
         Connecter = new LinkedList<>();
         groupAddress = new InetSocketAddress(group, PORT_JOUR + 1);
+
         Chat = new Thread(() -> {
             try {
                 ds = new DatagramSocket(PORT_JOUR);
-                ds.setReuseAddress(true);
+//                ds.setReuseAddress(true);
                 System.out.println("Port du jour: " + PORT_JOUR);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(this, "Impossible de bind le multicast.\nFin de l'application", "Erreur", JOptionPane.ERROR_MESSAGE);
                 System.exit(-1);
             }
-            while (!Chat.isInterrupted()) {
-                try {
-                    List l = Procedural.DivParametersUdp(Procedural.ReadUdp(ds));
-                    System.out.println("List: " + l);
-                    l.add(2,nbQuestion++);
-                    System.out.println("List: " + l);
-                    envoiMulticast(ds,Procedural.ListObjectToBytes(l));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.err.println("Réseau: " + group.toString().substring(1));
+            while (!Chat.isInterrupted()) try {
+                byte[] b = Procedural.ReadUdp(ds);
+                List l = Procedural.DivParametersUdp(b);
+                byte[] digest = (byte[]) l.remove(l.size() - 1);
+                byte[] calculated = DigestCalculator.digestMessage(l);
+                if (MessageDigest.isEqual(digest,calculated)){
+                    if (TypeRequeteIACOP.fromInt((Integer) l.get(0)) == TypeRequeteIACOP.POST_QUESTION)
+                        l.add(2, nbQuestion++);
+                    envoiMulticast(ds, Procedural.ListObjectToBytes(l));
                 }
+                else {
+                    System.out.println("Erreur lors du contrôle d'intègrité.\n Le paquêt n'a pas été retransmis");
+                    System.out.println(Arrays.toString(digest) + " != \n" + Arrays.toString(calculated));
+                }
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+                System.out.println("Réseau: " + group.toString().substring(1));
             }
         });
         Chat.setName("Thread d'écoute des messages UDP");
@@ -171,64 +181,64 @@ public class ServerChatFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Impossible de bind le serveur de réception.\nFin de l'application", "Erreur", JOptionPane.ERROR_MESSAGE);
                 System.exit(-1);
             }
-            while (!Ecoute.isInterrupted()) {
-                try {
-                    Socket s = ss.accept();
-                    System.out.println("Tentative de connexion de " + s.getRemoteSocketAddress().toString().substring(1));
-                    ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-                    TypeRequeteIACOP type = (TypeRequeteIACOP) ois.readObject();
-                    ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-                    if (type == TypeRequeteIACOP.LOGIN_GROUP) {
-                        Integer seedSize = 10;
-                        byte[] nb = new SecureRandom().generateSeed(seedSize);
-                        oos.writeObject(seedSize);
-                        s.getOutputStream().write(nb);
-                        Object o = ois.readObject();
+            while (!Ecoute.isInterrupted()) try {
+                Socket s = ss.accept();
+                System.out.print("Tentative de connexion de " + s.getRemoteSocketAddress().toString().substring(1) + ": ");
+                ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+                TypeRequeteIACOP type = (TypeRequeteIACOP) ois.readObject();
+                ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+                if (type == TypeRequeteIACOP.LOGIN_GROUP) {
+                    Integer seedSize = 10;
+                    byte[] nb = new SecureRandom().generateSeed(seedSize);
+                    oos.writeObject(seedSize);
+                    s.getOutputStream().write(nb);
+                    Object o = ois.readObject();
 
-                        ResultSet rs;
-                        if (o instanceof Login)
-                            rs = mysql.SelectUserPassword(((Login) o).getUser());
-                        else if (o instanceof String)
-                            rs = mysql.SelectUserBillet((String) o);
-                        else{
-                            oos.writeObject(-1);
-                            return;
-                        }
-
-                        if (rs.next()) {
-                            byte[] pass = null;
-                            if (o instanceof Login) {
-                                pass = DigestCalculator.hashPassword(rs.getString(1), nb);
-                            }
-                            if ((o instanceof Login && MessageDigest.isEqual(((Login) o).getPassword(), pass)) ||
-                                    o instanceof String) {
-                                String user = rs.getString(o instanceof Login ? 2 : 1);
-                                if (!Connecter.contains(user)) {
-                                    oos.writeObject(PORT_JOUR);
-                                    oos.writeObject(group);
-                                    ajoutConnecte(user, s.getRemoteSocketAddress());
-                                    oos.writeObject(user);
-                                    oos.writeObject(Connecter);
-                                }
-                                else
-                                    oos.writeObject(-1);
-                            }
-                            else
-                                oos.writeObject(-1);
-
-                        }
-                        else
-                            oos.writeObject(-1);
-                    }
-                    else
+                    ResultSet rs;
+                    if (o instanceof Login)
+                        rs = mysql.SelectUserPassword(((Login) o).getUser());
+                    else if (o instanceof String)
+                        rs = mysql.SelectUserBillet((String) o);
+                    else {
                         oos.writeObject(-1);
-                } catch (IOException e) {
-                    e.printStackTrace(System.out);
-                } catch (SQLException e) {
-                    e.printStackTrace(System.out);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace(System.out);
+                        return;
+                    }
+
+                    if (rs.next()) {
+                        byte[] pass = null;
+                        if (o instanceof Login) pass = DigestCalculator.hashPassword(rs.getString(1), nb);
+                        if ((o instanceof Login && MessageDigest.isEqual(((Login) o).getPassword(), pass)) ||
+                                o instanceof String) {
+                            String user = rs.getString(o instanceof Login ? 2 : 1);
+                            if (!Connecter.contains(user)) {
+                                oos.writeObject(PORT_JOUR);
+                                oos.writeObject(group);
+                                oos.writeObject(user);
+                                oos.writeObject(Connecter);
+                                ajoutConnecte(user, s.getRemoteSocketAddress());
+                            } else {
+                                System.out.println("Echouée");
+                                oos.writeObject(-1);
+                            }
+                        } else {
+                            System.out.println("Echouée");
+                            oos.writeObject(-1);
+                        }
+                    } else {
+                        System.out.println("Echouée");
+                        oos.writeObject(-1);
+                    }
+                } else {
+                    System.out.println("Echouée");
+                    oos.writeObject(-1);
                 }
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            } catch (SQLException e) {
+                e.printStackTrace(System.out);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace(System.out);
             }
         });
         Ecoute.setName("Thread d'écoute TCP");
@@ -316,6 +326,7 @@ public class ServerChatFrame extends javax.swing.JFrame {
      * Ajout un utilisateur à la liste et le notifie à tout les clients du multicast
      *
      * @param username Nom de l'utilisateur
+     * @param s Caca
      */
     private void ajoutConnecte(String username, SocketAddress s) throws IOException {
         listModelUser.addElement(username + " (" + s.toString().substring(1) + ")");
@@ -329,10 +340,8 @@ public class ServerChatFrame extends javax.swing.JFrame {
         ds.send(dp);
     }
 
-    private void envoiMulticast(DatagramSocket ds,byte[] data) throws IOException {
-        DatagramPacket dp = new DatagramPacket(data, data.length, group, PORT_JOUR + 1);
-        System.out.println("Envoi à " + dp.getSocketAddress().toString().substring(1));
-        ds.send(dp);
+    private void envoiMulticast(DatagramSocket ds, byte[] data) throws IOException {
+        ds.send(new DatagramPacket(data, data.length, group, PORT_JOUR + 1));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

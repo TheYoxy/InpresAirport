@@ -9,9 +9,11 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
@@ -29,15 +31,17 @@ public class ChatFrame extends javax.swing.JFrame {
     private SocketAddress server;
     private String username;
     private DefaultListModel<String> Users;
+    private DefaultComboBoxModel<String> AnswerModel;
 
     public ChatFrame() {
         initComponents();
         lf = new LoginFram(this, true);
         Users = new DefaultListModel<>();
+        AnswerModel = new DefaultComboBoxModel<>();
         connectList.setModel(Users);
+        answerCB.setModel(this.AnswerModel);
         Login();
         System.setOut(new PrintStream(new TextAreaOutputStream(msgTa)));
-
     }
 
     /**
@@ -79,43 +83,49 @@ public class ChatFrame extends javax.swing.JFrame {
             Chat = new Thread(() -> {
                 try {
                     ms = new MulticastSocket(lf.getPort() + 1);
-//                    ms.setLoopbackMode(true);
-//                    ms.setReuseAddress(true);
-                    /*Pour le débug sur une seule machine*/
-//                    ms.setInterface(InetAddress.getByName(PropertiesReader.getProperties("Servername")));
 
-                    NetworkInterface n = NetworkInterface.getByInetAddress(InetAddress.getByName(PropertiesReader.getProperties("Servername")));
-                    if (!n.isLoopback())
-                        ms.setNetworkInterface(n);
-//                    ms.setLoopbackMode(!n.isLoopback());
+                    System.out.println("Properties \"Servername\": " + PropertiesReader.getProperties("Servername"));
+                    System.out.println("InetAddress \"Servername \": " + InetAddress.getByName(PropertiesReader.getProperties("Servername")));
+                    System.out.println("InetAddress.getByName(PropertiesReader.getProperties(\"Servername\")).isLoopbackAddress() = " + InetAddress.getByName(PropertiesReader.getProperties("Servername")).isLoopbackAddress());
+
+                    if (InetAddress.getByName(PropertiesReader.getProperties("Servername")).isLoopbackAddress()){
+//                        ms.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getLoopbackAddress()));
+                        ms.setLoopbackMode(true);
+                    }
+
+                    System.out.println("getInetAddressMulticast(): " + lf.getInetAddressMulticast());
                     ms.joinGroup(lf.getInetAddressMulticast());
                     while (!Chat.isInterrupted()) {
-                        byte[] b = Procedural.ReadUdp(ms);
-                        List l = Procedural.DivParametersUdp(b);
-                        /* Traitement uniquement des packets ne provenant pas du client lui même */
-                        System.err.println("Message reçu");
-                        TypeRequeteIACOP t = TypeRequeteIACOP.fromInt((Integer) l.get(0));
-                        System.out.print(t.name() + " ");
-                        switch (t)
-                        {
-                            case POST_QUESTION:
-                                if (!l.get(1).toString().startsWith(username))
-                                    System.out.println(l.get(1) + "> " + l.get(2));
-                                break;
-                            case ANSWER_QUESTION:
-                                if (!l.get(1).toString().startsWith(username))
-                                    System.out.println(l.get(1) + "> " + l.get(2));
-                                break;
-                            case POST_EVENT:
+                        try{
+                            byte[] b = Procedural.ReadUdp(ms);
+                            System.err.println("Message reçu");
+                            List l = Procedural.DivParametersUdp(b);
+                            /* Traitement uniquement des packets ne provenant pas du client lui même */
+                            TypeRequeteIACOP t = TypeRequeteIACOP.fromInt((Integer) l.get(0));
+                            switch (t)
                             {
-                                TypeSpecialRequest tsr = TypeSpecialRequest.fromInt((Integer) l.get(1));
-                                switch (tsr){
-                                    case NEW_CONNECTED:
-                                        Users.addElement((String) l.get(2));
-                                        break;
+                                case POST_QUESTION:
+                                    System.out.println(l.get(1) + " (" + l.get(2) + ") >" + l.get(3));
+                                    AjoutQuestion((Integer) l.get(2));
+                                    break;
+                                case ANSWER_QUESTION:
+                                    System.out.println(l.get(1) + " (Réponse à " + l.get(2) + ") >" + l.get(3));
+                                    SupressionQuestion((Integer) l.get(2));
+                                    break;
+                                case POST_EVENT:
+                                {
+                                    TypeSpecialRequest tsr = TypeSpecialRequest.fromInt((Integer) l.get(1));
+                                    switch (tsr){
+                                        case NEW_CONNECTED:
+                                            Users.addElement((String) l.get(2));
+                                            break;
+                                    }
                                 }
-                            }
                                 break;
+                            }
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 } catch (IOException e) {
@@ -137,6 +147,16 @@ public class ChatFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Connexion au serveur impossible", "Erreur", JOptionPane.ERROR_MESSAGE);
             System.exit(-1);
         }
+    }
+
+    private void AjoutQuestion(Integer nb) {
+        this.answerCB.addItem(nb.toString());
+    }
+
+    private void SupressionQuestion(Integer nb) {
+        for (int i = 0; i < AnswerModel.getSize(); i++)
+            if (AnswerModel.getElementAt(i).equals(nb.toString()))
+                AnswerModel.removeElementAt(i);
     }
 
     /**
@@ -184,7 +204,7 @@ public class ChatFrame extends javax.swing.JFrame {
 
         jScrollPane2.setViewportView(connectList);
 
-        typeCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Question", "Réponse", "" }));
+        typeCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Question", "Réponse", "Information" }));
         typeCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 typeCBActionPerformed(evt);
@@ -192,6 +212,7 @@ public class ChatFrame extends javax.swing.JFrame {
         });
 
         answerCB.setAutoscrolls(true);
+        answerCB.setEnabled(false);
         answerCB.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 answerCBItemStateChanged(evt);
@@ -248,41 +269,19 @@ public class ChatFrame extends javax.swing.JFrame {
 
     private void envoyerBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_envoyerBActionPerformed
         // TODO add your handling code here:
-        try {
-            sendMessage(TypeRequeteIACOP.POST_QUESTION, msgTf.getText());
-            msgTf.setText("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        envoyerMessageAction();
     }//GEN-LAST:event_envoyerBActionPerformed
 
     private void msgTfKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_msgTfKeyTyped
         // TODO add your handling code here:
         if (evt.getKeyChar() == '\n') {
-            try {
-                TypeRequeteIACOP t = null;
-                String message = null;
-                switch (typeCB.getSelectedIndex())
-                {
-                    case 0:
-                        sendMessage(TypeRequeteIACOP.POST_QUESTION,msgTf.getText());
-                        break;
-                    case 1:
-                        sendMessage(TypeRequeteIACOP.ANSWER_QUESTION,Integer.parseInt(typeCB.getSelectedItem().toString()), msgTf.getText());
-                        break;
-                    case 2:
-                        sendMessage(TypeRequeteIACOP.POST_EVENT);
-                        break;
-                }
-                msgTf.setText("");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            envoyerMessageAction();
         }
     }//GEN-LAST:event_msgTfKeyTyped
 
     private void typeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeCBActionPerformed
         // TODO add your handling code here:
+        answerCB.setEnabled(typeCB.getSelectedIndex() == 1);
     }//GEN-LAST:event_typeCBActionPerformed
 
     private void answerCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_answerCBItemStateChanged
@@ -290,21 +289,39 @@ public class ChatFrame extends javax.swing.JFrame {
         System.out.println("STATE CHANGED");
     }//GEN-LAST:event_answerCBItemStateChanged
 
+    private void envoyerMessageAction()
+    {
+        try {
+            TypeRequeteIACOP t = null;
+            String message = null;
+            switch (typeCB.getSelectedIndex())
+            {
+                case 0:
+                    sendMessage(TypeRequeteIACOP.POST_QUESTION,msgTf.getText());
+                    break;
+                case 1:
+                    sendMessage(TypeRequeteIACOP.ANSWER_QUESTION,Integer.parseInt(answerCB.getSelectedItem().toString()), msgTf.getText());
+                    break;
+                case 2:
+                    sendMessage(TypeRequeteIACOP.POST_EVENT);
+                    break;
+            }
+            msgTf.setText("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sendMessage(TypeRequeteIACOP type,Object... message) throws IOException {
         List l = new LinkedList();
         l.add(type.getValue());
         l.add(username);
         for (Object o : message)
-            l.add(message);
+            l.add(o.toString());
         byte[] b = Procedural.ListObjectToBytes(l);
-
         DatagramPacket dp = new DatagramPacket(b, b.length, server);
         ms.send(dp);
-        System.out.println("La question à bien été posée");
-    }
-
-    private void sendSpecialMessage(){
-
+//        System.out.println("La question à bien été posée");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

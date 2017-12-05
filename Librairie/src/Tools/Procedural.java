@@ -13,32 +13,31 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Procedural {
     public static final char SEPARATION = 0xfffd;
-    public static final String BYTEIDENTIFIER = "BYTE";
     public static final String INTIDENTIFIER = "WZK";
 
     public static List<Object> DivParametersUdp(byte[] array) {
         if (array == null) throw new IllegalArgumentException();
         LinkedList<Object> l = new LinkedList<>();
-        byte[] b = new byte[array.length -1];
-        System.arraycopy(array,1,b,0,b.length);
-
+        byte[] b = new byte[array.length - Integer.BYTES];
+        System.arraycopy(array, Integer.BYTES, b, 0, b.length);
+        /* Division des éléments envoyés */
         String s = new String(b);
-        String[] ss = s.split(String.valueOf(SEPARATION),ByteBuffer.wrap(new String(array).substring(0,Integer.BYTES).getBytes()).asIntBuffer().get() + 1);
-        for (int i = 0; i < ss.length; i++) {
-            l.add(i == ss.length - 1
-                    ? ss[i].getBytes()
-                    : ss[i].length() == Integer.BYTES + INTIDENTIFIER.length() && ss[i].startsWith(INTIDENTIFIER)
-                        ? Integer.valueOf(ByteBuffer.wrap(ss[i].substring(INTIDENTIFIER.length()).getBytes()).asIntBuffer().get())
-                        : ss[i]);
+        String[] ss = s.split(String.valueOf(SEPARATION), ByteBuffer.wrap(new String(array).substring(0, Integer.BYTES).getBytes()).asIntBuffer().get() + 1);
+        for (int i = 0; i < ss.length - 1; i++) {
+            if (ss[i].length() == Integer.BYTES + INTIDENTIFIER.length() && ss[i].startsWith(INTIDENTIFIER))
+                l.add(ByteBuffer.wrap(ss[i].substring(INTIDENTIFIER.length()).getBytes()).asIntBuffer().get());
+            else l.add(ss[i]);
         }
+        /*Digest*/
+        byte[] d = new byte[ss[ss.length - 1].length()];
+        System.arraycopy(b, ss[ss.length - 1].length() + 1, d, 0, d.length);
+        l.add(d);
         return l;
     }
 
@@ -47,6 +46,8 @@ public class Procedural {
         for (Object o : l) {
             if (o instanceof Integer)
                 i += Integer.BYTES + INTIDENTIFIER.length();
+            else if (o instanceof byte[])
+                i += ((byte[]) o).length;
             else
                 i += o.toString().length();
             i++;
@@ -58,6 +59,8 @@ public class Procedural {
             if (o instanceof Integer) {
                 dos.write(INTIDENTIFIER.getBytes());
                 dos.writeInt((Integer) o);
+            } else if (o instanceof byte[]) {
+                dos.write((byte[]) o);
             } else {
                 dos.write(o.toString().getBytes());
             }

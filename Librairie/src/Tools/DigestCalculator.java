@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 public class DigestCalculator {
@@ -51,14 +52,13 @@ public class DigestCalculator {
             try {
                 if (o instanceof Integer)
                     dos.writeInt((Integer) o);
-                else if (o instanceof String)
-                    dos.writeUTF((String) o);
                 else
                     dos.writeBytes(o.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return md.digest(baos.toByteArray());
+        byte[] b = md.digest(baos.toByteArray());
+        return b;
     }
 }
