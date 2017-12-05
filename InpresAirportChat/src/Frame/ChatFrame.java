@@ -99,10 +99,12 @@ public class ChatFrame extends javax.swing.JFrame {
                         switch (t)
                         {
                             case POST_QUESTION:
+                                if (!l.get(1).toString().startsWith(username))
+                                    System.out.println(l.get(1) + "> " + l.get(2));
                                 break;
                             case ANSWER_QUESTION:
                                 if (!l.get(1).toString().startsWith(username))
-                                    System.out.println(l.get(1) + ": " + l.get(2));
+                                    System.out.println(l.get(1) + "> " + l.get(2));
                                 break;
                             case POST_EVENT:
                             {
@@ -152,13 +154,14 @@ public class ChatFrame extends javax.swing.JFrame {
         envoyerB = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         connectList = new javax.swing.JList<>();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        ListQuestion = new javax.swing.JList<>();
+        typeCB = new javax.swing.JComboBox<>();
+        answerCB = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Chat");
         setPreferredSize(new java.awt.Dimension(1280, 720));
 
         msgTa.setEditable(false);
@@ -179,19 +182,21 @@ public class ChatFrame extends javax.swing.JFrame {
             }
         });
 
-        connectList.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                connectListMouseClicked(evt);
-            }
-        });
         jScrollPane2.setViewportView(connectList);
 
-        ListQuestion.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ListQuestionMouseClicked(evt);
+        typeCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Question", "Réponse", "" }));
+        typeCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                typeCBActionPerformed(evt);
             }
         });
-        jScrollPane3.setViewportView(ListQuestion);
+
+        answerCB.setAutoscrolls(true);
+        answerCB.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                answerCBItemStateChanged(evt);
+            }
+        });
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -204,35 +209,38 @@ public class ChatFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(msgTf)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addGap(0, 0, Short.MAX_VALUE)
-                                                .addComponent(envoyerB)))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(typeCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(answerCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(envoyerB))
+                    .addComponent(msgTf)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(msgTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(envoyerB))
-                                        .addComponent(jScrollPane2)
-                                        .addComponent(jScrollPane3))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(msgTf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(envoyerB)
+                            .addComponent(typeCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(answerCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane2))
+                .addContainerGap())
         );
 
         pack();
@@ -252,7 +260,20 @@ public class ChatFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (evt.getKeyChar() == '\n') {
             try {
-                sendMessage(TypeRequeteIACOP.POST_QUESTION, msgTf.getText());
+                TypeRequeteIACOP t = null;
+                String message = null;
+                switch (typeCB.getSelectedIndex())
+                {
+                    case 0:
+                        sendMessage(TypeRequeteIACOP.POST_QUESTION,msgTf.getText());
+                        break;
+                    case 1:
+                        sendMessage(TypeRequeteIACOP.ANSWER_QUESTION,Integer.parseInt(typeCB.getSelectedItem().toString()), msgTf.getText());
+                        break;
+                    case 2:
+                        sendMessage(TypeRequeteIACOP.POST_EVENT);
+                        break;
+                }
                 msgTf.setText("");
             } catch (IOException e) {
                 e.printStackTrace();
@@ -260,23 +281,21 @@ public class ChatFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_msgTfKeyTyped
 
-    private void ListQuestionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ListQuestionMouseClicked
-        if (evt.getClickCount() == 2) {
+    private void typeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_typeCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_typeCBActionPerformed
 
-        }
-    }//GEN-LAST:event_ListQuestionMouseClicked
+    private void answerCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_answerCBItemStateChanged
+        // TODO add your handling code here:
+        System.out.println("STATE CHANGED");
+    }//GEN-LAST:event_answerCBItemStateChanged
 
-    private void connectListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_connectListMouseClicked
-        if (evt.getClickCount() == 2) {
-
-        }
-    }//GEN-LAST:event_connectListMouseClicked
-
-    private void sendMessage(TypeRequeteIACOP type, String message) throws IOException {
+    private void sendMessage(TypeRequeteIACOP type,Object... message) throws IOException {
         List l = new LinkedList();
         l.add(type.getValue());
         l.add(username);
-        l.add(message);
+        for (Object o : message)
+            l.add(message);
         byte[] b = Procedural.ListObjectToBytes(l);
 
         DatagramPacket dp = new DatagramPacket(b, b.length, server);
@@ -289,7 +308,7 @@ public class ChatFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> ListQuestion;
+    private javax.swing.JComboBox<String> answerCB;
     private javax.swing.JList<String> connectList;
     private javax.swing.JButton envoyerB;
     private javax.swing.JMenu jMenu1;
@@ -297,8 +316,8 @@ public class ChatFrame extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea msgTa;
     private javax.swing.JTextField msgTf;
+    private javax.swing.JComboBox<String> typeCB;
     // End of variables declaration//GEN-END:variables
 }

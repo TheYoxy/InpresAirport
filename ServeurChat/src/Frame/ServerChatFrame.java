@@ -52,7 +52,7 @@ import Tools.TextAreaOutputStream;
 public class ServerChatFrame extends javax.swing.JFrame {
     private final static int PORT_CHAT = Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT"));
     private final static int PORT_JOUR = /*new Random().nextInt(65535 - 1024) + 1024*/ PORT_CHAT;
-
+    private static int nbQuestion;
     private InetAddress group;
     private SocketAddress groupAddress;
     private Bd mysql;
@@ -137,7 +137,11 @@ public class ServerChatFrame extends javax.swing.JFrame {
             }
             while (!Chat.isInterrupted()) {
                 try {
-                    envoiMulticast(ds,Procedural.ReadUdp(ds));
+                    List l = Procedural.DivParametersUdp(Procedural.ReadUdp(ds));
+                    System.out.println("List: " + l);
+                    l.add(2,nbQuestion++);
+                    System.out.println("List: " + l);
+                    envoiMulticast(ds,Procedural.ListObjectToBytes(l));
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.err.println("Réseau: " + group.toString().substring(1));
