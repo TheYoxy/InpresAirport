@@ -52,6 +52,8 @@ public class ThreadClient extends Thread {
                         else System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                     }
                 } catch (IOException | ClassNotFoundException e) {
+                    if (e.getMessage().contains("reset"))
+                        boucle = false;
                     System.out.println(this.getName() + "> " + e.getMessage());
                 }
             }
