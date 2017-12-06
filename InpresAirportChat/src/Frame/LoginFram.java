@@ -29,15 +29,12 @@ public class LoginFram extends javax.swing.JDialog {
     public String getUsername() {
         return username;
     }
-
     public boolean isConnected() {
         return connected;
     }
-
     public int getPort() {
         return port;
     }
-
     public InetAddress getInetAddressMulticast() {
         return inetAddressMulticast;
     }

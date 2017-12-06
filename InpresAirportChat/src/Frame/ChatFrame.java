@@ -1,5 +1,7 @@
 package Frame;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
@@ -42,6 +44,18 @@ public class ChatFrame extends javax.swing.JFrame {
         answerCB.setModel(this.AnswerModel);
         Login();
         System.setOut(new PrintStream(new TextAreaOutputStream(msgTa)));
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                super.windowClosing(windowEvent);
+                try {
+                    sendDisconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.exit(0);
+            }
+        });
     }
 
     /**
@@ -86,7 +100,8 @@ public class ChatFrame extends javax.swing.JFrame {
 
                     System.out.println("Properties \"Servername\": " + PropertiesReader.getProperties("Servername"));
                     System.out.println("InetAddress \"Servername \": " + InetAddress.getByName(PropertiesReader.getProperties("Servername")));
-                    System.out.println("InetAddress.getByName(PropertiesReader.getProperties(\"Servername\")).isLoopbackAddress() = " + InetAddress.getByName(PropertiesReader.getProperties("Servername")).isLoopbackAddress());
+                    System.out.println("InetAddress.getByName(PropertiesReader.getProperties(\"Servername\")).isLoopbackAddress() = " +
+                        InetAddress.getByName(PropertiesReader.getProperties("Servername")).isLoopbackAddress());
 
                     if (InetAddress.getByName(PropertiesReader.getProperties("Servername")).isLoopbackAddress()){
 //                        ms.setNetworkInterface(NetworkInterface.getByInetAddress(InetAddress.getLoopbackAddress()));
@@ -118,6 +133,14 @@ public class ChatFrame extends javax.swing.JFrame {
                                     switch (tsr){
                                         case NEW_CONNECTED:
                                             Users.addElement((String) l.get(2));
+                                            break;
+                                        case DISCONNECT:
+                                            for (int i = 0; i < Users.size(); i++)
+                                                if (l.get(2).equals(Users.get(i)))
+                                                    Users.removeElementAt(i);
+                                            break;
+                                        case OTHERS:
+                                            System.out.println(l.get(2) + "> " + l.get(3));
                                             break;
                                     }
                                 }
@@ -300,10 +323,15 @@ public class ChatFrame extends javax.swing.JFrame {
                     sendMessage(TypeRequeteIACOP.POST_QUESTION,msgTf.getText());
                     break;
                 case 1:
+                    if (answerCB.getSelectedItem() == null)
+                    {
+                        JOptionPane.showMessageDialog(this,"Impossible d'envoyer une réponse, il n'y a aucune question qui à été sélectionnée.");
+                        return;
+                    }
                     sendMessage(TypeRequeteIACOP.ANSWER_QUESTION,Integer.parseInt(answerCB.getSelectedItem().toString()), msgTf.getText());
                     break;
                 case 2:
-                    sendMessage(TypeRequeteIACOP.POST_EVENT);
+                    sendMessage(TypeRequeteIACOP.POST_EVENT,TypeSpecialRequest.OTHERS.getValue(),msgTf.getText());
                     break;
             }
             msgTf.setText("");
@@ -317,11 +345,25 @@ public class ChatFrame extends javax.swing.JFrame {
         l.add(type.getValue());
         l.add(username);
         for (Object o : message)
-            l.add(o.toString());
+            if (o instanceof Integer)
+                l.add(o);
+            else
+                l.add(o.toString());
+
         byte[] b = Procedural.ListObjectToBytes(l);
         DatagramPacket dp = new DatagramPacket(b, b.length, server);
         ms.send(dp);
-//        System.out.println("La question à bien été posée");
+        // System.out.println("La question à bien été posée");
+    }
+
+    private void sendDisconnect() throws IOException {
+        List l = new LinkedList();
+        l.add(TypeRequeteIACOP.POST_EVENT.getValue());
+        l.add(TypeSpecialRequest.DISCONNECT.getValue());
+        l.add(username);
+        byte[] b = Procedural.ListObjectToBytes(l);
+        DatagramPacket dp = new DatagramPacket(b, b.length,server);
+        ms.send(dp);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

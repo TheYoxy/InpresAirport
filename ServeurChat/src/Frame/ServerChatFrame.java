@@ -113,7 +113,7 @@ public class ServerChatFrame extends javax.swing.JFrame {
     private void postInit() {
         System.setOut(new PrintStream(new TextAreaOutputStream(logsTA)));
         try {
-            group = InetAddress.getByName("224.0.0.1");
+            group = InetAddress.getByName("224.0.100.1");
         } catch (UnknownHostException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Impossible de retrouver le groupe pour le multicast", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -141,21 +141,32 @@ public class ServerChatFrame extends javax.swing.JFrame {
             }
             while (!Chat.isInterrupted()) try {
                 byte[] b = Procedural.ReadUdp(ds);
+                System.out.println("\nReçu: " + Arrays.toString(b));
                 List l = Procedural.DivParametersUdp(b);
+                System.out.println("List: " + l.subList(0,l.size() - 1) + Arrays.toString((byte[])l.get(l.size() - 1)));
                 byte[] digest = (byte[]) l.remove(l.size() - 1);
+                System.out.println("List: " + l);
                 byte[] calculated = DigestCalculator.digestMessage(l);
-                if (MessageDigest.isEqual(digest,calculated)){
+                System.out.println("Calculé");
+                if (MessageDigest.isEqual(digest,calculated)) {
                     if (TypeRequeteIACOP.fromInt((Integer) l.get(0)) == TypeRequeteIACOP.POST_QUESTION)
                         l.add(2, nbQuestion++);
+                    if (TypeRequeteIACOP.fromInt((Integer)l.get(0)) == TypeRequeteIACOP.POST_EVENT
+                            && TypeSpecialRequest.fromInt((Integer)l.get(1)) == TypeSpecialRequest.DISCONNECT)
+                        disconnectUser((String) l.get(2));
                     envoiMulticast(ds, Procedural.ListObjectToBytes(l));
+                    System.out.println("Message envoyé");
                 }
                 else {
                     System.out.println("Erreur lors du contrôle d'intègrité.\n Le paquêt n'a pas été retransmis");
-                    System.out.println(Arrays.toString(digest) + " != \n" + Arrays.toString(calculated));
+                    System.out.println("Calculé: " + Arrays.toString(calculated) + " (" + calculated.length + ") !=");
+                    System.out.println("Reçu   : " + Arrays.toString(digest) + " (" + digest.length + ")");
                 }
             } catch (IOException e) {
                 e.printStackTrace(System.out);
                 System.out.println("Réseau: " + group.toString().substring(1));
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace(System.out);
             }
         });
         Chat.setName("Thread d'écoute des messages UDP");
@@ -214,8 +225,9 @@ public class ServerChatFrame extends javax.swing.JFrame {
                                 oos.writeObject(PORT_JOUR);
                                 oos.writeObject(group);
                                 oos.writeObject(user);
-                                oos.writeObject(Connecter);
                                 ajoutConnecte(user, s.getRemoteSocketAddress());
+                                oos.writeObject(Connecter);
+                                System.out.println("Réussi");
                             } else {
                                 System.out.println("Echouée");
                                 oos.writeObject(-1);
@@ -234,10 +246,13 @@ public class ServerChatFrame extends javax.swing.JFrame {
                 }
                 s.close();
             } catch (IOException e) {
+                System.out.println();
                 e.printStackTrace(System.out);
             } catch (SQLException e) {
+                System.out.println();
                 e.printStackTrace(System.out);
             } catch (ClassNotFoundException e) {
+                System.out.println();
                 e.printStackTrace(System.out);
             }
         });
@@ -246,6 +261,10 @@ public class ServerChatFrame extends javax.swing.JFrame {
 
         listModelUser = new DefaultListModel<>();
         connectedList.setModel(listModelUser);
+    }
+
+    private void disconnectUser(String o) {
+        listModelUser.removeElement(o);
     }
 
     /**

@@ -46,19 +46,21 @@ public class DigestCalculator {
     }
 
     public static byte[] digestMessage(List l) {
+//        System.out.println("List l: " + l);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
         for (Object o : l) {
+//            System.out.println("o: " + o + " " + o.getClass().getName());
             try {
-                if (o instanceof Integer)
-                    dos.writeInt((Integer) o);
-                else
-                    dos.writeBytes(o.toString());
+                if (o instanceof Integer) dos.writeInt((Integer) o);
+                else if (o instanceof String) dos.writeUTF((String) o);
+                else dos.writeBytes(o.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         byte[] b = md.digest(baos.toByteArray());
+//        System.out.println("b: " + Arrays.toString(b));
         return b;
     }
 }

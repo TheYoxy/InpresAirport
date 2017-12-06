@@ -5,20 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Procedural {
-    public static final char SEPARATION = 0xfffd;
+    public static final String SEPARATION = ";;;";
     public static final String INTIDENTIFIER = "WZK";
 
     public static List<Object> DivParametersUdp(byte[] array) {
@@ -26,17 +20,25 @@ public class Procedural {
         LinkedList<Object> l = new LinkedList<>();
         byte[] b = new byte[array.length - Integer.BYTES];
         System.arraycopy(array, Integer.BYTES, b, 0, b.length);
+//        System.out.println("Array: " + Arrays.toString(array));
+//        System.out.println("b:     " + Arrays.toString(b));
         /* Division des éléments envoyés */
+
         String s = new String(b);
         String[] ss = s.split(String.valueOf(SEPARATION), ByteBuffer.wrap(new String(array).substring(0, Integer.BYTES).getBytes()).asIntBuffer().get() + 1);
+
         for (int i = 0; i < ss.length - 1; i++) {
+            Object add;
             if (ss[i].length() == Integer.BYTES + INTIDENTIFIER.length() && ss[i].startsWith(INTIDENTIFIER))
-                l.add(ByteBuffer.wrap(ss[i].substring(INTIDENTIFIER.length()).getBytes()).asIntBuffer().get());
-            else l.add(ss[i]);
+                l.add(add = ByteBuffer.wrap(ss[i].substring(INTIDENTIFIER.length()).getBytes()).asIntBuffer().get());
+            else l.add(add = ss[i]);
+//            System.out.println("Add: " + add);
         }
         /*Digest*/
-        byte[] d = new byte[ss[ss.length - 1].length()];
-        System.arraycopy(b, ss[ss.length - 1].length() + 1, d, 0, d.length);
+        byte[] d = new byte[(b.length - s.indexOf(ss[ss.length - 1]))];
+//        System.out.println("s.indexOf(ss[ss.length - 1]): " + s.indexOf(ss[ss.length - 1]));
+        System.arraycopy(b, s.indexOf(ss[ss.length - 1]), d, 0, d.length);
+//        System.out.println("d: " + Arrays.toString(d) + " (" + d.length + ")");
         l.add(d);
         return l;
     }
@@ -59,14 +61,14 @@ public class Procedural {
             if (o instanceof Integer) {
                 dos.write(INTIDENTIFIER.getBytes());
                 dos.writeInt((Integer) o);
-            } else if (o instanceof byte[]) {
-                dos.write((byte[]) o);
-            } else {
-                dos.write(o.toString().getBytes());
             }
-            dos.write((byte) SEPARATION);
+//            else if (o instanceof String) dos.writeUTF((String) o);
+            else if (o instanceof byte[]) dos.write((byte[]) o);
+            else dos.write(o.toString().getBytes());
+            dos.write(SEPARATION.getBytes());
         }
-        dos.write(DigestCalculator.digestMessage(l));
+        byte[] dig = DigestCalculator.digestMessage(l);
+        dos.write(dig);
         return baos.toByteArray();
     }
 
