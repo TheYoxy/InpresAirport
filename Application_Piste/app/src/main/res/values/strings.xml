@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Application_Piste</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email" translatable="false">Email</string>
+    <string name="user">User</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_user">This user is invalid</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">OUI</string>
+    <!--<string name="ServerName" translatable="false">10.59.22.87</string>-->
+    <!--<string name="ServerName" translatable="false">192.168.43.56</string>-->
+    <string name="ServerName" translatable="false">192.168.1.13</string>
+    <!--floryan-msi-portable.lan-->
+    <string name="flight">Flight</string>
+    <string name="validation">Validate</string>
+    <string name="chargement">Loaded</string>
+    <string name="valise">Suitcase</string>
+    <string name="Validate">Validate</string>
+</resources>
+

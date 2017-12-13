@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Application_Piste</string>
+    <string name="error_invalid_email">Cet e-mail est éronné</string>
+    <string name="error_invalid_user">Cet utilisateur est inexistant</string>
+    <string name="user">Utilisateur</string>
+    <string name="action_sign_in">Connexion</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="error_field_required">Ce champ est nécéssaire</string>
+    <string name="error_incorrect_password">Ce mot de passe est incorrect</string>
+    <string name="permission_rationale">NON</string>
+    <string name="flight">Vol</string>
+    <string name="validation">Valider</string>
+    <string name="chargement">Chargé ?</string>
+    <string name="valise">Valise</string>
+    <string name="Validate">Valider</string>
+</resources>
