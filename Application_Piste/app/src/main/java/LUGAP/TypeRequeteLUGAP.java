@@ -9,5 +9,6 @@ public enum TypeRequeteLUGAP implements TypeRequete {
     Disconnect,
     Request_Vols,
     Request_Bagages_Vol,
-    Update_Bagage_Vol
+    Update_Bagage_Vol,
+    Update_mobile
 }

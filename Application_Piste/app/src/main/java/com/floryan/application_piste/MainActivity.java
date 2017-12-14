@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -30,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Table t;
-    private ArrayAdapter<Vol> controleurVol;
     private List<Vol> i;
 
     @Override
@@ -49,17 +49,17 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener((adapterView, view, i, l1) -> {
             Intent intent1 = new Intent(getBaseContext(), BagagesActivity.class);
             intent1.putExtra(VOL, (Vol) lv.getItemAtPosition(i));
-            Bundle b = new Bundle();
-
-            startActivity(intent1);
+            int res = 0;
+            startActivityForResult(intent1, res);
+            if (res == -1)
+                Toast.makeText(MainActivity.this, "Les bagages de ce vol sont déjà en cours de modification", Toast.LENGTH_LONG).show();
         });
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        //Todo fix => Stop même quand on switch d'application
-        new Deconnexion().execute();
+    protected void onDestroy() {
+        super.onDestroy();
+        //        new Deconnexion().execute();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -92,21 +92,21 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
                 return false;
-                }
-                return true;
             }
+            return true;
+        }
 
-            @Override
-            protected void onPostExecute(Boolean aVoid) {
-                super.onPostExecute(aVoid);
-                if (aVoid) {
-                    ListView lv = findViewById(R.id.ListVols);
-                    try {
-                    controleurVol = new ArrayAdapter<>(MainActivity.this, R.layout.vol_list_layout,R.id.tv,Vol.fromTableList(t));
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean) {
+                ListView lv = findViewById(R.id.ListVols);
+                try {
+                    ArrayAdapter<Vol> controleurVol = new ArrayAdapter<>(MainActivity.this, R.layout.vol_list_layout, R.id.tv, Vol.fromTableList(t));
+                    lv.setAdapter(controleurVol);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                lv.setAdapter(controleurVol);
                 lv.invalidate();
             }
         }

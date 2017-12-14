@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
         String user = mUserView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-        new AsyncTask<Void, Void, Void>() {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -114,23 +114,25 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            protected Void doInBackground(Void[] objects) {
+            protected Boolean doInBackground(Void[] objects) {
                 try {
                     Looper.prepare();
                     s = new Socket(InetAddress.getByName(getString(R.string.ServerName)), getResources().getInteger(R.integer.ServerPort));
+                    return true;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    showProgress(false);
                 }
-                return null;
+                return false;
             }
 
             @Override
-            protected void onPostExecute(Void o) {
+            protected void onPostExecute(Boolean o) {
                 super.onPostExecute(o);
-
-                mAuthTask = new UserLoginTask(user, password);
-                mAuthTask.execute();
+                if (o) {
+                    mAuthTask = new UserLoginTask(user, password);
+                    mAuthTask.execute();
+                }
+                showProgress(false);
             }
         }.execute();
     }
