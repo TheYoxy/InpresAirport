@@ -54,11 +54,7 @@ public class BagagesActivity extends AppCompatActivity {
             else {
                 setContentView(R.layout.activity_bagages);
                 Button b = findViewById(R.id.button2);
-                b.setOnClickListener(view -> {
-                    System.out.println("Fin des ajouts");
-                    finishActivity(1);
-                    System.out.println("Fin des ajouts");
-                });
+                b.setOnClickListener(view -> finish());
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

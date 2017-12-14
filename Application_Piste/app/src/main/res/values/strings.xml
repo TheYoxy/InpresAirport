@@ -11,8 +11,8 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">OUI</string>
-    <!--<string name="ServerName" translatable="false">10.59.22.87</string>-->
-    <string name="ServerName" translatable="false">192.168.43.56</string>
+    <string name="ServerName" translatable="false">10.59.22.87</string>
+    <!--<string name="ServerName" translatable="false">192.168.43.56</string>-->
     <!--<string name="ServerName" translatable="false">192.168.1.13</string>-->
     <!--floryan-msi-portable.lan-->
     <string name="flight">Flight</string>
