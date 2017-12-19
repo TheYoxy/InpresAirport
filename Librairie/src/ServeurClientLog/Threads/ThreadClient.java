@@ -49,15 +49,18 @@ public class ThreadClient extends Thread {
                     } else {
                         boucle = !req.isDisconnect();
                         if (boucle) req.createRunnable(Oos).run();
-                        else System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
                     }
                 } catch (IOException | ClassNotFoundException e) {
-                    if (e.getMessage().contains("reset"))
+                    if (e.getMessage() == null)
                         boucle = false;
-                    System.out.println(this.getName() + "> " + e.getMessage());
+                    if (e.getMessage() != null && e.getMessage().contains("reset"))
+                        boucle = false;
+                    if (e.getMessage() != null)
+                        System.out.println(this.getName() + "> " + e.getMessage());
                 }
+                if (!boucle)
+                    System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
             }
-
             try {
                 Client.close();
             } catch (IOException e) {

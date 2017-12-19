@@ -9,8 +9,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 public class DigestCalculator {
@@ -32,7 +30,6 @@ public class DigestCalculator {
         DataOutputStream dos = new DataOutputStream(baos);
         dos.writeUTF(password);
         dos.writeInt(challenge);
-        dos.writeUTF(String.valueOf(LocalDate.now()));
         return md.digest(baos.toByteArray());
     }
 
@@ -41,7 +38,6 @@ public class DigestCalculator {
         DataOutputStream dos = new DataOutputStream(baos);
         dos.writeUTF(password);
         dos.write(challenge);
-        dos.writeUTF(String.valueOf(LocalDate.now()));
         return md.digest(baos.toByteArray());
     }
 
@@ -60,7 +56,6 @@ public class DigestCalculator {
             }
         }
         byte[] b = md.digest(baos.toByteArray());
-//        System.out.println("b: " + Arrays.toString(b));
-        return b;
+         return b;
     }
 }

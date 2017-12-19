@@ -6,7 +6,8 @@ import ServeurClientLog.Interfaces.TypeReponse;
 import java.io.Serializable;
 
 public class ReponseLUGAP implements Reponse, Serializable {
-    private TypeReponseLUGAP Reponse = null;
+    private static final long serialVersionUID = 124L;
+    private TypeReponseLUGAP Reponse;
     private Serializable Param = null;
 
     public ReponseLUGAP(TypeReponseLUGAP reponse) {

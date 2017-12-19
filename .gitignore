@@ -16,3 +16,4 @@ build.xml
 manifest.mf
 /dist/
 /build/
+*/libs/*

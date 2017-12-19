@@ -1,10 +1,10 @@
 package Application_Bagages;
 
-import NetworkObject.Table;
 import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;
 import LUGAP.TypeRequeteLUGAP;
+import NetworkObject.Table;
 import Tools.Procedural;
 import Tools.PropertiesReader;
 
@@ -140,14 +140,11 @@ public class Application_Bagage extends javax.swing.JFrame {
 
         BagagisteNomPrenomLabel.setFont(new java.awt.Font("Calibri", 2, 12)); // NOI18N
 
-        ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
+        ResultatJTable.setModel(new javax.swing.table.DefaultTableModel(new Object[][]{
 
-                },
-                new String[]{
+        }, new String[]{
 
-                }
-        ));
+        }));
         ResultatJTable.setCellSelectionEnabled(true);
         ResultatJTable.setEnabled(false);
         ResultatJTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -175,35 +172,8 @@ public class Application_Bagage extends javax.swing.JFrame {
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(BagagisteLabel)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addComponent(VolsLabel))
-                                                .addGap(0, 636, Short.MAX_VALUE)))
-                                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(BagagisteLabel)
-                                        .addComponent(BagagisteNomPrenomLabel))
-                                .addGap(24, 24, 24)
-                                .addComponent(VolsLabel)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(ScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE).addGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addComponent(BagagisteLabel).addGap(18, 18, 18).addComponent(BagagisteNomPrenomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)).addComponent(VolsLabel)).addGap(0, 636, Short.MAX_VALUE))).addContainerGap()));
+        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(BagagisteLabel).addComponent(BagagisteNomPrenomLabel)).addGap(24, 24, 24).addComponent(VolsLabel).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(ScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE).addContainerGap()));
 
         getAccessibleContext().setAccessibleDescription("");
 
@@ -217,7 +187,7 @@ public class Application_Bagage extends javax.swing.JFrame {
             if (row >= 0) {
                 String vol = ResultatJTable.getValueAt(row, 0).toString();
                 //Si il y a un lock, ListeBag renvoie une exception non gèrée, et fini la méthode
-                ListeBag = new ListeBagages(this, true, vol, Oos,Ois,Serveur);
+                ListeBag = new ListeBagages(this, true, vol, Oos, Ois, Serveur);
                 ListeBag.setVisible(true);
                 DisconnectMIActionPerformed(null);
             }
@@ -253,6 +223,7 @@ public class Application_Bagage extends javax.swing.JFrame {
         clearChamps();
         Connection(true);
     }//GEN-LAST:event_DisconnectMIActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BagagisteLabel;
     private javax.swing.JLabel BagagisteNomPrenomLabel;

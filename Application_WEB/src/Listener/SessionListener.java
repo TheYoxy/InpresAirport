@@ -1,16 +1,15 @@
 package Listener;
 
-import java.sql.SQLException;
-import java.util.List;
+import Beans.ReservationB;
+import Tools.Bd;
+import Tools.BdType;
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-
-import Beans.ReservationB;
-import Tools.Bd;
-import Tools.BdType;
+import java.sql.SQLException;
+import java.util.List;
 
 @WebListener("/")
 public class SessionListener implements HttpSessionListener {

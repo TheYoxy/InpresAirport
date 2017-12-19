@@ -1,8 +1,8 @@
 package IACOP;
 
-import java.security.InvalidParameterException;
-
 import ServeurClientLog.Interfaces.TypeRequete;
+
+import java.security.InvalidParameterException;
 
 public enum TypeRequeteIACOP implements TypeRequete {
     LOGIN_GROUP(0x1000), POST_QUESTION(0x10), ANSWER_QUESTION(0x20), POST_EVENT(0x30);
