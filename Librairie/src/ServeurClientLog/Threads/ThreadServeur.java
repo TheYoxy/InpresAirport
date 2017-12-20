@@ -1,6 +1,7 @@
 package ServeurClientLog.Threads;
 
 import ServeurClientLog.Containers.Containeur;
+import ServeurClientLog.Interfaces.Requete;
 import Tools.Procedural;
 
 import java.io.IOException;
@@ -12,15 +13,20 @@ import java.net.Socket;
  * threadClient (Thread esclave du poool)
  */
 public class ThreadServeur extends Thread {
-    private final int NbThreads;
     private final int Port;
-    private final Containeur<Socket> File;
+    private final Containeur<Socket> FileSocket;
+    private final ThreadClient[] listChild;
     private ServerSocket SSocket = null;
 
-    public ThreadServeur(int port, int nb_threads) {
+    public ThreadServeur(int port, int nb_threads, Class<? extends Requete> type) {
         this.Port = port;
-        this.File = new Containeur<>();
-        this.NbThreads = nb_threads;
+        this.FileSocket = new Containeur<>();
+        this.listChild = new ThreadClient[nb_threads];
+        for (int i = 0; i < listChild.length; i++) listChild[i] = new ThreadClient(FileSocket, "Thread du pool n°" + String.valueOf(i), type);
+    }
+
+    public ThreadClient[] getListChild() {
+        return listChild;
     }
 
     @Override
@@ -34,16 +40,13 @@ public class ThreadServeur extends Thread {
         }
 
         // Démarrage du pool de threads
-        for (int i = 0; i < NbThreads; i++) {
-            ThreadClient tcl = new ThreadClient(File, "Thread du pool n°" + String.valueOf(i));
-            tcl.start();
-        }
+        for (ThreadClient tc : listChild) tc.start();
 
         while (!isInterrupted()) {
             try {
                 Socket cSocket = SSocket.accept();
                 System.out.println("Connexion de " + Procedural.IpPort(cSocket) + '\n');
-                File.add(cSocket);
+                FileSocket.add(cSocket);
             } catch (IOException e) {
                 System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
                 return;
