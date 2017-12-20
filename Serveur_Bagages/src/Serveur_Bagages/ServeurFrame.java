@@ -1,10 +1,11 @@
 package Serveur_Bagages;
 
+import java.io.PrintStream;
+
+import LUGAP.RequeteLUGAP;
 import ServeurClientLog.Threads.ThreadServeur;
 import Tools.PropertiesReader;
 import Tools.TextAreaOutputStream;
-
-import java.io.PrintStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
 
@@ -126,7 +127,7 @@ public class ServeurFrame extends javax.swing.JFrame {
     private void StartBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartBActionPerformed
         if (!StateRB.isSelected()) {
             try {
-                Ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BAGAGES")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")));
+                Ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BAGAGES")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), RequeteLUGAP.class);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 System.exit(-1);
