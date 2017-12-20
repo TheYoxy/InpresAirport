@@ -1,18 +1,19 @@
 package ServeurClientLog.Threads;
 
-import ServeurClientLog.Containers.Containeur;
-import ServeurClientLog.Interfaces.Requete;
-import Tools.Procedural;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import ServeurClientLog.Containers.Containeur;
+import ServeurClientLog.Interfaces.Requete;
+import Tools.Procedural;
 
 /**
  * Classe qui gère le thread du serveur (Thread maître du pool) , qui va écouter sur un port, et qui va ajouter des tâches à faire pour les
  * threadClient (Thread esclave du poool)
  */
 public class ThreadServeur extends Thread {
+
     private final int Port;
     private final Containeur<Socket> FileSocket;
     private final ThreadClient[] listChild;

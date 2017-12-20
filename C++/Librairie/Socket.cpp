@@ -1,4 +1,3 @@
-#include <fcntl.h>
 #include "Socket.h"
 
 extern SParametres Parametres;

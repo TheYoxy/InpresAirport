@@ -1,7 +1,5 @@
 package NetworkObject;
 
-import android.support.annotation.NonNull;
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -37,21 +35,12 @@ public class Vol implements Serializable {
         IdAvion = idAvion;
     }
 
-    @NonNull
     public static List<Vol> fromTableList(Table t) throws ParseException {
         List<Vol> l = new LinkedList<>();
         for (Vector<String> v : t.getChamps()) l.add(fromVector(v));
         return l;
     }
 
-    @NonNull
-    public static Vol[] fromTableTable(Table t) throws ParseException {
-        ArrayList<Vol> al = new ArrayList<>();
-        for (Vector<String> v : t.getChamps()) al.add(fromVector(v));
-        return al.toArray(new Vol[al.size()]);
-    }
-
-    @NonNull
     public static Vol fromVector(Vector<String> t) throws ParseException {
         Vol v;
         if (t.size() == 6) {
@@ -64,6 +53,12 @@ public class Vol implements Serializable {
         } else
             throw new IllegalArgumentException("Size of vector is incorrect. (Requires 6)");
         return v;
+    }
+
+    public static Vol[] fromTableTable(Table t) throws ParseException {
+        ArrayList<Vol> al = new ArrayList<>();
+        for (Vector<String> v : t.getChamps()) al.add(fromVector(v));
+        return al.toArray(new Vol[al.size()]);
     }
 
     public String getNumeroVol() {
@@ -92,6 +87,6 @@ public class Vol implements Serializable {
 
     @Override
     public String toString() {
-        return "Vol: " + NumeroVol  + " (" + Destination + ")";
+        return "Vol: " + NumeroVol + " (" + Destination + ")";
     }
 }

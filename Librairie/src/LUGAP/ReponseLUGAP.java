@@ -1,13 +1,13 @@
 package LUGAP;
 
+import java.io.Serializable;
+
 import ServeurClientLog.Interfaces.Reponse;
 import ServeurClientLog.Interfaces.TypeReponse;
 
-import java.io.Serializable;
-
 public class ReponseLUGAP implements Reponse, Serializable {
     private static final long serialVersionUID = 124L;
-    private TypeReponseLUGAP Reponse;
+    private TypeReponseLUGAP Reponse = null;
     private Serializable Param = null;
 
     public ReponseLUGAP(TypeReponseLUGAP reponse) {

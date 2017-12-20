@@ -1,13 +1,5 @@
 package LUGAP;
 
-import NetworkObject.Login;
-import NetworkObject.Table;
-import ServeurClientLog.Interfaces.Requete;
-import Tools.Bd;
-import Tools.BdType;
-import Tools.DigestCalculator;
-import Tools.VolField;
-
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -20,6 +12,14 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import NetworkObject.Login;
+import NetworkObject.Table;
+import ServeurClientLog.Interfaces.Requete;
+import Tools.Bd;
+import Tools.BdType;
+import Tools.DigestCalculator;
+import Tools.VolField;
 
 public class RequeteLUGAP implements Requete {
     private static final long serialVersionUID = 123L;
@@ -37,6 +37,7 @@ public class RequeteLUGAP implements Requete {
     //        BD_THREAD_LOCAL.set(null);
     //        RESULT_SET_UPDATE.set(null);
     //    }
+
 
     private TypeRequeteLUGAP Type = null;
     private Serializable Param = null;
@@ -111,6 +112,7 @@ public class RequeteLUGAP implements Requete {
                                 byte envoye[] = ((Login) Param).getPassword();
                                 byte pass[] = DigestCalculator.hashPassword(rs.getString(password), CHALLENGE.get());
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
+
                                 System.out.println("-------------------------------------------------------------------");
                                 System.out.println(Thread.currentThread().getName() + "> Hash en string: ");
                                 System.out.println(Thread.currentThread().getName() + "> Hash envoyé:           " + new String(envoye));

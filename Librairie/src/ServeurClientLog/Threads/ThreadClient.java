@@ -1,16 +1,16 @@
 package ServeurClientLog.Threads;
 
-import ServeurClientLog.Containers.Containeur;
-import ServeurClientLog.Interfaces.Events.StateChanged;
-import ServeurClientLog.Interfaces.Requete;
-import Tools.Procedural;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
+
+import ServeurClientLog.Containers.Containeur;
+import ServeurClientLog.Interfaces.Events.StateChanged;
+import ServeurClientLog.Interfaces.Requete;
+import Tools.Procedural;
 
 public class ThreadClient extends Thread {
     private final Containeur<Socket> TachesAExecuter;
@@ -68,6 +68,7 @@ public class ThreadClient extends Thread {
                 }
                 if (!boucle) System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
             }
+
             try {
                 Client.close();
                 fireState(false);

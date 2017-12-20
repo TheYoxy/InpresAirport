@@ -1,19 +1,5 @@
 #ifndef SERVEUR_SOCKET_H
 #define SERVEUR_SOCKET_H
-#define EXCEPTION() (std::string(__FILE__) + ":" + std::to_string(__LINE__) + " ")
-//Couleurs pour le terminal
-#define INIT 0
-#define NOIR 30
-#define RED 31
-#define GREEN 32
-#define YELLOW 33
-#define BLUE 34
-#define MAGENTA 35
-#define CYAN 36
-
-#define WHITE 37
-#define Error(couleur, message) std::cerr << "\033[" << couleur << "m" << message << "\033[" << INIT << "m" << std::endl
-
 #include <unistd.h>
 #include <cstring>
 #include <cstdio>
@@ -26,7 +12,8 @@
 #include "ipv4.h"
 #include "Structs.h"
 #include "Fonctions.h"
-
+#include "Macro.h"
+#include <fcntl.h>
 //Lecture selon le nombre de bytes à lire
 //Lecture de bytes en fonction d'une fin de lecture
 class Socket {

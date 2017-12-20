@@ -36,6 +36,11 @@ pthread_key_t keySocketThread;
 // Parametres.PortRange[0] => Premier port disponible pour le serveur
 SocketServeur *socketPrincipal = nullptr;
 
+#ifdef DEBUG
+
+#endif
+
+
 int main(int argc, char **args) {
     cout << CLEAN;
     InitialisationLog();
