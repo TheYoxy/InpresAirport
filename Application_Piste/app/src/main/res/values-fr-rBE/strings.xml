@@ -15,4 +15,7 @@
     <string name="valise">Valise</string>
     <string name="Validate">Valider</string>
     <string name="poids">"Poids: "</string>
+    <string name="flightdot">"Vol: "</string>
+    <string name="fullyload">"Completement chargé ? "</string>
+    <string name="dest">"Destination: "</string>
 </resources>

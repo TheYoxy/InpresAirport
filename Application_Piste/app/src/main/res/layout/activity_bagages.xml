@@ -30,7 +30,7 @@
             app:title="Bagages" />
 
         <ListView
-            android:id="@+id/ListBagages"
+            android:id="@+id/ListBagages" style="@style/Widget.AppCompat.ListView.Menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout_editor_absoluteX="8dp"
