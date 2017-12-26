@@ -16,6 +16,7 @@ import java.util.Random;
 import NetworkObject.Login;
 import NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
+import TICKMAP.RequeteTICKMAP;
 import Tools.Bd;
 import Tools.BdType;
 import Tools.DigestCalculator;
@@ -27,10 +28,12 @@ public class RequeteLUGAP implements Requete {
     private static final ThreadLocal<Boolean> LOG_STATUS = ThreadLocal.withInitial(() -> false);
     private static final ThreadLocal<Bd> BD_THREAD_LOCAL = ThreadLocal.withInitial(() -> null);
     private static final ThreadLocal<ResultSet> RESULT_SET_UPDATE = ThreadLocal.withInitial(() -> null);
-    //    private static final ThreadLocal<Integer> CHALLENGE = new ThreadLocal<>();/*ThreadLocal.withInitial(() -> 0);*/
-    //    private static final ThreadLocal<Boolean> LOG_STATUS = new ThreadLocal<>();/*ThreadLocal.withInitial(() -> false);*/
-    //    private static final ThreadLocal<Bd> BD_THREAD_LOCAL = new ThreadLocal<>();/*ThreadLocal.withInitial(() -> null);*/
-    //    private static final ThreadLocal<ResultSet> RESULT_SET_UPDATE = new ThreadLocal<>();/*ThreadLocal.withInitial(() -> null);*/
+
+    //    private static final ThreadLocal<Integer> CHALLENGE = new ThreadLocal<>();
+    //    private static final ThreadLocal<Boolean> LOG_STATUS = new ThreadLocal<>();
+    //    private static final ThreadLocal<Bd> BD_THREAD_LOCAL = new ThreadLocal<>();
+    //    private static final ThreadLocal<ResultSet> RESULT_SET_UPDATE = new ThreadLocal<>();
+
     //    static{
     //        CHALLENGE.set(0);
     //        LOG_STATUS.set(false);
@@ -99,13 +102,7 @@ public class RequeteLUGAP implements Requete {
                                 password = i;
                             }
                         }
-                        if (user == -1) {
-                            System.out.println(Thread.currentThread().getName() + "> (Server error) User introuvable");
-                            return;
-                        } else if (password == -1) {
-                            System.out.println(Thread.currentThread().getName() + "> (Server error) Password introuvable");
-                            return;
-                        }
+                        if (RequeteTICKMAP.test(user, password)) return;
                         rep = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN);
                         while (rs.next()) {
                             if (rs.getString(user).equals(((Login) Param).getUser())) {

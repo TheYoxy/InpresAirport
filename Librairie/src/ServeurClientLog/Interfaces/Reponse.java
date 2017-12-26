@@ -1,5 +1,7 @@
 package ServeurClientLog.Interfaces;
 
-public interface Reponse {
+import java.io.Serializable;
+
+public interface Reponse extends Serializable {
     TypeReponse getCode();
 }

@@ -1,5 +1,9 @@
 package Serveur;
 
+import java.io.PrintStream;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import ServeurClientLog.Threads.ThreadClient;
 import ServeurClientLog.Threads.ThreadServeur;
 import TICKMAP.RequeteTICKMAP;
@@ -10,13 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.io.PrintStream;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class ServeurControlleur implements Initializable {
     @FXML
@@ -29,7 +27,7 @@ public class ServeurControlleur implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.setOut(new PrintStream(new FTextAreaOutputStream(Console)));
-        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BAGAGES")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), RequeteTICKMAP.class);
+        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), RequeteTICKMAP.class);
 
         ThreadClient[] tc = ts.getListChild();
         for (ThreadClient aTc : tc) {

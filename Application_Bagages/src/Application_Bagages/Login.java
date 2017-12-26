@@ -1,17 +1,19 @@
 package Application_Bagages;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;
 import LUGAP.TypeRequeteLUGAP;
 import Tools.DigestCalculator;
 import Tools.Procedural;
-
-import javax.swing.*;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 
 /**
  * @author floryan
@@ -201,7 +203,14 @@ public class Login extends javax.swing.JDialog {
         System.out.println("Challenge: " + challenge);
         //Login
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Login, new NetworkObject.Login(LoginTF.getText(), DigestCalculator.hashPassword(new String(PasswordPF.getPassword()), challenge)), Procedural.IpPort(Socket)));
+            Oos.writeObject(new RequeteLUGAP(
+                    TypeRequeteLUGAP.Login,
+                    new NetworkObject.Login(
+                            LoginTF.getText(),
+                            DigestCalculator.hashPassword(
+                                    new String(PasswordPF.getPassword()),
+                                    challenge)),
+                    Procedural.IpPort(Socket)));
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();

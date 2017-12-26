@@ -1,27 +1,27 @@
-package LUGAP;
+package TICKMAP;
 
 import java.io.Serializable;
 
 import ServeurClientLog.Interfaces.Reponse;
 import ServeurClientLog.Interfaces.TypeReponse;
 
-public class ReponseLUGAP implements Reponse {
-    private static final long serialVersionUID = 124L;
-    private TypeReponseLUGAP Reponse = null;
+public class ReponseTICKMAP implements Reponse {
+    private static final long serialVersionUID = 111L;
+    private TypeReponseTICKMAP Reponse = null;
     private Serializable Param = null;
 
-    public ReponseLUGAP(TypeReponseLUGAP reponse) {
-        Reponse = reponse;
+    public ReponseTICKMAP(TypeReponseTICKMAP reponse, Serializable param) {
+        this(reponse);
+        this.Param = param;
     }
 
-    public ReponseLUGAP(TypeReponseLUGAP reponse, Serializable param) {
+    public ReponseTICKMAP(TypeReponseTICKMAP reponse) {
         this.Reponse = reponse;
-        this.Param = param;
     }
 
     @Override
     public String toString() {
-        return "ReponseLUGAP{" +
+        return "ReponseTICKMAP{" +
                 "Reponse=" + Reponse +
                 ", Param=" + Param +
                 '}';
