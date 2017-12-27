@@ -2,6 +2,7 @@ package LUGAP;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -74,7 +75,7 @@ public class RequeteLUGAP implements Requete {
     }
 
     @Override
-    public Runnable createRunnable(final ObjectOutputStream oosClient) {
+    public Runnable createRunnable(final OutputStream output) {
         Runnable retour = null;
         switch (this.Type) {
             case TryConnect:
@@ -83,7 +84,7 @@ public class RequeteLUGAP implements Requete {
                     CHALLENGE.set(new Random().nextInt());
                     ReponseLUGAP rep = new ReponseLUGAP(TypeReponseLUGAP.OK, CHALLENGE.get());
                     System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + CHALLENGE.get());
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Login:
@@ -142,7 +143,7 @@ public class RequeteLUGAP implements Requete {
                     if (rep.getCode() == TypeReponseLUGAP.UNKNOWN_LOGIN) {
                         System.out.println(Thread.currentThread().getName() + "> Utilisateur introuvable");
                     }
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Logout:
@@ -157,7 +158,7 @@ public class RequeteLUGAP implements Requete {
                         e.printStackTrace(System.out);
                         rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Disconnect:
@@ -177,7 +178,7 @@ public class RequeteLUGAP implements Requete {
                         System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
                         rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Request_Bagages_Vol:
@@ -199,7 +200,7 @@ public class RequeteLUGAP implements Requete {
                             System.out.println(Thread.currentThread().getName() + "> SQLException code: " + e.getErrorCode());
                         }
                     }
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Update_Bagage_Vol:
@@ -211,7 +212,7 @@ public class RequeteLUGAP implements Requete {
                     if (l.size() < 3 && l.size() % 2 == 0) {
                         System.out.println(Thread.currentThread().getName() + "> Taille incohérente");
                         rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
-                        RequeteLUGAP.this.Reponse(oosClient, rep);
+                        RequeteLUGAP.this.Reponse(output, rep);
                         return;
                     }
 
@@ -231,7 +232,7 @@ public class RequeteLUGAP implements Requete {
                         e.printStackTrace(System.out);
                         rep = new ReponseLUGAP(TypeReponseLUGAP.NOT_OK);
                     }
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
             case Update_mobile:
@@ -245,11 +246,11 @@ public class RequeteLUGAP implements Requete {
                             RequeteLUGAP.this.Update(RESULT_SET_UPDATE.get(), ls);
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            RequeteLUGAP.this.Reponse(oosClient, new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
+                            RequeteLUGAP.this.Reponse(output, new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
                             return;
                         } catch (UpdateException e) {
                             e.printStackTrace();
-                            RequeteLUGAP.this.Reponse(oosClient, new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
+                            RequeteLUGAP.this.Reponse(output, new ReponseLUGAP(TypeReponseLUGAP.NOT_OK));
                             return;
                         }
                     }
@@ -260,7 +261,7 @@ public class RequeteLUGAP implements Requete {
                         e.printStackTrace();
                     }
                     rep = new ReponseLUGAP(TypeReponseLUGAP.OK);
-                    RequeteLUGAP.this.Reponse(oosClient, rep);
+                    RequeteLUGAP.this.Reponse(output, rep);
                 };
                 break;
         }
@@ -272,10 +273,10 @@ public class RequeteLUGAP implements Requete {
         System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + Type.toString() + " de " + From);
     }
 
-    private void Reponse(final ObjectOutputStream oos, ReponseLUGAP rep) {
+    private void Reponse(final OutputStream outputStream, ReponseLUGAP rep) {
         System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
         try {
-            oos.writeObject(rep);
+            ((ObjectOutputStream) outputStream).writeObject(rep);
         } catch (IOException e) {
             e.printStackTrace();
         }
