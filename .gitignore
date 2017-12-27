@@ -17,3 +17,5 @@ manifest.mf
 /dist/
 /build/
 */libs/*
+*.jar
+Librairie/src/CryptoTest/
