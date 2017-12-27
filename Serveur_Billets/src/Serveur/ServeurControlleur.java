@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 import ServeurClientLog.Threads.ThreadClient;
 import ServeurClientLog.Threads.ThreadServeur;
 import TICKMAP.RequeteTICKMAP;
+import TICKMAP.SecureRequeteTICKMAP;
 import Tools.FTextAreaOutputStream;
 import Tools.PropertiesReader;
 import javafx.application.Platform;
@@ -27,7 +28,17 @@ public class ServeurControlleur implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.setOut(new PrintStream(new FTextAreaOutputStream(Console)));
-        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")), Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), RequeteTICKMAP.class);
+        try {
+            //Init des classes de la crypto
+            Class.forName("Tools.Crypto.PrivateKeyCipher");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")),
+                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")),
+                RequeteTICKMAP.class,
+                SecureRequeteTICKMAP.class);
 
         ThreadClient[] tc = ts.getListChild();
         for (ThreadClient aTc : tc) {

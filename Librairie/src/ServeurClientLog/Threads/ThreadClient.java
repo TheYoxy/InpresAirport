@@ -19,9 +19,9 @@ public class ThreadClient extends Thread {
     private ObjectOutputStream Oos;
     private boolean Logged;
     private List<StateChanged> stateChangedList;
-    private Class<? extends Requete> type;
+    private Class<? extends Requete>[] type;
 
-    public ThreadClient(Containeur<Socket> st, String n, Class<? extends Requete> type) {
+    public ThreadClient(Containeur<Socket> st, String n, Class<? extends Requete>... type) {
         TachesAExecuter = st;
         this.setName(n);
         stateChangedList = new LinkedList<>();
@@ -49,24 +49,33 @@ public class ThreadClient extends Thread {
             while (boucle) {
                 try {
                     Requete req = (Requete) Ois.readObject();
-                    if (type.isAssignableFrom(req.getClass())) {
-                        if (!Logged) {
-                            if (req.isLogin()) req.createRunnable(Oos).run();
-                            Logged = req.loginSucced();
-                        } else {
-                            boucle = !req.isDisconnect();
-                            if (boucle) req.createRunnable(Oos).run();
+                    int i, typeLength;
+                    for (i = 0, typeLength = type.length; i < typeLength; i++) {
+                        Class c = type[i];
+                        if (c.isAssignableFrom(req.getClass())) {
+                            if (!Logged) {
+                                if (req.isLogin()) req.createRunnable(Oos).run();
+                                Logged = req.loginSucced();
+                            } else {
+                                boucle = !req.isDisconnect();
+                                if (boucle) req.createRunnable(Oos).run();
+                            }
+                            break;
                         }
-                    } else {
-                        System.out.println("Message reçu de type invalide");
-                        System.out.println(req.getClass().toString() + " != " + type.toString());
                     }
+
+                    if (i == typeLength) {
+                        System.out.println("Message reçu de type invalide");
+                    }
+
                 } catch (IOException | ClassNotFoundException e) {
                     if (e.getMessage() == null) boucle = false;
                     if (e.getMessage() != null && e.getMessage().contains("reset")) boucle = false;
-                    if (e.getMessage() != null) System.out.println(this.getName() + "> " + e.getMessage());
+                    if (e.getMessage() != null)
+                        System.out.println(this.getName() + "> " + e.getMessage());
                 }
-                if (!boucle) System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
+                if (!boucle)
+                    System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
             }
 
             try {

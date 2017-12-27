@@ -2,7 +2,6 @@ package TICKMAP;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -28,15 +27,6 @@ public class RequeteTICKMAP implements Requete {
     private Serializable Param = null;
     private String From = "";
 
-    public RequeteTICKMAP(TypeRequeteTICKMAP type, Serializable param) {
-        this(type);
-        this.Param = param;
-    }
-
-    private RequeteTICKMAP(TypeRequeteTICKMAP type) {
-        this.Type = type;
-    }
-
     public RequeteTICKMAP(TypeRequeteTICKMAP type, Serializable Param, String From) {
         this(type, From);
         this.Param = Param;
@@ -45,6 +35,10 @@ public class RequeteTICKMAP implements Requete {
     public RequeteTICKMAP(TypeRequeteTICKMAP type, String from) {
         this(type);
         this.From = from;
+    }
+
+    private RequeteTICKMAP(TypeRequeteTICKMAP type) {
+        this.Type = type;
     }
 
     public Serializable getParam() {
@@ -56,7 +50,7 @@ public class RequeteTICKMAP implements Requete {
     }
 
     @Override
-    public Runnable createRunnable(final OutputStream output) {
+    public Runnable createRunnable(final ObjectOutputStream output) {
         Runnable retour = null;
         switch (this.Type) {
             case TryConnect:
@@ -64,7 +58,7 @@ public class RequeteTICKMAP implements Requete {
                     CHALLENGE.set(new SecureRandom().nextInt());
                     ReponseTICKMAP rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, CHALLENGE.get());
                     System.out.println(Thread.currentThread().getName() + "> Digest salé généré: " + CHALLENGE.get());
-                    Reponse((ObjectOutputStream) output, rep);
+                    Reponse(output, rep);
                 };
                 break;
             case Login:
@@ -122,12 +116,8 @@ public class RequeteTICKMAP implements Requete {
                     if (rep.getCode() == TypeReponseLUGAP.UNKNOWN_LOGIN) {
                         System.out.println(Thread.currentThread().getName() + "> Utilisateur introuvable");
                     }
-                    Reponse((ObjectOutputStream) output, rep);
+                    Reponse(output, rep);
                 };
-                break;
-            case Logout:
-                break;
-            case Disconnect:
                 break;
         }
         return retour;

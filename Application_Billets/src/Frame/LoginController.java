@@ -1,5 +1,6 @@
 package Frame;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,11 +10,30 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ResourceBundle;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import NetworkObject.AESParams;
 import NetworkObject.Login;
 import TICKMAP.ReponseTICKMAP;
 import TICKMAP.RequeteTICKMAP;
+import TICKMAP.SecureRequeteTICKMAP;
 import TICKMAP.TypeReponseTICKMAP;
 import TICKMAP.TypeRequeteTICKMAP;
 import Tools.AsyncTask;
@@ -53,18 +73,6 @@ public class LoginController implements Initializable {
     private Socket s;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-
-    public Socket getS() {
-        return s;
-    }
-
-    public ObjectInputStream getOis() {
-        return ois;
-    }
-
-    public ObjectOutputStream getOos() {
-        return oos;
-    }
 
     public boolean isConnected() {
         return connected;
@@ -178,6 +186,7 @@ public class LoginController implements Initializable {
                                 case BAD_PASSWORD:
                                     return BAD_PASSWORD;
                                 case OK:
+                                    KeyExchange();
                                     return OK;
                             }
                         else return SERVERERROR;
@@ -195,8 +204,94 @@ public class LoginController implements Initializable {
             } catch (ClassNotFoundException e) {
                 error = e.getMessage();
                 return CLASSNOTFOUND;
+            } catch (NoSuchAlgorithmException e) {
+                error = e.getMessage();
+            } catch (CertificateException e) {
+                error = e.getMessage();
+            } catch (KeyStoreException e) {
+                error = e.getMessage();
+            } catch (InvalidKeyException e) {
+                error = e.getMessage();
+            } catch (InvalidAlgorithmParameterException e) {
+                error = e.getMessage();
+            } catch (NoSuchPaddingException e) {
+                error = e.getMessage();
+            } catch (BadPaddingException e) {
+                error = e.getMessage();
+            } catch (NoSuchProviderException e) {
+                error = e.getMessage();
+            } catch (IllegalBlockSizeException e) {
+                error = e.getMessage();
             }
             return SOCKET_TIMEOUT;
+        }
+
+        /**
+         * Méthode qui fait l'échange de la clef de session entre le serveur et le client
+         *
+         * @throws NoSuchProviderException
+         * @throws NoSuchAlgorithmException
+         * @throws InvalidKeyException
+         * @throws CertificateException
+         * @throws KeyStoreException
+         * @throws NoSuchPaddingException
+         * @throws IOException
+         * @throws BadPaddingException
+         * @throws IllegalBlockSizeException
+         * @throws InvalidAlgorithmParameterException
+         * @throws ClassNotFoundException
+         */
+        private void KeyExchange() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, KeyStoreException, NoSuchPaddingException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, ClassNotFoundException {
+            ReponseTICKMAP rep;
+            do {
+                AESParams aesParams = genSecretKey();
+                Cipher cipher = genPublicKey();
+                oos.writeObject(new SecureRequeteTICKMAP(TypeRequeteTICKMAP.Handshake, aesParams, Procedural.StringIp(s), cipher));
+                rep = (ReponseTICKMAP) ois.readObject();
+            } while (rep.getCode() != TypeReponseTICKMAP.OK);
+        }
+
+        /**
+         * @return Object AESParams contenant toutes les données pour pouvoir faire de l'AESParams
+         * @throws NoSuchProviderException  OUi
+         * @throws NoSuchAlgorithmException OUI
+         */
+        private AESParams genSecretKey() throws NoSuchProviderException, NoSuchAlgorithmException {
+            System.out.print("Génération de la clef de session ");
+            SecureRandom sr = new SecureRandom();
+            System.out.print(".");
+            KeyGenerator key = KeyGenerator.getInstance("Rijndael", "BC");
+            System.out.print(".");
+            key.init(sr);
+            System.out.print(".");
+            SecretKey secretKey = key.generateKey();
+            System.out.print(".");
+            byte[] init = new byte[16];
+            System.out.print(".");
+            sr.nextBytes(init);
+            System.out.println(".");
+            return new AESParams(secretKey, init);
+        }
+
+        /**
+         * @return
+         * @throws KeyStoreException
+         * @throws IOException
+         * @throws NoSuchPaddingException
+         * @throws NoSuchAlgorithmException
+         * @throws NoSuchProviderException
+         * @throws InvalidKeyException
+         * @throws CertificateException
+         */
+        private Cipher genPublicKey() throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
+            System.out.println("Récupération de la clef publique du serveur");
+            KeyStore ks = KeyStore.getInstance("jks");
+            ks.load(new FileInputStream(System.getProperty("user.home") + "/.keystore"), "GR;Ps~\"[?3])N9j4".toCharArray());
+            X509Certificate certificate = (X509Certificate) ks.getCertificate("appbillets");
+            PublicKey pk = certificate.getPublicKey();
+            Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
+            cipher.init(Cipher.PUBLIC_KEY, pk);
+            return cipher;
         }
     }
 }

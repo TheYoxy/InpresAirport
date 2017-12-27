@@ -13,7 +13,6 @@ import java.util.List;
 
 public class DigestCalculator {
     private static MessageDigest md;
-
     static {
         //addProvider en local, car on travaille sur différentes machines
         Security.addProvider(new BouncyCastleProvider());
@@ -55,7 +54,6 @@ public class DigestCalculator {
                 e.printStackTrace();
             }
         }
-        byte[] b = md.digest(baos.toByteArray());
-         return b;
+        return md.digest(baos.toByteArray());
     }
 }

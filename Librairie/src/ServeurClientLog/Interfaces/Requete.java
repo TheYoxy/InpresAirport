@@ -1,10 +1,10 @@
 package ServeurClientLog.Interfaces;
 
-import java.io.OutputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public interface Requete extends Serializable {
-    Runnable createRunnable(OutputStream oosClient);
+    Runnable createRunnable(ObjectOutputStream oosClient);
 
     boolean isLogin();
 

@@ -75,7 +75,7 @@ public class RequeteLUGAP implements Requete {
     }
 
     @Override
-    public Runnable createRunnable(final OutputStream output) {
+    public Runnable createRunnable(final ObjectOutputStream output) {
         Runnable retour = null;
         switch (this.Type) {
             case TryConnect:

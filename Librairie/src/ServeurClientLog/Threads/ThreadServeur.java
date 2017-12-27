@@ -19,7 +19,7 @@ public class ThreadServeur extends Thread {
     private final ThreadClient[] listChild;
     private ServerSocket SSocket = null;
 
-    public ThreadServeur(int port, int nb_threads, Class<? extends Requete> type) {
+    public ThreadServeur(int port, int nb_threads, Class<? extends Requete>... type) {
         this.Port = port;
         this.FileSocket = new Containeur<>();
         this.listChild = new ThreadClient[nb_threads];
