@@ -1,6 +1,7 @@
 package ServeurClientLog.Threads;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,17 +14,19 @@ import Tools.Procedural;
  * threadClient (Thread esclave du poool)
  */
 public class ThreadServeur extends Thread {
-
     private final int Port;
-    private final Containeur<Socket> FileSocket;
+    private final Containeur<Runnable> FileSocket;
     private final ThreadClient[] listChild;
     private ServerSocket SSocket = null;
+    private Class<? extends Requete> types[];
 
     public ThreadServeur(int port, int nb_threads, Class<? extends Requete>... type) {
         this.Port = port;
         this.FileSocket = new Containeur<>();
         this.listChild = new ThreadClient[nb_threads];
-        for (int i = 0; i < listChild.length; i++) listChild[i] = new ThreadClient(FileSocket, "Thread du pool n°" + String.valueOf(i), type);
+        types = type;
+        for (int i = 0; i < listChild.length; i++)
+            listChild[i] = new ThreadClient(FileSocket, "Thread du pool n°" + String.valueOf(i));
     }
 
     public ThreadClient[] getListChild() {
@@ -45,12 +48,23 @@ public class ThreadServeur extends Thread {
 
         while (!isInterrupted()) {
             try {
-                Socket cSocket = SSocket.accept();
-                System.out.println("Connexion de " + Procedural.IpPort(cSocket) + '\n');
-                FileSocket.add(cSocket);
+                Socket socket = SSocket.accept();
+                System.out.println("Connexion de " + Procedural.IpPort(socket) + '\n');
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                Requete req = (Requete) ois.readObject();
+                int i, typeLength;
+                for (i = 0, typeLength = types.length; i < typeLength; i++) {
+                    Class c = types[i];
+                    if (c.isAssignableFrom(req.getClass())) {
+                        FileSocket.add(req.createRunnable(socket));
+                        break;
+                    }
+                }
             } catch (IOException e) {
                 System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
                 return;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }

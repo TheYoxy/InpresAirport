@@ -1,16 +1,8 @@
 package ServeurClientLog.Interfaces;
 
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 
 public interface Requete extends Serializable {
-    Runnable createRunnable(ObjectOutputStream oosClient);
-
-    boolean isLogin();
-
-    boolean loginSucced();
-
-    boolean isLogout();
-
-    boolean isDisconnect();
+    Runnable createRunnable(Socket client);
 }

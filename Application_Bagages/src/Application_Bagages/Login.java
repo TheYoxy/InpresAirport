@@ -8,6 +8,7 @@ import java.net.Socket;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import LUGAP.LUGAPThreadRequest;
 import LUGAP.ReponseLUGAP;
 import LUGAP.RequeteLUGAP;
 import LUGAP.TypeReponseLUGAP;
@@ -33,6 +34,12 @@ public class Login extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         Socket = serveur;
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream(Socket.getOutputStream());
+            oos.writeObject(new LUGAPThreadRequest());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

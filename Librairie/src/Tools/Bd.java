@@ -1,12 +1,24 @@
 package Tools;
 
-import NetworkObject.Table;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
+
+import NetworkObject.Table;
 
 @SuppressWarnings("ALL")
 public class Bd {
@@ -174,6 +186,7 @@ public class Bd {
      * @throws SQLException
      */
     public static Table toTable(ResultSet rs) throws SQLException {
+        if (rs == null) return null;
         Vector<String> title = new Vector<>();
         ResultSetMetaData rsmd = rs.getMetaData();
         for (int i = 1; i <= rsmd.getColumnCount(); i++) {

@@ -1,31 +1,20 @@
 package ServeurClientLog.Threads;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
 
 import ServeurClientLog.Containers.Containeur;
 import ServeurClientLog.Interfaces.Events.StateChanged;
-import ServeurClientLog.Interfaces.Requete;
-import Tools.Procedural;
 
 public class ThreadClient extends Thread {
-    private final Containeur<Socket> TachesAExecuter;
-    private Socket Client;
-    private ObjectInputStream Ois;
-    private ObjectOutputStream Oos;
-    private boolean Logged;
+    private final Containeur<Runnable> TachesAExecuter;
+    private Runnable Client;
     private List<StateChanged> stateChangedList;
-    private Class<? extends Requete>[] type;
 
-    public ThreadClient(Containeur<Socket> st, String n, Class<? extends Requete>... type) {
+    public ThreadClient(Containeur<Runnable> st, String name) {
         TachesAExecuter = st;
-        this.setName(n);
+        this.setName(name);
         stateChangedList = new LinkedList<>();
-        this.type = type;
     }
 
     @Override
@@ -34,57 +23,10 @@ public class ThreadClient extends Thread {
             try {
                 Client = TachesAExecuter.get();
                 fireState(true);
+                Client.run();
+                fireState(false);
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());
-            }
-            boolean boucle = true;
-            try {
-                Ois = new ObjectInputStream(Client.getInputStream());
-                Oos = new ObjectOutputStream(Client.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-                boucle = false;
-            }
-
-            while (boucle) {
-                try {
-                    Requete req = (Requete) Ois.readObject();
-                    int i, typeLength;
-                    for (i = 0, typeLength = type.length; i < typeLength; i++) {
-                        Class c = type[i];
-                        if (c.isAssignableFrom(req.getClass())) {
-                            if (!Logged) {
-                                if (req.isLogin()) req.createRunnable(Oos).run();
-                                Logged = req.loginSucced();
-                            } else {
-                                boucle = !req.isDisconnect();
-                                if (boucle) req.createRunnable(Oos).run();
-                            }
-                            break;
-                        }
-                    }
-
-                    if (i == typeLength) {
-                        System.out.println("Message reçu de type invalide");
-                    }
-
-                } catch (IOException | ClassNotFoundException e) {
-                    if (e.getMessage() == null) boucle = false;
-                    if (e.getMessage() != null && e.getMessage().contains("reset")) boucle = false;
-                    if (e.getMessage() != null)
-                        System.out.println(this.getName() + "> " + e.getMessage());
-                }
-                if (!boucle)
-                    System.out.println(this.getName() + "> Déconnexion de " + Procedural.IpPort(Client));
-            }
-
-            try {
-                Client.close();
-                fireState(false);
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            } finally {
-                fireState(false);
             }
         }
     }
