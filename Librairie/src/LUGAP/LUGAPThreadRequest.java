@@ -18,10 +18,10 @@ import java.util.Random;
 import NetworkObject.Login;
 import NetworkObject.Table;
 import ServeurClientLog.Interfaces.Requete;
-import TICKMAP.RequeteTICKMAP;
 import Tools.Bd;
 import Tools.BdType;
 import Tools.DigestCalculator;
+import Tools.Procedural;
 
 public class LUGAPThreadRequest implements Requete {
     private static final long serialVersionUID = 129L;
@@ -61,7 +61,7 @@ public class LUGAPThreadRequest implements Requete {
                                         password = i;
                                     }
                                 }
-                                if (RequeteTICKMAP.test(user, password)) return;
+                                if (Procedural.test(user, password)) return;
                                 rep = new ReponseLUGAP(TypeReponseLUGAP.UNKNOWN_LOGIN);
                                 while (rs.next()) {
                                     if (rs.getString(user).equals(((Login) req.getParam()).getUser())) {

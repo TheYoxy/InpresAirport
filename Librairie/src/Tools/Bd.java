@@ -137,7 +137,7 @@ public class Bd {
                     try {
                         System.out.println(Thread.currentThread().getName() + "> Requête ");
                         String id = ((Integer) (j + 1)).toString();
-//                        String id = "1";
+                        //                        String id = "1";
                         System.out.println(Thread.currentThread().getName() + "> Id: " + id);
                         ResultSet rs = anA.SelectBagageVol(id);
                         System.out.println(Thread.currentThread().getName() + "> Select passé");
@@ -258,15 +258,15 @@ public class Bd {
         l.sort(Comparator.naturalOrder());
 
         String numbillet = (l.size() != 0
-                            ? String.format("%06d", Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
-                            : "000001-" + numVol);
+                ? String.format("%06d", Integer.parseInt(l.get(l.size() - 1).split("-")[0]) + 1) + "-" + numVol
+                : "000001-" + numVol);
         ps = Connection.prepareStatement("INSERT INTO Billets(NumeroBillet, NumeroVol,idFacture) VALUES (?,?,?)");
         ps.setString(1, numbillet);
         ps.setString(2, numVol);
         ps.setInt(3, idFacture);
         return ps.executeUpdate() != 0
-               ? numbillet
-               : null;
+                ? numbillet
+                : null;
     }
 
     public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
@@ -329,6 +329,10 @@ public class Bd {
         return Connection.createStatement().executeQuery("SELECT * FROM Vols WHERE HeureDepart BETWEEN CURRENT_DATE AND CURRENT_DATE + 1");
     }
 
+    public synchronized ResultSet SelectWeekVols() throws SQLException {
+        return Connection.createStatement().executeQuery("SELECT * FROM Vols WHERE HeureDepart BETWEEN current_date AND current_date + 7");
+    }
+
     public synchronized ResultSet SelectVolReservable(String numVol) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("SELECT * FROM VolReservable WHERE NumeroVol LIKE ?");
         ps.setString(1, numVol);
@@ -370,8 +374,8 @@ public class Bd {
             case Reception:
             case Verifier:
                 ps.setInt(1, Boolean.valueOf(String.valueOf(value))
-                             ? 1
-                             : 0);
+                        ? 1
+                        : 0);
                 break;
             case Charger:
             case Remarque:

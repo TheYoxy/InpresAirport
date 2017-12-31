@@ -60,6 +60,10 @@ public class ThreadServeur extends Thread {
                         break;
                     }
                 }
+                if (i == typeLength) {
+                    System.out.println("L'objet envoyé par le client n'est pas accepté par le serveur.");
+                    System.out.println("Type: " + req.getClass());
+                }
             } catch (IOException e) {
                 System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
                 return;

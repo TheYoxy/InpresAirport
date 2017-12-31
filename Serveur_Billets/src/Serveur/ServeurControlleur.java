@@ -6,8 +6,7 @@ import java.util.ResourceBundle;
 
 import ServeurClientLog.Threads.ThreadClient;
 import ServeurClientLog.Threads.ThreadServeur;
-import TICKMAP.RequeteTICKMAP;
-import TICKMAP.SecureRequeteTICKMAP;
+import TICKMAP.TickmapThreadRequest;
 import Tools.FTextAreaOutputStream;
 import Tools.PropertiesReader;
 import javafx.application.Platform;
@@ -36,9 +35,7 @@ public class ServeurControlleur implements Initializable {
             System.exit(-1);
         }
         ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")),
-                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")),
-                RequeteTICKMAP.class,
-                SecureRequeteTICKMAP.class);
+                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), TickmapThreadRequest.class);
 
         ThreadClient[] tc = ts.getListChild();
         for (ThreadClient aTc : tc) {

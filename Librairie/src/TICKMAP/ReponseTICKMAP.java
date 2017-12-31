@@ -7,6 +7,7 @@ import ServeurClientLog.Interfaces.TypeReponse;
 
 public class ReponseTICKMAP implements Reponse {
     private static final long serialVersionUID = 111L;
+    public static final ReponseTICKMAP BAD = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
     private TypeReponseTICKMAP Reponse = null;
     private Serializable Param = null;
 

@@ -21,6 +21,17 @@ public class Procedural {
     public static final String SEPARATION = ";;;";
     public static final String INTIDENTIFIER = "WZK";
 
+    public static boolean test(int user, int password) {
+        if (user == -1) {
+            System.out.println(Thread.currentThread().getName() + "> (Server error) User introuvable");
+            return true;
+        } else if (password == -1) {
+            System.out.println(Thread.currentThread().getName() + "> (Server error) Password introuvable");
+            return true;
+        }
+        return false;
+    }
+
     public static List<Object> DivParametersUdp(byte[] array) {
         if (array == null) throw new IllegalArgumentException();
         LinkedList<Object> l = new LinkedList<>();

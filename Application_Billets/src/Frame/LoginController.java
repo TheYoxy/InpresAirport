@@ -1,5 +1,8 @@
 package Frame;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -30,10 +33,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import NetworkObject.AESParams;
+import NetworkObject.CryptedPackage;
 import NetworkObject.Login;
+import NetworkObject.Table;
 import TICKMAP.ReponseTICKMAP;
 import TICKMAP.RequeteTICKMAP;
-import TICKMAP.SecureRequeteTICKMAP;
+import TICKMAP.TickmapThreadRequest;
 import TICKMAP.TypeReponseTICKMAP;
 import TICKMAP.TypeRequeteTICKMAP;
 import Tools.AsyncTask;
@@ -73,7 +78,7 @@ public class LoginController implements Initializable {
     private Socket s;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-
+    private Table vols = null;
     public boolean isConnected() {
         return connected;
     }
@@ -106,6 +111,7 @@ public class LoginController implements Initializable {
         private static final int BADPARAM = -6;
         private static final int BAD_LOGIN = -10;
         private static final int BAD_PASSWORD = -11;
+        private static final int OTHER = 1;
         private static final int OK = 0;
         private String error = "";
 
@@ -138,10 +144,10 @@ public class LoginController implements Initializable {
                         message += error;
                         break;
                     case IOEXCEPTION:
-                        message = error;
+                        message = "IOexception: " + error;
                         break;
                     case CLASSNOTFOUND:
-                        message = error;
+                        message = "Class not found: " + error;
                         break;
                     case SERVERERROR:
                         message = "Erreur au niveau du serveur";
@@ -154,6 +160,9 @@ public class LoginController implements Initializable {
                         break;
                     case BAD_PASSWORD:
                         message = "Mot de passe incorrect";
+                        break;
+                    case OTHER:
+                        message = error;
                         break;
                 }
                 Alert a = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
@@ -169,6 +178,8 @@ public class LoginController implements Initializable {
                 if (s == null) {
                     s = new Socket();
                     s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port"))), 5000);
+                    ObjectOutputStream tempoos = new ObjectOutputStream(s.getOutputStream());
+                    tempoos.writeObject(new TickmapThreadRequest());
                 }
                 if (oos == null) oos = new ObjectOutputStream(s.getOutputStream());
                 oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.TryConnect, Procedural.IpPort(s)));
@@ -177,7 +188,7 @@ public class LoginController implements Initializable {
                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
                     if (rep.getParam() != null) {
                         challenge = (int) rep.getParam();
-                        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Login, new Login(Username.getText(), DigestCalculator.hashPassword(Password.getText(), challenge)), Procedural.IpPort(s)));
+                        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Login, new Login(Username.getText(), DigestCalculator.hashPassword(Password.getText(), challenge))));
                         rep = (ReponseTICKMAP) ois.readObject();
                         if (rep.getCode() == TypeReponseTICKMAP.OK)
                             switch ((TypeReponseTICKMAP) rep.getCode()) {
@@ -205,25 +216,25 @@ public class LoginController implements Initializable {
                 error = e.getMessage();
                 return CLASSNOTFOUND;
             } catch (NoSuchAlgorithmException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (CertificateException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (KeyStoreException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (InvalidKeyException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (InvalidAlgorithmParameterException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (NoSuchPaddingException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (BadPaddingException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (NoSuchProviderException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             } catch (IllegalBlockSizeException e) {
-                error = e.getMessage();
+                error = e.getLocalizedMessage();
             }
-            return SOCKET_TIMEOUT;
+            return OTHER;
         }
 
         /**
@@ -244,31 +255,50 @@ public class LoginController implements Initializable {
         private void KeyExchange() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, KeyStoreException, NoSuchPaddingException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, ClassNotFoundException {
             ReponseTICKMAP rep;
             do {
-                AESParams aesParams = genSecretKey();
+                CryptedPackage cp = new CryptedPackage(genSecretAES(), genAESParams());
                 Cipher cipher = genPublicKey();
-                oos.writeObject(new SecureRequeteTICKMAP(TypeRequeteTICKMAP.Handshake, aesParams, Procedural.StringIp(s), cipher));
+                System.out.println("Création du flux");
+                DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+                System.out.println("TEST");
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream tempoos = new ObjectOutputStream(baos);
+                tempoos.writeObject(cp);
+                System.out.println("tempoos.writeObject(cp);");
+                dos.write(cipher.doFinal(baos.toByteArray()));
+                System.out.println("Ecriture");
+                dos.flush();
+                System.out.println("Flush");
                 rep = (ReponseTICKMAP) ois.readObject();
             } while (rep.getCode() != TypeReponseTICKMAP.OK);
+            vols = (Table) rep.getParam();
+        }
+
+        /**
+         * @return
+         * @throws NoSuchProviderException
+         * @throws NoSuchAlgorithmException
+         */
+        private SecretKey genSecretAES() throws NoSuchProviderException, NoSuchAlgorithmException {
+            System.out.println("Génération d'une clef Rijndael/AES");
+            KeyGenerator key = KeyGenerator.getInstance("Rijndael", "BC");
+            System.out.print(".");
+            key.init(new SecureRandom());
+            System.out.print(".");
+            return key.generateKey();
         }
 
         /**
          * @return Object AESParams contenant toutes les données pour pouvoir faire de l'AESParams
-         * @throws NoSuchProviderException  OUi
-         * @throws NoSuchAlgorithmException OUI
+         * @throws NoSuchProviderException
+         * @throws NoSuchAlgorithmException
          */
-        private AESParams genSecretKey() throws NoSuchProviderException, NoSuchAlgorithmException {
+        private AESParams genAESParams() throws NoSuchProviderException, NoSuchAlgorithmException {
             System.out.print("Génération de la clef de session ");
-            SecureRandom sr = new SecureRandom();
-            System.out.print(".");
-            KeyGenerator key = KeyGenerator.getInstance("Rijndael", "BC");
-            System.out.print(".");
-            key.init(sr);
-            System.out.print(".");
-            SecretKey secretKey = key.generateKey();
+            SecretKey secretKey = genSecretAES();
             System.out.print(".");
             byte[] init = new byte[16];
             System.out.print(".");
-            sr.nextBytes(init);
+            new SecureRandom().nextBytes(init);
             System.out.println(".");
             return new AESParams(secretKey, init);
         }
