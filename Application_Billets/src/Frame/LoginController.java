@@ -60,25 +60,35 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class LoginController implements Initializable {
-    @FXML
-    private VBox LoginPanel;
-    @FXML
-    private Pane ChargementPanel;
-    @FXML
-    private ProgressIndicator Chargement;
-    @FXML
-    private TextField Username;
-    @FXML
-    private PasswordField Password;
-    @FXML
-    private Button connexion;
-    @FXML
-    private Label Error;
+    @FXML private VBox LoginPanel;
+    @FXML private Pane ChargementPanel;
+    @FXML private ProgressIndicator Chargement;
+    @FXML private TextField Username;
+    @FXML private PasswordField Password;
+    @FXML private Button connexion;
+    @FXML private Label Error;
     private boolean connected;
     private Socket s;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Table vols = null;
+
+    public Socket getSocket() {
+        return s;
+    }
+
+    public ObjectInputStream getObjectInputStream() {
+        return ois;
+    }
+
+    public ObjectOutputStream getObjectOutputStream() {
+        return oos;
+    }
+
+    public Table getVols() {
+        return vols;
+    }
+
     public boolean isConnected() {
         return connected;
     }

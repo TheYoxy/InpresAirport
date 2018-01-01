@@ -42,6 +42,7 @@ public class ServeurControlleur implements Initializable {
             RadioButton rb = new RadioButton(aTc.getName());
             aTc.addStateChangedListener((state) -> Platform.runLater(() -> rb.setSelected(state)));
             rb.getStyleClass().add("rb");
+            rb.setDisable(true);
             VBoxStatus.getChildren().addAll(rb);
         }
         /* Lancement du serveur */

@@ -13,6 +13,14 @@ INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar',
 INSERT INTO Vols VALUES ('1', 'Paris', current_date, current_date, current_date, 42);
 INSERT INTO Vols VALUES ('2', 'Liège', current_date, current_date, current_date, 42);
 INSERT INTO Vols VALUES ('3', 'Londres', current_date - 1, current_date, current_date, 43);
+INSERT INTO Vols VALUES ('4', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('5', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('6', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('7', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('8', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('9', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('10', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
+INSERT INTO Vols VALUES ('11', 'Londres', current_date + 1, current_date + 1, current_date + 1, 43);
 INSERT INTO Billets VALUES ('1', '1',-1);
 INSERT INTO Billets VALUES ('2', '1',-1);
 INSERT INTO Billets VALUES ('3', '1',-1);
