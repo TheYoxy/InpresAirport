@@ -5,23 +5,38 @@ CREATE TABLE Avion (
   Vol     BOOLEAN
 )
   ENGINE = INNODB;
-DROP TABLE IF EXISTS Vols;
-CREATE TABLE Vols (
+
+DROP TABLE IF EXISTS Vol;
+CREATE TABLE Vol (
   NumeroVol        VARCHAR(15) PRIMARY KEY,
-  Destination      VARCHAR(30),
+  Lieu             VARCHAR(100),
   HeureDepart      DATETIME NOT NULL,
   HeureArrivee     DATETIME NOT NULL,
-  HeureArriveeDest DATETIME NOT NULL,
+  Prix             DECIMAL(15, 2),
+  Description      VARCHAR(1000),
+  PlacesDisponible INTEGER CHECK (PlacesDisponible >= 0),
   IdAvion          INT REFERENCES Avion (IdAvion)
 )
   ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Billets;
 CREATE TABLE Billets (
   NumeroBillet VARCHAR(40) PRIMARY KEY,
-  NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vols (NumeroVol),
-  idFacture    INTEGER     NOT NULL REFERENCES Facture (idFacture)
+  NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vol (NumeroVol),
+  idFacture    INTEGER     NOT NULL REFERENCES Facture (idFacture),
+  idVoyageur   INTEGER     NOT NULL REFERENCES Voyageur (idVoyageur)
 )
   ENGINE = INNODB;
+
+DROP TABLE IF EXISTS Voyageur;
+CREATE TABLE Voyageur (
+  idVoyageur INTEGER AUTO_INCREMENT PRIMARY KEY,
+  nom        VARCHAR(50) NOT NULL,
+  prenom     VARCHAR(50) NOT NULL,
+  naissance  DATE        NOT NULL
+)
+  ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Bagages;
 CREATE TABLE Bagages (
   NumeroBagage VARCHAR(15) PRIMARY KEY,
@@ -35,12 +50,14 @@ CREATE TABLE Bagages (
   CHECK (Charger IN ('O', 'N', 'R'))
 )
   ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Login;
 CREATE TABLE Login (
   Username VARCHAR(100) PRIMARY KEY,
   Password VARCHAR(100)
 )
   ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Agents;
 CREATE TABLE Agents (
   Nom      VARCHAR(25)  NOT NULL,
@@ -50,18 +67,11 @@ CREATE TABLE Agents (
   PRIMARY KEY (Nom, Prenom)
 )
   ENGINE = INNODB;
-DROP TABLE IF EXISTS VolReservable;
-CREATE TABLE VolReservable (
-  NumeroVol        VARCHAR(15) PRIMARY KEY REFERENCES Vols (NumeroVol),
-  Lieu             VARCHAR(100) REFERENCES Vols (Destination),
-  Date             DATE,
-  Prix             DECIMAL(15, 2),
-  Description      VARCHAR(1000),
-  PlacesDisponible INTEGER CHECK (PlacesDisponible >= 0)
-)
-  ENGINE = INNODB;
-DROP TABLE IF EXISTS Users;
-CREATE TABLE Users (
+
+/* WEB */
+
+DROP TABLE IF EXISTS WebUsers;
+CREATE TABLE WebUsers (
   Username VARCHAR(20) PRIMARY KEY,
   Password VARCHAR(20)  NOT NULL,
   Nom      VARCHAR(100),
@@ -69,20 +79,22 @@ CREATE TABLE Users (
   Mail     VARCHAR(100) NOT NULL UNIQUE
 )
   ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Reservation;
 CREATE TABLE Reservation (
-  Username        VARCHAR(20) REFERENCES Users (Username),
-  NumeroVol       VARCHAR(15) REFERENCES Vols (NumeroVol),
+  Username        VARCHAR(20) REFERENCES WebUsers (Username),
+  NumeroVol       VARCHAR(15) REFERENCES Vol (NumeroVol),
   nbPlaces        INTEGER                               NOT NULL CHECK (nbPlaces > 0),
   timeReservation TIMESTAMP DEFAULT current_timestamp() NOT NULL,
   PRIMARY KEY (Username, NumeroVol, timeReservation)
 )
   ENGINE = INNODB;
+
 DROP TABLE IF EXISTS Facture;
 CREATE TABLE Facture (
   idFacture INTEGER PRIMARY KEY AUTO_INCREMENT,
-  Username  VARCHAR(20) REFERENCES Users (Username),
-  NumeroVol VARCHAR(15) REFERENCES Vols (NumeroVol),
+  Username  VARCHAR(20) REFERENCES WebUsers (Username),
+  NumeroVol VARCHAR(15) REFERENCES Vol (NumeroVol),
   nbPlaces  INTEGER NOT NULL,
   prix      DOUBLE  NOT NULL
 )
