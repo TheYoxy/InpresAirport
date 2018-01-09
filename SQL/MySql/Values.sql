@@ -6,6 +6,7 @@ DELETE FROM Bagages;
 DELETE FROM WebUsers;
 DELETE FROM Reservation;
 DELETE FROM Facture;
+DELETE FROM Transactions;
 -- Delete les valeurs existante et remet des valeurs 'bidon'
 INSERT INTO Avion (Modele, Vol) VALUES
   ('Airbus A330', 0),
@@ -14,9 +15,13 @@ INSERT INTO Avion (Modele, Vol) VALUES
   ('Airbus A330', 0);
 INSERT INTO Login VALUES ('floryan', '1234'), ('nico', '1234');
 INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar', 'Floryan', 'Bagagiste', 'floryan');
-INSERT INTO Vol VALUES ('1', 'Paris', current_date, current_date, 502.45, 'Vol en amoureux pour visiter Paris', 1, 1),
-  ('2', 'Liège', current_date, current_date, 40.52, 'Voyage direct vers le carré de Liège', 100, 2),
-  ('3', 'Londres', current_date, current_date, 69.42, 'Insert a French description here', 100, 3);
+INSERT INTO Vol VALUES
+  ('1', 'Paris', current_date + 1, current_date + 1, 502.45, 'Vol en amoureux pour visiter Paris',
+   1, 1),
+  ('2', 'Liège', current_date + 1, current_date + 1, 40.52, 'Voyage direct vers le carré de Liège',
+   100, 2),
+  ('3', 'Londres', current_date + 1, current_date + 1, 69.42, 'Insert a French description here',
+   100, 3);
 
 # INSERT INTO Billets VALUES ('1', '1', -1);
 # INSERT INTO Billets VALUES ('2', '1', -1);

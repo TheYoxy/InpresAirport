@@ -23,6 +23,7 @@ DROP TABLE IF EXISTS Billets;
 CREATE TABLE Billets (
   NumeroBillet VARCHAR(40) PRIMARY KEY,
   NumeroVol    VARCHAR(15) NOT NULL REFERENCES Vol (NumeroVol),
+  NumeroPlace  INTEGER     NOT NULL,
   idFacture    INTEGER     NOT NULL REFERENCES Facture (idFacture),
   idVoyageur   INTEGER     NOT NULL REFERENCES Voyageur (idVoyageur)
 )
@@ -97,5 +98,11 @@ CREATE TABLE Facture (
   NumeroVol VARCHAR(15) REFERENCES Vol (NumeroVol),
   nbPlaces  INTEGER NOT NULL,
   prix      DOUBLE  NOT NULL
+)
+  ENGINE = INNODB;
+/* */
+DROP TABLE IF EXISTS Transactions;
+CREATE TABLE Transactions (
+  instant TIME
 )
   ENGINE = INNODB;

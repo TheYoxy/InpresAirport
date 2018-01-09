@@ -72,6 +72,11 @@ public class LoginController implements Initializable {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Table vols = null;
+    private CryptedPackage cp;
+
+    public CryptedPackage getCp() {
+        return cp;
+    }
 
     public Socket getSocket() {
         return s;
@@ -145,6 +150,7 @@ public class LoginController implements Initializable {
                 LoginPanel.setVisible(true);
                 String message = "";
                 switch (result) {
+                    // FIXME: 4/01/18 Renvoi de valeur incorrect
                     case SOCKET_TIMEOUT:
                         message = "Connexion au serveur impossible (Timeout)";
                         message += error;
@@ -262,22 +268,18 @@ public class LoginController implements Initializable {
          * @throws InvalidAlgorithmParameterException
          * @throws ClassNotFoundException
          */
-        private void KeyExchange() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, KeyStoreException, NoSuchPaddingException, IOException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, ClassNotFoundException {
+        private void KeyExchange() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, CertificateException, KeyStoreException, NoSuchPaddingException, IOException, BadPaddingException, IllegalBlockSizeException, ClassNotFoundException {
             ReponseTICKMAP rep;
             do {
-                CryptedPackage cp = new CryptedPackage(genSecretAES(), genAESParams());
+                cp = new CryptedPackage(genSecretAES(), genAESParams());
                 Cipher cipher = genPublicKey();
                 System.out.println("Création du flux");
                 DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
-                System.out.println("TEST");
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream tempoos = new ObjectOutputStream(baos);
                 tempoos.writeObject(cp);
-                System.out.println("tempoos.writeObject(cp);");
                 dos.write(cipher.doFinal(baos.toByteArray()));
-                System.out.println("Ecriture");
                 dos.flush();
-                System.out.println("Flush");
                 rep = (ReponseTICKMAP) ois.readObject();
             } while (rep.getCode() != TypeReponseTICKMAP.OK);
             vols = (Table) rep.getParam();

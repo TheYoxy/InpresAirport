@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,9 +28,11 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 
-import LUGAP.TypeReponseLUGAP;
+import NetworkObject.Bean.Voyageur;
 import NetworkObject.CryptedPackage;
+import NetworkObject.Ids;
 import NetworkObject.Login;
+import NetworkObject.Places;
 import ServeurClientLog.Interfaces.Reponse;
 import ServeurClientLog.Interfaces.Requete;
 import Tools.AESCryptedSocket;
@@ -123,32 +126,67 @@ public class TickmapThreadRequest implements Requete {
                                 rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
                             }
 
-                            if (rep.getCode() == TypeReponseLUGAP.UNKNOWN_LOGIN) {
+                            if (rep.getCode() == TypeReponseTICKMAP.UNKNOWN_LOGIN) {
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur introuvable");
                             }
                             Reponse(oos, rep);
-
-                            DataInputStream dis = new DataInputStream(new BufferedInputStream(client.getInputStream()));
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            //Lecture de mon objet crypté
-                            do {
-                                baos.write(dis.readByte());
-                            } while (dis.available() > 0);
-                            System.out.println(Thread.currentThread().getName() + "> Récupération des clefs");
-                            //Transformation de mon objet
-                            ByteArrayInputStream bais = new ByteArrayInputStream(PrivateKeyCipher.cipher.doFinal(baos.toByteArray()));
-                            ObjectInputStream tempois = new ObjectInputStream(bais);
-                            System.out.println(Thread.currentThread().getName() + "> Décryptage des clefs");
-                            CryptedPackage cryptedPackage = (CryptedPackage) tempois.readObject();
-                            System.out.println(Thread.currentThread().getName() + "> Clefs reçues");
-                            System.out.print(Thread.currentThread().getName() + "> Génération du HMAC: ");
-                            cryptedSocket = new AESCryptedSocket(client, cryptedPackage.getParams());
-                            hmac = Mac.getInstance("HMAC-SHA1", "BC");
-                            hmac.init(cryptedPackage.getKey());
-                            System.out.println("réussie");
-                            rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, Bd.toTable(bd.SelectWeekVols()));
-                            Reponse(oos, rep);
+                            if (rep.getCode() != TypeReponseTICKMAP.NOT_OK) {
+                                DataInputStream dis = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                //Lecture de mon objet crypté
+                                do {
+                                    baos.write(dis.readByte());
+                                } while (dis.available() > 0);
+                                System.out.println(Thread.currentThread().getName() + "> Récupération des clefs");
+                                //Transformation de mon objet
+                                ByteArrayInputStream bais = new ByteArrayInputStream(PrivateKeyCipher.cipher.doFinal(baos.toByteArray()));
+                                ObjectInputStream tempois = new ObjectInputStream(bais);
+                                System.out.println(Thread.currentThread().getName() + "> Décryptage des clefs");
+                                CryptedPackage cryptedPackage = (CryptedPackage) tempois.readObject();
+                                System.out.println(Thread.currentThread().getName() + "> Clefs reçues");
+                                System.out.print(Thread.currentThread().getName() + "> Génération du HMAC: ");
+                                cryptedSocket = new AESCryptedSocket(client, cryptedPackage.getParams());
+                                hmac = Mac.getInstance("HMAC-SHA1", "BC");
+                                hmac.init(cryptedPackage.getKey());
+                                System.out.println("réussie");
+                                rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, Bd.toTable(bd.SelectWeekVols()));
+                                Reponse(oos, rep);
+                            }
                             break;
+                        case Handshake:
+                            break;
+                        case Ajout_Voyageurs: {
+                            Places p = null;
+                            rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
+                            try {
+                                List list = (List) cryptedSocket.readObject();
+                                String vol = list.get(0).toString();
+                                ResultSet rs = bd.SelectVolReservable(vol);
+                                Voyageur[] listVoyageurs = (Voyageur[]) list.get(1);
+                                int count = listVoyageurs.length;
+                                if (rs.next()) {
+                                    int nb = rs.getInt("PlacesDisponible");
+                                    if (nb < count)
+                                        rep = new ReponseTICKMAP(TypeReponseTICKMAP.FULL, count - nb);
+                                    else {
+                                        rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK);
+                                        bd.SuppPlacesReservables(vol, count);
+                                        ResultSet rss = bd.SelectLieu(vol);
+                                        rss.next();
+                                        String lieu = rss.getString(1);
+                                        p = new Places(Ids.genIdBillets(bd.SelectBillets(vol), lieu, vol, count), nb * rs.getDouble("Prix"));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Reponse(oos, rep);
+
+                            if (rep.getCode() == TypeReponseTICKMAP.OK) {
+                                cryptedSocket.writeObject(p);
+                            }
+                        }
+                        break;
                         case Logout:
                             if (log) {
                                 log = false;

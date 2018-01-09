@@ -12,7 +12,7 @@ public class RequeteTICKMAP implements Serializable {
         this.Param = Param;
     }
 
-    private RequeteTICKMAP(TypeRequeteTICKMAP type) {
+    public RequeteTICKMAP(TypeRequeteTICKMAP type) {
         this.Type = type;
     }
 
