@@ -3,13 +3,12 @@ package ServeurClientLog.Threads;
 import java.util.LinkedList;
 import java.util.List;
 
-import ServeurClientLog.Containers.Containeur;
 import ServeurClientLog.Interfaces.Events.StateChanged;
+import ServeurClientLog.Objects.Containeur;
 
 public class ThreadClient extends Thread {
-    private final Containeur<Runnable> TachesAExecuter;
-    private Runnable Client;
-    private List<StateChanged> stateChangedList;
+    protected final Containeur<Runnable> TachesAExecuter;
+    protected List<StateChanged> stateChangedList;
 
     public ThreadClient(Containeur<Runnable> st, String name) {
         TachesAExecuter = st;
@@ -21,9 +20,9 @@ public class ThreadClient extends Thread {
     public void run() {
         while (!isInterrupted()) {
             try {
-                Client = TachesAExecuter.get();
+                Runnable runnable = TachesAExecuter.get();
                 fireState(true);
-                Client.run();
+                runnable.run();
                 fireState(false);
             } catch (InterruptedException e) {
                 System.out.println(this.getName() + "> Interruption : " + e.getMessage());

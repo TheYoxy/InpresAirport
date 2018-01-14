@@ -17,6 +17,12 @@ import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
+import ServeurClientLog.Threads.ThreadClient;
+import Tools.Crypto.Digest.DigestCalculator;
+import javafx.application.Platform;
+import javafx.scene.control.RadioButton;
+import javafx.scene.layout.VBox;
+
 public class Procedural {
     public static final String SEPARATION = ";;;";
     public static final String INTIDENTIFIER = "WZK";
@@ -141,5 +147,15 @@ public class Procedural {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public static void ajoutBoutonListener(ThreadClient[] tc, VBox layout) {
+        for (ThreadClient aTc : tc) {
+            RadioButton rb = new RadioButton(aTc.getName());
+            aTc.addStateChangedListener((state) -> Platform.runLater(() -> rb.setSelected(state)));
+            rb.getStyleClass().add("rb");
+            rb.setDisable(true);
+            layout.getChildren().addAll(rb);
+        }
     }
 }

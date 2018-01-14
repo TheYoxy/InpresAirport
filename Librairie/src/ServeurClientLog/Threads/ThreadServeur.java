@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ServeurClientLog.Containers.Containeur;
 import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Objects.Containeur;
 import Tools.Procedural;
 
 /**
@@ -14,19 +14,19 @@ import Tools.Procedural;
  * threadClient (Thread esclave du poool)
  */
 public class ThreadServeur extends Thread {
-    private final int Port;
-    private final Containeur<Runnable> FileSocket;
-    private final ThreadClient[] listChild;
+    protected final int port;
+    protected final Containeur<Runnable> fileSocket;
+    protected final Class<? extends Requete> types[];
+    protected final ThreadClient[] listChild;
     private ServerSocket SSocket = null;
-    private Class<? extends Requete> types[];
 
-    public ThreadServeur(int port, int nb_threads, Class<? extends Requete>... type) {
-        this.Port = port;
-        this.FileSocket = new Containeur<>();
+    public ThreadServeur(int port, int nb_threads, Class<? extends Requete>... types) {
+        this.port = port;
+        this.fileSocket = new Containeur<>();
         this.listChild = new ThreadClient[nb_threads];
-        types = type;
+        this.types = types;
         for (int i = 0; i < listChild.length; i++)
-            listChild[i] = new ThreadClient(FileSocket, "Thread du pool n°" + String.valueOf(i));
+            listChild[i] = new ThreadClient(fileSocket, "Thread du pool n°" + String.valueOf(i));
     }
 
     public ThreadClient[] getListChild() {
@@ -36,10 +36,10 @@ public class ThreadServeur extends Thread {
     @Override
     public void run() {
         try {
-            SSocket = new ServerSocket(Port);
-            System.out.println("Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
+            SSocket = new ServerSocket(port);
+            System.out.println(Thread.currentThread().getName() + "> Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
         } catch (IOException e) {
-            System.out.println("Erreur de port d'écoute ! ? [" + e + "]\n");
+            System.out.println(Thread.currentThread().getName() + "> Erreur de port d'écoute ! ? [" + e + "]\n");
             return;
         }
 
@@ -49,14 +49,14 @@ public class ThreadServeur extends Thread {
         while (!isInterrupted()) {
             try {
                 Socket socket = SSocket.accept();
-                System.out.println("Connexion de " + Procedural.IpPort(socket) + '\n');
+                System.out.println(Thread.currentThread().getName() + "> Connexion de " + Procedural.IpPort(socket) + '\n');
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 Requete req = (Requete) ois.readObject();
                 int i, typeLength;
                 for (i = 0, typeLength = types.length; i < typeLength; i++) {
                     Class c = types[i];
                     if (c.isAssignableFrom(req.getClass())) {
-                        FileSocket.add(req.createRunnable(socket));
+                        fileSocket.add(req.createRunnable(socket));
                         break;
                     }
                 }
