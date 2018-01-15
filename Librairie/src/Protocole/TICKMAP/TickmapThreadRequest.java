@@ -34,7 +34,7 @@ import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Voyageur;
 import NetworkObject.CryptedPackage;
 import ServeurClientLog.Interfaces.Reponse;
-import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.ServeurRequete;
 import Tools.AESCryptedSocket;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
@@ -43,7 +43,7 @@ import Tools.Crypto.PrivateKey.PrivateKeyCipher;
 import Tools.Ids;
 import Tools.Procedural;
 
-public class TickmapThreadRequest implements Requete {
+public class TickmapThreadRequest implements ServeurRequete {
     @Override
     public Runnable createRunnable(Socket client) {
         return () -> {

@@ -16,14 +16,14 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
-import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.ServeurRequete;
 import Tools.Crypto.Keystore.CustomKeyStore;
 import Tools.Procedural;
 
 public class SSLThreadServeur extends ThreadServeur {
     private SSLServerSocket serverSocket = null;
 
-    public SSLThreadServeur(int port, int nb_threads, Class<? extends Requete>... types) {
+    public SSLThreadServeur(int port, int nb_threads, Class<? extends ServeurRequete>... types) {
         super(port, nb_threads, types);
     }
 
@@ -66,7 +66,7 @@ public class SSLThreadServeur extends ThreadServeur {
                 SSLSocket socket = (SSLSocket) serverSocket.accept();
                 System.out.println(Thread.currentThread().getName() + "> Connexion de " + Procedural.IpPort(socket) + '\n');
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                Requete req = (Requete) ois.readObject();
+                ServeurRequete req = (ServeurRequete) ois.readObject();
                 int i, typeLength;
                 for (i = 0, typeLength = types.length; i < typeLength; i++) {
                     Class c = types[i];

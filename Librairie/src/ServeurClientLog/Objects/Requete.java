@@ -5,23 +5,23 @@ import java.io.Serializable;
 import ServeurClientLog.Interfaces.TypeRequete;
 
 public abstract class Requete implements Serializable {
-    protected TypeRequete type = null;
-    protected Serializable param = null;
+    protected Serializable[] param = null;
 
-    public Requete(TypeRequete type, Serializable param) {
-        this(type);
+    protected Requete(Serializable... param) {
         this.param = param;
     }
 
-    public Requete(TypeRequete type) {
-        this.type = type;
-    }
-
-    public Serializable getParam() {
+    public Serializable[] getParams() {
         return param;
     }
 
-    public TypeRequete getType() {
-        return type;
+    public Serializable getParam() {
+        return param[0];
     }
+
+    public Serializable getParam(int pos) {
+        return param[pos];
+    }
+
+    public abstract TypeRequete getType();
 }

@@ -1,38 +1,28 @@
 package Protocole.LUGAP;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
-import ServeurClientLog.Interfaces.Reponse;
-import ServeurClientLog.Interfaces.TypeReponse;
+import ServeurClientLog.Objects.Reponse;
 
-public class ReponseLUGAP implements Reponse {
-    private static final long serialVersionUID = 124L;
-    private TypeReponseLUGAP Reponse = null;
-    private Serializable Param = null;
+public class ReponseLUGAP extends Reponse {
+    protected TypeReponseLUGAP reponse = null;
 
-    public ReponseLUGAP(TypeReponseLUGAP reponse) {
-        Reponse = reponse;
+    public ReponseLUGAP(TypeReponseLUGAP reponse, Serializable... param) {
+        this.reponse = reponse;
+        this.params = param;
     }
 
-    public ReponseLUGAP(TypeReponseLUGAP reponse, Serializable param) {
-        this.Reponse = reponse;
-        this.Param = param;
+    @Override
+    public TypeReponseLUGAP getCode() {
+        return this.reponse;
     }
 
     @Override
     public String toString() {
         return "ReponseLUGAP{" +
-                "Reponse=" + Reponse +
-                ", Param=" + Param +
+                "reponse=" + reponse +
+                ", Param=" + Arrays.toString(params) +
                 '}';
-    }
-
-    public Serializable getParam() {
-        return Param;
-    }
-
-    @Override
-    public TypeReponse getCode() {
-        return this.Reponse;
     }
 }

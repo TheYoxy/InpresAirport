@@ -1,39 +1,30 @@
 package Protocole.TICKMAP;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
-import ServeurClientLog.Interfaces.Reponse;
 import ServeurClientLog.Interfaces.TypeReponse;
+import ServeurClientLog.Objects.Reponse;
 
-public class ReponseTICKMAP implements Reponse {
+public class ReponseTICKMAP extends Reponse {
     public static final ReponseTICKMAP BAD = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
-    private static final long serialVersionUID = 111L;
-    private TypeReponseTICKMAP Reponse = null;
-    private Serializable Param = null;
+    protected TypeReponseTICKMAP reponse = null;
 
-    public ReponseTICKMAP(TypeReponseTICKMAP reponse, Serializable param) {
-        this(reponse);
-        this.Param = param;
+    public ReponseTICKMAP(TypeReponseTICKMAP reponse, Serializable... param) {
+        super(param);
+        this.reponse = reponse;
     }
 
-    public ReponseTICKMAP(TypeReponseTICKMAP reponse) {
-        this.Reponse = reponse;
+    @Override
+    public TypeReponse getCode() {
+        return this.reponse;
     }
 
     @Override
     public String toString() {
         return "ReponseTICKMAP{" +
-                "Reponse=" + Reponse +
-                ", Param=" + Param +
+                "reponse=" + reponse +
+                ", Param=" + Arrays.toString(params) +
                 '}';
-    }
-
-    public Serializable getParam() {
-        return Param;
-    }
-
-    @Override
-    public TypeReponse getCode() {
-        return this.Reponse;
     }
 }

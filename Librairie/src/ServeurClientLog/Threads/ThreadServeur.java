@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.ServeurRequete;
 import ServeurClientLog.Objects.Containeur;
 import Tools.Procedural;
 
@@ -16,11 +16,11 @@ import Tools.Procedural;
 public class ThreadServeur extends Thread {
     protected final int port;
     protected final Containeur<Runnable> fileSocket;
-    protected final Class<? extends Requete> types[];
+    protected final Class<? extends ServeurRequete> types[];
     protected final ThreadClient[] listChild;
     private ServerSocket SSocket = null;
 
-    public ThreadServeur(int port, int nb_threads, Class<? extends Requete>... types) {
+    public ThreadServeur(int port, int nb_threads, Class<? extends ServeurRequete>... types) {
         this.port = port;
         this.fileSocket = new Containeur<>();
         this.listChild = new ThreadClient[nb_threads];
@@ -51,7 +51,7 @@ public class ThreadServeur extends Thread {
                 Socket socket = SSocket.accept();
                 System.out.println(Thread.currentThread().getName() + "> Connexion de " + Procedural.IpPort(socket) + '\n');
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-                Requete req = (Requete) ois.readObject();
+                ServeurRequete req = (ServeurRequete) ois.readObject();
                 int i, typeLength;
                 for (i = 0, typeLength = types.length; i < typeLength; i++) {
                     Class c = types[i];

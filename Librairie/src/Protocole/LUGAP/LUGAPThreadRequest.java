@@ -17,13 +17,13 @@ import java.util.Random;
 
 import NetworkObject.Bean.Login;
 import NetworkObject.Bean.Table;
-import ServeurClientLog.Interfaces.Requete;
+import ServeurClientLog.Interfaces.ServeurRequete;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Procedural;
 
-public class LUGAPThreadRequest implements Requete {
+public class LUGAPThreadRequest implements ServeurRequete {
     private static final long serialVersionUID = 129L;
 
     @Override
@@ -40,7 +40,7 @@ public class LUGAPThreadRequest implements Requete {
                 while (boucle) {
                     RequeteLUGAP req = (RequeteLUGAP) ois.readObject();
                     ReponseLUGAP rep;
-                    HeaderRunnable(req.getType().toString(), req.getFrom());
+                    HeaderRunnable(req.getType().toString(), Procedural.IpPort(client));
                     switch (req.getType()) {
                         case TryConnect:
                             challenge = new Random().nextInt();
