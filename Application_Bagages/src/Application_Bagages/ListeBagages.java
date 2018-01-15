@@ -15,23 +15,24 @@
  */
 package Application_Bagages;
 
-import NetworkObject.Bagage;
-import NetworkObject.Table;
-import LUGAP.ReponseLUGAP;
-import LUGAP.RequeteLUGAP;
-import LUGAP.TypeReponseLUGAP;
-import LUGAP.TypeRequeteLUGAP;
-import Tools.Procedural;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.Frame;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Vector;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+import NetworkObject.Bean.Bagage;
+import NetworkObject.Bean.Table;
+import Protocole.LUGAP.ReponseLUGAP;
+import Protocole.LUGAP.RequeteLUGAP;
+import Protocole.LUGAP.TypeReponseLUGAP;
+import Protocole.LUGAP.TypeRequeteLUGAP;
 
 public class ListeBagages extends javax.swing.JDialog {
     private Table BagagesTable = null;
@@ -61,7 +62,7 @@ public class ListeBagages extends javax.swing.JDialog {
     {
         ReponseLUGAP rep;
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, VolLabel2.getText(), Procedural.IpPort(Serveur)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Bagages_Vol, VolLabel2.getText()));
             rep = (ReponseLUGAP) Ois.readObject();
             if (rep.getCode() == TypeReponseLUGAP.SQL_LOCK) JOptionPane.showMessageDialog(this, "Les bagages de ce vol sont déjà en cours de modification.", "Erreur", JOptionPane.ERROR_MESSAGE);
             else if (rep.getCode() != TypeReponseLUGAP.OK) JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -224,7 +225,7 @@ public class ListeBagages extends javax.swing.JDialog {
                 }
                 try {
                     //Envoi de l'objet au serveur
-                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagage_Vol,l,Procedural.IpPort(Serveur)));
+                    Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Update_Bagage_Vol, l));
                     ReponseLUGAP rep = (ReponseLUGAP) Ois.readObject();
                     if (rep.getCode() != TypeReponseLUGAP.OK) JOptionPane.showMessageDialog(this, "Erreur au niveau du serveur", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } catch (IOException e) {

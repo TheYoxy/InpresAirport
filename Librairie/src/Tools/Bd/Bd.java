@@ -37,6 +37,19 @@ public class Bd {
 
     /**
      * @param type
+     * @param lockTime
+     * @throws IOException
+     * @throws SQLException
+     */
+    public Bd(BdType type, int lockTime) throws IOException, SQLException {
+        this.Connection = createConnection(type);
+        setInnoDB_Lock_Time(lockTime);
+        this.Connection.setAutoCommit(false);
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Static">
+    /**
+     * @param type
      * @return
      * @throws SQLException
      * @throws IOException
@@ -64,25 +77,6 @@ public class Bd {
             e.printStackTrace();
         }
         return DriverManager.getConnection(url, user, passwd);
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="Static">
-
-    /**
-     * @param type
-     * @param lockTime
-     * @throws IOException
-     * @throws SQLException
-     */
-    public Bd(BdType type, int lockTime) throws IOException, SQLException {
-        this.Connection = createConnection(type);
-        setInnoDB_Lock_Time(lockTime);
-        this.Connection.setAutoCommit(false);
-    }
-
-    private void setInnoDB_Lock_Time(int time) throws SQLException {
-        Statement s = this.Connection.createStatement();
-        s.execute("SET SESSION innodb_lock_wait_timeout = " + (time - 1));
     }
 
     /**
@@ -304,6 +298,12 @@ public class Bd {
         return ps.executeQuery();
     }
 
+    private synchronized void setInnoDB_Lock_Time(int time) throws SQLException {
+        Statement s = this.Connection.createStatement();
+        s.execute("SET SESSION innodb_lock_wait_timeout = " + (time - 1));
+    }
+
+
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="INSERT">
@@ -352,7 +352,6 @@ public class Bd {
         ps.setString(4, time); //A mettre en time
         return ps.executeUpdate() != 0;
     }
-    //</editor-fold>
 
     public synchronized boolean InsertUser(String username, String password, String mail) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Password, Mail) VALUES (?,?,?)");
@@ -361,6 +360,7 @@ public class Bd {
         ps.setString(3, mail);
         return ps.executeUpdate() != 0;
     }
+    //</editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="UPDATE">
     public synchronized int AjoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
@@ -396,11 +396,23 @@ public class Bd {
         return ps.executeUpdate();
     }
 
+    public synchronized int Payement(String numeroCarte, double value) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Carte SET solde = solde - ? WHERE numeroCarte = ?");
+        ps.setDouble(1, value);
+        ps.setString(2, numeroCarte);
+        return ps.executeUpdate();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="DB Operations">
     public synchronized void Close() throws SQLException {
         Close(false);
+    }
+
+    public synchronized ResultSet SelectAlimCarte(String numeroCarte) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT solde FROM Carte WHERE numeroCarte = ?");
+        ps.setString(1, numeroCarte);
+        return ps.executeQuery();
     }
 
     public synchronized void Close(boolean commit) throws SQLException {

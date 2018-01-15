@@ -3,7 +3,6 @@ package Frame;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -33,16 +32,17 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import NetworkObject.AESParams;
+import NetworkObject.Bean.Login;
+import NetworkObject.Bean.Table;
 import NetworkObject.CryptedPackage;
-import NetworkObject.Login;
-import NetworkObject.Table;
-import TICKMAP.ReponseTICKMAP;
-import TICKMAP.RequeteTICKMAP;
-import TICKMAP.TickmapThreadRequest;
-import TICKMAP.TypeReponseTICKMAP;
-import TICKMAP.TypeRequeteTICKMAP;
+import Protocole.TICKMAP.ReponseTICKMAP;
+import Protocole.TICKMAP.RequeteTICKMAP;
+import Protocole.TICKMAP.TickmapThreadRequest;
+import Protocole.TICKMAP.TypeReponseTICKMAP;
+import Protocole.TICKMAP.TypeRequeteTICKMAP;
 import Tools.AsyncTask;
-import Tools.DigestCalculator;
+import Tools.Crypto.Digest.DigestCalculator;
+import Tools.Crypto.Keystore.LoadedKeyStore;
 import Tools.Procedural;
 import Tools.PropertiesReader;
 import javafx.event.ActionEvent;
@@ -130,6 +130,10 @@ public class LoginController implements Initializable {
         private static final int OK = 0;
         private String error = "";
 
+        private static final String keystore = "Application_Billets.jks";
+        private static final String password = "azerty";
+        private static final String keyname = "appbillets";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -138,52 +142,24 @@ public class LoginController implements Initializable {
             LoginPanel.setVisible(false);
         }
 
-        @Override
-        protected void onPostExecute(Integer result) {
-            super.onPostExecute(result);
-            System.out.println("onPostExecute()");
-            if (result == 0) {
-                connected = true;
-                ((Stage) connexion.getScene().getWindow()).close();
-            } else {
-                ChargementPanel.setVisible(false);
-                LoginPanel.setVisible(true);
-                String message = "";
-                switch (result) {
-                    // FIXME: 4/01/18 Renvoi de valeur incorrect
-                    case SOCKET_TIMEOUT:
-                        message = "Connexion au serveur impossible (Timeout)";
-                        message += error;
-                        break;
-                    case UNKNOWHOST:
-                        message = "Impossible de résoudre le nom du serveur\n";
-                        message += error;
-                        break;
-                    case IOEXCEPTION:
-                        message = "IOexception: " + error;
-                        break;
-                    case CLASSNOTFOUND:
-                        message = "Class not found: " + error;
-                        break;
-                    case SERVERERROR:
-                        message = "Erreur au niveau du serveur";
-                        break;
-                    case BADPARAM:
-                        message = "Erreur de valeur de retour";
-                        break;
-                    case BAD_LOGIN:
-                        message = "Utilisateur inconnu";
-                        break;
-                    case BAD_PASSWORD:
-                        message = "Mot de passe incorrect";
-                        break;
-                    case OTHER:
-                        message = error;
-                        break;
-                }
-                Alert a = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-                a.showAndWait();
-            }
+        /**
+         * @return
+         * @throws KeyStoreException
+         * @throws IOException
+         * @throws NoSuchPaddingException
+         * @throws NoSuchAlgorithmException
+         * @throws NoSuchProviderException
+         * @throws InvalidKeyException
+         * @throws CertificateException
+         */
+        private Cipher genPublicKey() throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
+            System.out.println("Récupération de la clef publique du serveur");
+            KeyStore ks = new LoadedKeyStore(keystore, password.toCharArray()).getKs();
+            X509Certificate certificate = (X509Certificate) ks.getCertificate(keyname);
+            PublicKey pk = certificate.getPublicKey();
+            Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
+            cipher.init(Cipher.PUBLIC_KEY, pk);
+            return cipher;
         }
 
         @Override
@@ -238,8 +214,6 @@ public class LoginController implements Initializable {
             } catch (KeyStoreException e) {
                 error = e.getLocalizedMessage();
             } catch (InvalidKeyException e) {
-                error = e.getLocalizedMessage();
-            } catch (InvalidAlgorithmParameterException e) {
                 error = e.getLocalizedMessage();
             } catch (NoSuchPaddingException e) {
                 error = e.getLocalizedMessage();
@@ -315,25 +289,54 @@ public class LoginController implements Initializable {
             return new AESParams(secretKey, init);
         }
 
-        /**
-         * @return
-         * @throws KeyStoreException
-         * @throws IOException
-         * @throws NoSuchPaddingException
-         * @throws NoSuchAlgorithmException
-         * @throws NoSuchProviderException
-         * @throws InvalidKeyException
-         * @throws CertificateException
-         */
-        private Cipher genPublicKey() throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
-            System.out.println("Récupération de la clef publique du serveur");
-            KeyStore ks = KeyStore.getInstance("jks");
-            ks.load(new FileInputStream(System.getProperty("user.home") + "/.keystore"), "GR;Ps~\"[?3])N9j4".toCharArray());
-            X509Certificate certificate = (X509Certificate) ks.getCertificate("appbillets");
-            PublicKey pk = certificate.getPublicKey();
-            Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
-            cipher.init(Cipher.PUBLIC_KEY, pk);
-            return cipher;
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            System.out.println("onPostExecute()");
+            if (result == 0) {
+                connected = true;
+                ((Stage) connexion.getScene().getWindow()).close();
+            } else {
+                ChargementPanel.setVisible(false);
+                LoginPanel.setVisible(true);
+                String message = "";
+                switch (result) {
+                    // FIXME: 4/01/18 Renvoi de valeur incorrect
+                    case SOCKET_TIMEOUT:
+                        message = "Connexion au serveur impossible (Timeout)";
+                        message += error;
+                        break;
+                    case UNKNOWHOST:
+                        message = "Impossible de résoudre le nom du serveur\n";
+                        message += error;
+                        break;
+                    case IOEXCEPTION:
+                        message = "IOexception: " + error;
+                        break;
+                    case CLASSNOTFOUND:
+                        message = "Class not found: " + error;
+                        break;
+                    case SERVERERROR:
+                        message = "Erreur au niveau du serveur";
+                        break;
+                    case BADPARAM:
+                        message = "Erreur de valeur de retour";
+                        break;
+                    case BAD_LOGIN:
+                        message = "Utilisateur inconnu";
+                        break;
+                    case BAD_PASSWORD:
+                        message = "Mot de passe incorrect";
+                        break;
+                    case OTHER:
+                        message = error;
+                        break;
+                }
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText("");
+                a.setContentText(message);
+                a.showAndWait();
+            }
         }
     }
 }

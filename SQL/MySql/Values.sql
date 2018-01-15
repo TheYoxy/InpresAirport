@@ -1,5 +1,5 @@
-DELETE FROM Login;
 DELETE FROM Agents;
+DELETE FROM Login;
 DELETE FROM Vol;
 DELETE FROM Billets;
 DELETE FROM Bagages;
@@ -14,7 +14,8 @@ INSERT INTO Avion (Modele, Vol) VALUES
   ('Airbus A330', 0),
   ('Airbus A330', 0);
 INSERT INTO Login VALUES ('floryan', '1234'), ('nico', '1234');
-INSERT INTO Agents VALUES ('Bonemme', 'Nicolas', 'Bagagiste', 'nico'), ('Simar', 'Floryan', 'Bagagiste', 'floryan');
+INSERT INTO Agents
+VALUES ('nico', 'Bonemme', 'Nicolas', 'Bagagiste'), ('floryan', 'Simar', 'Floryan', 'Bagagiste');
 INSERT INTO Vol VALUES
   ('1', 'Paris', current_date + 1, current_date + 1, 502.45, 'Vol en amoureux pour visiter Paris',
    1, 1),
@@ -22,7 +23,7 @@ INSERT INTO Vol VALUES
    100, 2),
   ('3', 'Londres', current_date + 1, current_date + 1, 69.42, 'Insert a French description here',
    100, 3);
-
+INSERT INTO Carte VALUES ('11111111111111111', 1000.00, NULL);
 # INSERT INTO Billets VALUES ('1', '1', -1);
 # INSERT INTO Billets VALUES ('2', '1', -1);
 # INSERT INTO Billets VALUES ('3', '1', -1);

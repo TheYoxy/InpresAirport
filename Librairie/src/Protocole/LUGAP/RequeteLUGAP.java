@@ -1,6 +1,7 @@
 package Protocole.LUGAP;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import ServeurClientLog.Objects.Requete;
 
@@ -15,5 +16,13 @@ public class RequeteLUGAP extends Requete {
     @Override
     public TypeRequeteLUGAP getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return "RequeteLUGAP{" +
+                "type=" + type + ',' +
+                "params=" + Arrays.toString(param) +
+                '}';
     }
 }

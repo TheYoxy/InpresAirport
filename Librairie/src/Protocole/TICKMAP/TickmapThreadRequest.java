@@ -11,9 +11,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -39,11 +42,15 @@ import Tools.AESCryptedSocket;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Crypto.Digest.DigestCalculator;
-import Tools.Crypto.PrivateKey.PrivateKeyCipher;
+import Tools.Crypto.PrivateKey.CustomPrivateKeyCipher;
 import Tools.Ids;
 import Tools.Procedural;
 
 public class TickmapThreadRequest implements ServeurRequete {
+    private final String keystore = "Serveur_Billets.jks";
+    private final String password = "azerty";
+    private final String keyname = "appbillets";
+
     @Override
     public Runnable createRunnable(Socket client) {
         return () -> {
@@ -141,7 +148,9 @@ public class TickmapThreadRequest implements ServeurRequete {
                                 } while (dis.available() > 0);
                                 System.out.println(Thread.currentThread().getName() + "> Récupération des clefs");
                                 //Transformation de mon objet
-                                ByteArrayInputStream bais = new ByteArrayInputStream(PrivateKeyCipher.cipher.doFinal(baos.toByteArray()));
+
+                                CustomPrivateKeyCipher cpkc = new CustomPrivateKeyCipher(keystore, password, keyname);
+                                ByteArrayInputStream bais = new ByteArrayInputStream(cpkc.getCipher().doFinal(baos.toByteArray()));
                                 ObjectInputStream tempois = new ObjectInputStream(bais);
                                 System.out.println(Thread.currentThread().getName() + "> Décryptage des clefs");
                                 CryptedPackage cryptedPackage = (CryptedPackage) tempois.readObject();
@@ -154,6 +163,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                                 rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, Bd.toTable(bd.SelectWeekVols()));
                                 Reponse(oos, rep);
                                 log = true;
+
                             }
                             break;
                         case Ajout_Voyageurs: {
@@ -232,6 +242,12 @@ public class TickmapThreadRequest implements ServeurRequete {
                         }
                     else
                         return;
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                } catch (UnrecoverableKeyException e) {
+                    e.printStackTrace();
+                } catch (KeyStoreException e) {
+                    e.printStackTrace();
                 }
             }
         };

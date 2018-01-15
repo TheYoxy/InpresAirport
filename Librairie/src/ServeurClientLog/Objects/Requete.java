@@ -24,4 +24,7 @@ public abstract class Requete implements Serializable {
     }
 
     public abstract TypeRequete getType();
+
+    @Override
+    public abstract String toString();
 }

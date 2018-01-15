@@ -21,8 +21,8 @@ import Beans.ConnectionB;
 import Enums.ConnectionResult;
 import Enums.ErrorField;
 import Enums.Form;
-import Tools.Bd;
-import Tools.BdType;
+import Tools.Bd.Bd;
+import Tools.Bd.BdType;
 
 @WebServlet(name = "Servlet.LoginServlet", value = "/Main")
 

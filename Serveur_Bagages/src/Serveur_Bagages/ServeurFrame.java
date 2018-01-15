@@ -2,10 +2,10 @@ package Serveur_Bagages;
 
 import java.io.PrintStream;
 
-import LUGAP.LUGAPThreadRequest;
+import Protocole.LUGAP.LUGAPThreadRequest;
 import ServeurClientLog.Threads.ThreadServeur;
+import Tools.Affichage.TextAreaOutputStream;
 import Tools.PropertiesReader;
-import Tools.TextAreaOutputStream;
 
 public class ServeurFrame extends javax.swing.JFrame {
 
@@ -18,7 +18,7 @@ public class ServeurFrame extends javax.swing.JFrame {
         initComponents();
         System.setOut(new PrintStream(new TextAreaOutputStream(ConsoleTA)));
         try {
-            Class.forName("Tools.Bd");
+            Class.forName("Tools.Bd.Bd");
         } catch (ClassNotFoundException e) {
             System.out.println("Exception: " + e.getMessage());
             e.printStackTrace();

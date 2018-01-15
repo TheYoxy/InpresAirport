@@ -6,8 +6,8 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -17,38 +17,44 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
 import ServeurClientLog.Interfaces.ServeurRequete;
-import Tools.Crypto.Keystore.CustomKeyStore;
+import Tools.Crypto.Keystore.LoadedKeyStore;
 import Tools.Procedural;
 
 public class SSLThreadServeur extends ThreadServeur {
     private SSLServerSocket serverSocket = null;
+    private String keyStoreFile = null;
+    private char[] keyStorePassword = null;
 
-    public SSLThreadServeur(int port, int nb_threads, Class<? extends ServeurRequete>... types) {
+    /**
+     * @param port
+     * @param nb_threads
+     * @param keyStoreFile     Nom du fichier contenant le keystore, qui doit <b>obligatoirement</b> se trouver dans le dossier Librairie/src/Tools/Crypto/Keystore/Keystores
+     * @param keyStorePassword
+     * @param types
+     */
+    public SSLThreadServeur(int port, int nb_threads, String keyStoreFile, String keyStorePassword, Class<? extends ServeurRequete>... types) {
         super(port, nb_threads, types);
+        this.keyStoreFile = keyStoreFile;
+        this.keyStorePassword = keyStorePassword.toCharArray();
     }
 
     @Override
     public void run() {
-        super.run();
         //Initialisation de SSL
-        KeyStore ks = CustomKeyStore.getInstance().getKs();
+        KeyStore ks = null;
         try {
+            LoadedKeyStore lks = new LoadedKeyStore(keyStoreFile, keyStorePassword);
+            ks = lks.getKs();
             SSLContext context = SSLContext.getInstance("SSLv3");
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-            kmf.init(ks, CustomKeyStore.PASS);
+            kmf.init(ks, lks.getPass());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(ks);
-            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null); //SecureRandom à null -> Utilisation implicite d'un sécure random
             SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
             serverSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } catch (KeyStoreException e) {
             e.printStackTrace();
             System.exit(-1);
         } catch (KeyManagementException e) {
@@ -57,10 +63,19 @@ public class SSLThreadServeur extends ThreadServeur {
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
 
         for (ThreadClient tc : listChild) tc.start();
-
+        System.out.println(Thread.currentThread().getName() + "> Thread en écoute sur l'adresse: " + Procedural.StringIp(serverSocket.getInetAddress()) + ":" + serverSocket.getLocalPort());
         while (!isInterrupted()) {
             try {
                 SSLSocket socket = (SSLSocket) serverSocket.accept();
@@ -82,8 +97,10 @@ public class SSLThreadServeur extends ThreadServeur {
             } catch (IOException e) {
                 System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
                 return;
+            } catch (ClassCastException e) {
+                e.printStackTrace(System.out);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.out);
             }
         }
     }

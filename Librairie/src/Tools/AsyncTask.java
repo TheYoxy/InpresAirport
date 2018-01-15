@@ -24,7 +24,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
         // Invoke pre execute
         try {
             runAndWait(this::onPreExecute);
-            Thread.sleep(1);
+            Thread.yield();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

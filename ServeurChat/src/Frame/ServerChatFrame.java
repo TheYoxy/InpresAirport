@@ -15,8 +15,6 @@
  */
 package Frame;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,12 +23,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.sql.ResultSet;
@@ -42,15 +38,15 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
-import IACOP.TypeRequeteIACOP;
-import IACOP.TypeSpecialRequest;
-import NetworkObject.Login;
-import Tools.Bd;
-import Tools.BdType;
-import Tools.DigestCalculator;
+import NetworkObject.Bean.Login;
+import Protocole.IACOP.TypeRequeteIACOP;
+import Protocole.IACOP.TypeSpecialRequest;
+import Tools.Affichage.TextAreaOutputStream;
+import Tools.Bd.Bd;
+import Tools.Bd.BdType;
+import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Procedural;
 import Tools.PropertiesReader;
-import Tools.TextAreaOutputStream;
 
 public class ServerChatFrame extends javax.swing.JFrame {
     private final static int PORT_CHAT = Integer.parseInt(PropertiesReader.getProperties("PORT_CHAT"));
@@ -133,7 +129,7 @@ public class ServerChatFrame extends javax.swing.JFrame {
             try {
                 ds = new DatagramSocket(PORT_JOUR);
 //                ds.setReuseAddress(true);
-                System.out.println("Port du jour: " + PORT_JOUR);
+                System.out.println("port du jour: " + PORT_JOUR);
             } catch (IOException e) {
                 e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(this, "Impossible de bind le multicast.\nFin de l'application", "Erreur", JOptionPane.ERROR_MESSAGE);

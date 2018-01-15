@@ -8,12 +8,12 @@ import java.net.Socket;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import LUGAP.LUGAPThreadRequest;
-import LUGAP.ReponseLUGAP;
-import LUGAP.RequeteLUGAP;
-import LUGAP.TypeReponseLUGAP;
-import LUGAP.TypeRequeteLUGAP;
-import Tools.DigestCalculator;
+import Protocole.LUGAP.LUGAPThreadRequest;
+import Protocole.LUGAP.ReponseLUGAP;
+import Protocole.LUGAP.RequeteLUGAP;
+import Protocole.LUGAP.TypeReponseLUGAP;
+import Protocole.LUGAP.TypeRequeteLUGAP;
+import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Procedural;
 
 /**
@@ -189,7 +189,7 @@ public class Login extends javax.swing.JDialog {
             if (Oos == null) {
                 Oos = new ObjectOutputStream(Socket.getOutputStream());
             }
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect,Procedural.IpPort(Socket)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.TryConnect));
             if (Ois == null)
                 Ois = new ObjectInputStream(Socket.getInputStream());
             rep = (ReponseLUGAP) Ois.readObject();
@@ -211,13 +211,12 @@ public class Login extends javax.swing.JDialog {
         //Login
         try {
             Oos.writeObject(new RequeteLUGAP(
-                    TypeRequeteLUGAP.Login,
-                    new NetworkObject.Login(
+                    TypeRequeteLUGAP.Login, Procedural.IpPort(Socket),
+                    new NetworkObject.Bean.Login(
                             LoginTF.getText(),
                             DigestCalculator.hashPassword(
                                     new String(PasswordPF.getPassword()),
-                                    challenge)),
-                    Procedural.IpPort(Socket)));
+                                    challenge))));
             rep = (ReponseLUGAP) Ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -226,7 +225,7 @@ public class Login extends javax.swing.JDialog {
         }
 
         if (rep == null) return;
-        switch ((TypeReponseLUGAP) rep.getCode()) {
+        switch (rep.getCode()) {
             case UNKNOWN_LOGIN:
                 JOptionPane.showMessageDialog(this, "Le login entré est inexistant", "Retour de connection", JOptionPane.ERROR_MESSAGE);
                 break;

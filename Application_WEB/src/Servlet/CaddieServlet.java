@@ -24,8 +24,8 @@ import javax.servlet.http.HttpSession;
 
 import Beans.ConnectionB;
 import Beans.ReservationB;
-import Tools.Bd;
-import Tools.BdType;
+import Tools.Bd.Bd;
+import Tools.Bd.BdType;
 
 
 @WebServlet(name = "Servlet.CaddieServlet", value = "/Caddie")

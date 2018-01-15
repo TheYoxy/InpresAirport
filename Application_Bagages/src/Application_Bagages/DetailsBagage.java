@@ -15,7 +15,7 @@
  */
 package Application_Bagages;
 
-import NetworkObject.Bagage;
+import NetworkObject.Bean.Bagage;
 
 public class DetailsBagage extends javax.swing.JDialog {
 

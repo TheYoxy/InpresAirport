@@ -1,20 +1,21 @@
 package Application_Bagages;
 
-import LUGAP.ReponseLUGAP;
-import LUGAP.RequeteLUGAP;
-import LUGAP.TypeReponseLUGAP;
-import LUGAP.TypeRequeteLUGAP;
-import NetworkObject.Table;
-import Tools.Procedural;
-import Tools.PropertiesReader;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+
+import javax.swing.JOptionPane;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableModel;
+
+import NetworkObject.Bean.Table;
+import Protocole.LUGAP.ReponseLUGAP;
+import Protocole.LUGAP.RequeteLUGAP;
+import Protocole.LUGAP.TypeReponseLUGAP;
+import Protocole.LUGAP.TypeRequeteLUGAP;
+import Tools.PropertiesReader;
 
 public class Application_Bagage extends javax.swing.JFrame {
 
@@ -70,45 +71,22 @@ public class Application_Bagage extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new Application_Bagage().setVisible(true));
     }
 
-    public void Connection(boolean ouvertureFenetre) {
-        this.setVisible(ouvertureFenetre);
-        Log.setVisible(true);
-        if (!Log.isConnecter()) {
-            formWindowClosing(null);
-            dispose();
-            return;
-        }
-        if (!ouvertureFenetre) {
-            this.setVisible(true);
-        }
-        if (Ois == null) {
-            Ois = Log.getOis();
-        }
-        if (Oos == null) {
-            Oos = Log.getOos();
-        }
-        BagagisteNomPrenomLabel.setText(Log.getNomPrenomUser());
-
-        ReponseLUGAP rep = null;
+    private void DisconnectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DisconnectMIActionPerformed
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols, Procedural.IpPort(Serveur)));
-            rep = (ReponseLUGAP) Ois.readObject();
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Logout));
+            ReponseLUGAP rep = (ReponseLUGAP) Ois.readObject();
+            if (rep.getCode() != TypeReponseLUGAP.OK)
+                //TODO Gestion d'exception
+                return;
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
         }
-        if (rep.getCode() != TypeReponseLUGAP.OK) {
-            JOptionPane.showMessageDialog(this, "Erreur lors de la réception du tableau", "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
-        Table t = (Table) rep.getParam();
-        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(), t.getTete()));
-    }
+        Log.ResetChamps();
+        clearChamps();
+        Connection(true);
+    }//GEN-LAST:event_DisconnectMIActionPerformed
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -199,30 +177,53 @@ public class Application_Bagage extends javax.swing.JFrame {
         BagagisteNomPrenomLabel.setText("");
     }
 
+    public void Connection(boolean ouvertureFenetre) {
+        this.setVisible(ouvertureFenetre);
+        Log.setVisible(true);
+        if (!Log.isConnecter()) {
+            formWindowClosing(null);
+            dispose();
+            return;
+        }
+        if (!ouvertureFenetre) {
+            this.setVisible(true);
+        }
+        if (Ois == null) {
+            Ois = Log.getOis();
+        }
+        if (Oos == null) {
+            Oos = Log.getOos();
+        }
+        BagagisteNomPrenomLabel.setText(Log.getNomPrenomUser());
+
+        ReponseLUGAP rep = null;
+        try {
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Request_Vols));
+            rep = (ReponseLUGAP) Ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        if (rep.getCode() != TypeReponseLUGAP.OK) {
+            JOptionPane.showMessageDialog(this, "Erreur lors de la réception du tableau", "Exception", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        }
+        Table t = (Table) rep.getParam();
+        ResultatJTable.setModel(new DefaultTableModel(t.getChamps(), t.getTete()));
+    }
+
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Disconnect, Procedural.IpPort(Serveur)));
+            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Disconnect));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_formWindowClosing
-
-    private void DisconnectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DisconnectMIActionPerformed
-        try {
-            Oos.writeObject(new RequeteLUGAP(TypeRequeteLUGAP.Logout, Procedural.IpPort(Serveur)));
-            ReponseLUGAP rep = (ReponseLUGAP) Ois.readObject();
-            if (rep.getCode() != TypeReponseLUGAP.OK)
-                //TODO Gestion d'exception
-                return;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        Log.ResetChamps();
-        clearChamps();
-        Connection(true);
-    }//GEN-LAST:event_DisconnectMIActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BagagisteLabel;

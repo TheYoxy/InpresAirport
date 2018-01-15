@@ -18,15 +18,17 @@ import java.util.Vector;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 
+import NetworkObject.Bean.Places;
+import NetworkObject.Bean.Table;
 import NetworkObject.Bean.Voyageur;
-import NetworkObject.Places;
-import NetworkObject.Table;
-import TICKMAP.ReponseTICKMAP;
-import TICKMAP.RequeteTICKMAP;
-import TICKMAP.TypeReponseTICKMAP;
-import TICKMAP.TypeRequeteTICKMAP;
+import NetworkObject.CryptedPackage;
+import Protocole.TICKMAP.ReponseTICKMAP;
+import Protocole.TICKMAP.RequeteTICKMAP;
+import Protocole.TICKMAP.TypeReponseTICKMAP;
+import Protocole.TICKMAP.TypeRequeteTICKMAP;
 import Tools.AESCryptedSocket;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -61,6 +63,7 @@ public class MainController implements Initializable {
     private ObjectOutputStream oos;
     private Table vols;
     private AESCryptedSocket cryptedSocket;
+    private Mac hmac;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,11 +83,18 @@ public class MainController implements Initializable {
                 Platform.exit();
             }
 
+            /* Récupération des params de crypto et réseau et initialisation */
             this.s = loginController.getSocket();
             this.ois = loginController.getObjectInputStream();
             this.oos = loginController.getObjectOutputStream();
             vols = loginController.getVols();
-            cryptedSocket = new AESCryptedSocket(this.s, loginController.getCp().getParams());
+            CryptedPackage cp = loginController.getCp();
+            cryptedSocket = new AESCryptedSocket(this.s, cp.getParams());
+
+            hmac = Mac.getInstance("HMAC-SHA1", "BC");
+            hmac.init(cp.getKey());
+
+            /* Mise en place de la table */
             for (int i = 0; i < vols.getColumnCount(); i++) {
                 TableColumn tc = new TableColumn(vols.getTete().elementAt(i));
                 final int cell = i;
@@ -135,6 +145,7 @@ public class MainController implements Initializable {
                     System.out.println("Max: " + max);
                 }
             }
+
             try {
                 Stage s = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader();
@@ -156,39 +167,19 @@ public class MainController implements Initializable {
 
                 ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
-                    System.out.println("OK");
                     Places p = (Places) cryptedSocket.readObject();
-
-                    Dialog dialog = new Alert(Alert.AlertType.CONFIRMATION);
-                    dialog.setTitle("");
-                    dialog.setHeaderText("Confirmation de la réservation");
-
-                    GridPane grid = new GridPane();
-                    grid.setHgap(10);
-                    grid.setVgap(10);
-                    grid.setPadding(new Insets(20, 150, 10, 10));
-
-                    TextField prix = new TextField();
-                    prix.setText(String.valueOf(p.getPrix()));
-                    prix.setEditable(false);
-
-                    ListView<String> ids = new ListView();
-                    ids.getItems().addAll(p.getNumPlaces());
-                    ids.setEditable(false);
-                    ids.setPrefHeight(ids.getMinHeight());
-                    grid.add(new Label("Prix: "), 0, 0);
-                    grid.add(prix, 1, 0);
-                    grid.add(new Label(ids.getItems().size() > 1 ? "Numéros de billets: " : "Numéro de billet: "), 0, 1);
-                    grid.add(ids, 1, 1);
-
-                    dialog.getDialogPane().setContent(grid);
-                    Optional val = dialog.showAndWait();
-                    val.ifPresent(o -> {
+                    Optional val = showConfirm(p);
+                    val.ifPresent((Object o) -> {
                         System.out.println(o.getClass().getName());
                     });
 
                 } else if (rep.getCode() == TypeReponseTICKMAP.FULL) {
-                    System.out.println("FULL");
+                    int c = (int) rep.getParam();
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setHeaderText(null);
+                    a.setContentText("Impossible de réserver les places.\n" +
+                            "Il ne reste que " + c + (c < 1 ? " place " : " places ") + "disponible.");
+                    a.showAndWait();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -200,5 +191,32 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static Optional showConfirm(Places p) {
+        Dialog dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.setTitle("");
+        dialog.setHeaderText("Confirmation de la réservation");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField prix = new TextField();
+        prix.setText(String.valueOf(p.getPrix()));
+        prix.setEditable(false);
+
+        ListView<String> ids = new ListView();
+        ids.getItems().addAll(p.getNumPlaces());
+        ids.setEditable(false);
+        ids.setPrefHeight(ids.getMinHeight());
+        grid.add(new Label("Prix: "), 0, 0);
+        grid.add(prix, 1, 0);
+        grid.add(new Label(ids.getItems().size() > 1 ? "Numéros de billets: " : "Numéro de billet: "), 0, 1);
+        grid.add(ids, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        return dialog.showAndWait();
     }
 }

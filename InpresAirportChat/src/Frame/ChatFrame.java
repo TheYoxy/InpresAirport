@@ -8,10 +8,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
-import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,11 +17,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
-import IACOP.TypeRequeteIACOP;
-import IACOP.TypeSpecialRequest;
+import Protocole.IACOP.TypeRequeteIACOP;
+import Protocole.IACOP.TypeSpecialRequest;
+import Tools.Affichage.TextAreaOutputStream;
 import Tools.Procedural;
 import Tools.PropertiesReader;
-import Tools.TextAreaOutputStream;
 
 public class ChatFrame extends javax.swing.JFrame {
 

@@ -1,5 +1,6 @@
 package Protocole.SEBATRAP;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +11,7 @@ import java.sql.SQLException;
 
 import ServeurClientLog.Interfaces.Reponse;
 import ServeurClientLog.Interfaces.ServeurRequete;
+import ServeurClientLog.Objects.Requete;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Procedural;
@@ -20,10 +22,15 @@ public class STThreadRequest implements ServeurRequete {
     @Override
     public Runnable createRunnable(Socket client) {
         return () -> {
+
             ObjectInputStream ois;
             ObjectOutputStream oos;
             Bd bd;
             boolean boucle = true;
+            boolean verif = false;
+            String carte = null;
+            double prix = 0;
+
             try {
                 bd = new Bd(BdType.MySql, 5);
                 ois = new ObjectInputStream(client.getInputStream());
@@ -37,40 +44,81 @@ public class STThreadRequest implements ServeurRequete {
             }
 
             while (boucle) {
-                //                ReponseST rep = new ReponseST();
+                ReponseST rep = new ReponseST(TypeReponseST.NOT_OK);
                 try {
                     RequeteST req = (RequeteST) ois.readObject();
-
-                    HeaderRunnable(req.getType().toString(), Procedural.StringIp(client));
+                    HeaderRunnable(req, Procedural.StringIp(client));
                     switch (req.getType()) {
                         case VERIF: {
                             Serializable[] params = req.getParams();
-                            String carte = (String) params[0];
+                            carte = (String) params[0];
+                            System.out.println(Thread.currentThread().getName() + "> Carte: " + carte);
                             ResultSet rs = bd.SelectAlimCarte(carte);
-                            //                            if (!rs.next())
-                            //                                rep = new ReponseST();
+                            if (rs.next()) {
+                                double restant = rs.getDouble(1);
+                                prix = (double) params[1];
+                                if (prix < restant) {
+                                    rep = new ReponseST(TypeReponseST.OK);
+                                    verif = true;
+                                } else
+                                    boucle = false;
+                            } else
+                                rep = new ReponseST(TypeReponseST.CARD_NOT_FOUND);
                         }
                         break;
                         case PAYEMENT:
+                            if (verif) {
+                                ResultSet rs = bd.SelectAlimCarte(carte);
+                                rs.next();
+                                double avant = rs.getDouble("solde");
+
+                                int nb = bd.Payement(carte, prix);
+
+                                rs = bd.SelectAlimCarte(carte);
+                                rs.next();
+                                double apres = rs.getDouble("solde");
+                                bd.commit();
+
+                                System.out.println(Thread.currentThread().getName() + "> " + avant + " -> " + apres);
+                                System.out.println(Thread.currentThread().getName() + "> Nombre d'update: " + nb);
+                                rep = new ReponseST(TypeReponseST.OK);
+                            }
                             boucle = false;
                             break;
                     }
                 } catch (Exception e) {
+                    if (e.getClass() == EOFException.class) {
+                        boucle = false;
+                        continue;
+                    }
                     e.printStackTrace(System.out);
-
+                } finally {
+                    try {
+                        Reponse(oos, rep);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        boucle = false;
+                    }
                 }
+            }
+
+            try {
+                bd.Close(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         };
     }
 
-    private void HeaderRunnable(String type, String from) {
-        System.out.println();
-        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + type + " de " + from);
+    private void HeaderRunnable(Requete req, String from) {
+        System.out.println("====================");
+        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + req.getType().toString() + " de " + from);
+        System.out.println(Thread.currentThread().getName() + "> Message reçu: " + req);
     }
 
     private void Reponse(final ObjectOutputStream outputStream, Reponse rep) throws IOException {
         System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
         outputStream.writeObject(rep);
+        System.out.println("====================\n");
     }
-
 }

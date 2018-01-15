@@ -9,9 +9,9 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import IACOP.TypeRequeteIACOP;
-import NetworkObject.Login;
-import Tools.DigestCalculator;
+import NetworkObject.Bean.Login;
+import Protocole.IACOP.TypeRequeteIACOP;
+import Tools.Crypto.Digest.DigestCalculator;
 import Tools.PropertiesReader;
 
 public class LoginFram extends javax.swing.JDialog {
