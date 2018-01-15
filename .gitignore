@@ -19,3 +19,4 @@ manifest.mf
 */libs/*
 *.jar
 Librairie/src/CryptoTest/
+SSLCert/*
