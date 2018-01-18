@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-
-<BorderPane prefHeight="679.0" prefWidth="1030.0" stylesheets="@fxml.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Serveur.ServeurControlleur">
+<?import javafx.geometry.Insets?><?import javafx.scene.control.Label?><?import javafx.scene.control.TextArea?><?import javafx.scene.layout.BorderPane?><?import javafx.scene.layout.VBox?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="679.0" prefWidth="1030.0"
+    stylesheets="@fxml.css" xmlns="http://javafx.com/javafx/8.0.121"
+    fx:controller="ServeurBillets.ServeurControlleur">
     <center>
         <TextArea fx:id="Console" editable="false" prefHeight="1076.0" prefWidth="1465.0" styleClass="console" BorderPane.alignment="CENTER" />
     </center>

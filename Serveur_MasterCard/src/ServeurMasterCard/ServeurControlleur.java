@@ -1,11 +1,11 @@
-package Serveur;
+package ServeurMasterCard;
 
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import Protocole.TICKMAP.TickmapThreadRequest;
-import ServeurClientLog.Threads.ThreadServeur;
+import Protocole.SEBATRAP.STThreadRequest;
+import ServeurClientLog.Threads.SSLThreadServeur;
 import Tools.Affichage.FTextAreaOutputStream;
 import Tools.Procedural;
 import Tools.PropertiesReader;
@@ -19,19 +19,15 @@ public class ServeurControlleur implements Initializable {
     private TextArea Console;
     @FXML
     private VBox VBoxStatus;
-
-    private ThreadServeur ts = null;
+    private SSLThreadServeur ts;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.setOut(new PrintStream(new FTextAreaOutputStream(Console)));
-
-        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")),
-                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), TickmapThreadRequest.class);
-
+        ts = new SSLThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_MASTERCARD")),
+                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), "Serveur_Billets.jks",
+                "azerty", STThreadRequest.class);
         Procedural.ajoutBoutonListener(ts.getListChild(), VBoxStatus);
-
-        /* Lancement du serveur */
         ts.start();
     }
 }

@@ -1,0 +1,7 @@
+.console {
+    -fx-text-alignment: center;
+}
+
+.rb {
+    -fx-padding: .15em .5em .15em;
+}

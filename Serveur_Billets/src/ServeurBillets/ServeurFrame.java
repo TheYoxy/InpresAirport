@@ -1,4 +1,4 @@
-package Serveur;
+package ServeurBillets;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +12,7 @@ public class ServeurFrame extends Application {
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("Serveur.fxml"));
         stage.setScene(new Scene(root));
-        stage.setTitle("Serveur_Payement");
+        stage.setTitle("Serveur_Billets");
         stage.show();
     }
 }
