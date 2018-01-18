@@ -71,7 +71,7 @@ public class ServeurFrame extends javax.swing.JFrame {
         StartB = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Serveur");
+        setTitle("Serveur_Bagages");
         setFont(new java.awt.Font("Liberation Mono", 0, 14)); // NOI18N
 
         ConsoleTA.setEditable(false);
