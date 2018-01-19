@@ -3,7 +3,6 @@ package Protocole.TICKMAP;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import ServeurClientLog.Interfaces.TypeReponse;
 import ServeurClientLog.Objects.Reponse;
 
 public class ReponseTICKMAP extends Reponse {
@@ -16,7 +15,7 @@ public class ReponseTICKMAP extends Reponse {
     }
 
     @Override
-    public TypeReponse getCode() {
+    public TypeReponseTICKMAP getCode() {
         return this.reponse;
     }
 

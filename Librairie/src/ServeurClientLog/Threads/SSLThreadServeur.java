@@ -16,8 +16,8 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 
-import ServeurClientLog.Interfaces.ServeurRequete;
-import Tools.Crypto.Keystore.LoadedKeyStore;
+import ServeurClientLog.Objects.ServeurRequete;
+import Tools.Crypto.FonctionsCrypto;
 import Tools.Procedural;
 
 public class SSLThreadServeur extends ThreadServeur {
@@ -43,15 +43,17 @@ public class SSLThreadServeur extends ThreadServeur {
         //Initialisation de SSL
         KeyStore ks = null;
         try {
-            LoadedKeyStore lks = new LoadedKeyStore(keyStoreFile, keyStorePassword);
-            ks = lks.getKs();
-            SSLContext context = SSLContext.getInstance("SSLv3");
+            ks = FonctionsCrypto.loadKeyStore(keyStoreFile, keyStorePassword);
+
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-            kmf.init(ks, lks.getPass());
+            kmf.init(ks, keyStorePassword);
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(ks);
+
+            SSLContext context = SSLContext.getInstance("TLS");
             context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null); //SecureRandom à null -> Utilisation implicite d'un sécure random
+
             SSLServerSocketFactory sslServerSocketFactory = context.getServerSocketFactory();
             serverSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(port);
         } catch (NoSuchAlgorithmException e) {
@@ -95,13 +97,14 @@ public class SSLThreadServeur extends ThreadServeur {
                     System.out.println("Type: " + req.getClass());
                 }
             } catch (IOException e) {
-                System.out.println("Erreur d'accept ! ? [" + e.getMessage() + "]\n");
+                e.printStackTrace(System.out);
                 return;
             } catch (ClassCastException e) {
                 e.printStackTrace(System.out);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace(System.out);
             }
+
         }
     }
 }

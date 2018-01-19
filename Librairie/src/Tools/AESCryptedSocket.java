@@ -2,13 +2,10 @@ package Tools;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
@@ -24,6 +21,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
 import NetworkObject.AESParams;
+import Tools.Crypto.FonctionsCrypto;
 
 public class AESCryptedSocket {
     private static final String ENCRYPTION = "Rijndael/CBC/PKCS5Padding";
@@ -54,20 +52,16 @@ public class AESCryptedSocket {
         dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
     }
 
-    public void writeObject(Serializable e) throws IOException, BadPaddingException, IllegalBlockSizeException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(e);
-        dos.write(chiffrement.doFinal(baos.toByteArray()));
-        dos.flush();
-    }
-
     public Serializable readObject() throws IOException, ClassNotFoundException, BadPaddingException, IllegalBlockSizeException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         do {
             baos.write(dis.readByte());
         } while (dis.available() > 0);
-        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(dechiffrement.doFinal(baos.toByteArray())));
-        return (Serializable) ois.readObject();
+        return (Serializable) FonctionsCrypto.decrypt(baos.toByteArray(), dechiffrement);
+    }
+
+    public void writeObject(Serializable e) throws IOException, BadPaddingException, IllegalBlockSizeException {
+        dos.write(FonctionsCrypto.encrypt(e, chiffrement));
+        dos.flush();
     }
 }

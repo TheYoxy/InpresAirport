@@ -34,7 +34,7 @@ public class Application_Bagage extends javax.swing.JFrame {
 
         this.setEnabled(false);
         try {
-            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
+            Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("BILLETS_NAME")), Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")));
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);

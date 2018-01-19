@@ -1,8 +1,5 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Beans.ReservationB" %>
-<%@ page import="Enums.ConnectionResult" %>
-<%@ page import="Enums.ErrorField" %>
-<%@ page import="Enums.Form" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <jsp:useBean id="Result" class="Beans.ConnectionB" scope="session"/>
 <header role="banner">
@@ -95,7 +92,7 @@
                     <label class="image-replace cd-email" for="signin-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signin-email" type="email"
                            name="mail"
-                           placeholder="E-mail" value="${param["mail"]}">
+                           placeholder="E-mail" value="${params["mail"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.LOGIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
@@ -121,7 +118,7 @@
             </form>
 
             <%--<p class="cd-form-bottom-message"><a href="#">Forgot your password?</a></p>--%>
-            <!-- <a href="#0" class="cd-close-form">Close</a> -->
+            <!-- <a href="#0" class="cd-close-form">close</a> -->
         </div> <!-- cd-login -->
 
         <div id="cd-signup" ${Result.place == Form.SIGNIN ? "class='is-selected'" : ""}>
@@ -132,7 +129,7 @@
                     <input class="full-width has-padding has-border" id="signup-username"
                            type="text"
                            name="username"
-                           placeholder="Username" value="${param["username"]}">
+                           placeholder="Username" value="${params["username"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.LOGIN && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
@@ -140,7 +137,7 @@
                     <label class="image-replace cd-email" for="signup-email">E-mail</label>
                     <input class="full-width has-padding has-border" id="signup-email" type="email"
                            name="mail"
-                           placeholder="E-mail" value="${param["email"]}">
+                           placeholder="E-mail" value="${params["email"]}">
                     <span class="cd-error-message ${Result.result == ConnectionResult.FAIL && Result.field == ErrorField.EMAIL && Result.place == Form.SIGNIN? "is-visible" : ""}">${Result.errorMessage}</span>
                 </p>
 
@@ -165,7 +162,7 @@
                 </p>
             </form>
 
-            <!-- <a href="#0" class="cd-close-form">Close</a> -->
+            <!-- <a href="#0" class="cd-close-form">close</a> -->
         </div> <!-- cd-signup -->
 
         <div id="cd-reset-password"> <!-- reset password form -->

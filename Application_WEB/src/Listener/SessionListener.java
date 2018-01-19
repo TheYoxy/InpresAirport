@@ -43,7 +43,7 @@ public class SessionListener implements HttpSessionListener {
         if (list != null)
             for (ReservationB rb : list)
                 try {
-                    Sgbd.AjoutPlacesLibres((String) rb.getInfosVol().get(0), rb.getNbrPlaces());
+                    Sgbd.ajoutPlacesLibres((String) rb.getInfosVol().get(0), rb.getNbrPlaces());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

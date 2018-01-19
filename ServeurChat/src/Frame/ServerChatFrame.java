@@ -203,9 +203,9 @@ public class ServerChatFrame extends javax.swing.JFrame {
 
                     ResultSet rs;
                     if (o instanceof Login)
-                        rs = mysql.SelectUserPassword(((Login) o).getUser());
+                        rs = mysql.selectUserPassword(((Login) o).getUser());
                     else if (o instanceof String)
-                        rs = mysql.SelectUserBillet((String) o);
+                        rs = mysql.selectUserBillet((String) o);
                     else {
                         oos.writeObject(-1);
                         return;

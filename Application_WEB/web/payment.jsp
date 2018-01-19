@@ -24,7 +24,7 @@
     </thead>
     <tbody>
     <%
-        Map<Integer, List<String>> map = (Map<Integer, List<String>>) session.getAttribute("Payement");
+        Map<Integer, List<String>> map = (Map<Integer, List<String>>) session.getAttribute("payement");
         if (map != null) {
             for (Map.Entry<Integer, List<String>> e : map.entrySet()) {
                 out.println("<tr><td style='border-top: solid .5px'>");

@@ -25,7 +25,7 @@ public class ServeurControlleur implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.setOut(new PrintStream(new FTextAreaOutputStream(Console)));
         ts = new SSLThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_MASTERCARD")),
-                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), "Serveur_Billets.jks",
+                Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), "Serveur_Mastercard.pkcs12",
                 "azerty", STThreadRequest.class);
         Procedural.ajoutBoutonListener(ts.getListChild(), VBoxStatus);
         ts.start();

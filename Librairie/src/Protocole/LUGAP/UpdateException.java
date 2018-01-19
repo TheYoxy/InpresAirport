@@ -1,4 +1,4 @@
 package Protocole.LUGAP;
 
-public class UpdateException extends Throwable {
+public class UpdateException extends Exception {
 }

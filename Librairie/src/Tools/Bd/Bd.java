@@ -21,7 +21,6 @@ import java.util.Vector;
 import NetworkObject.Bean.Table;
 import Tools.VolField;
 
-@SuppressWarnings("ALL")
 public class Bd {
 
     private Connection Connection;
@@ -35,19 +34,6 @@ public class Bd {
         this.Connection = createConnection(type);
     }
 
-    /**
-     * @param type
-     * @param lockTime
-     * @throws IOException
-     * @throws SQLException
-     */
-    public Bd(BdType type, int lockTime) throws IOException, SQLException {
-        this.Connection = createConnection(type);
-        setInnoDB_Lock_Time(lockTime);
-        this.Connection.setAutoCommit(false);
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="Static">
     /**
      * @param type
      * @return
@@ -80,10 +66,27 @@ public class Bd {
     }
 
     /**
+     * @param type
+     * @param lockTime
+     * @throws IOException
+     * @throws SQLException
+     */
+    public Bd(BdType type, int lockTime) throws IOException, SQLException {
+        this.Connection = createConnection(type);
+        setInnoDB_Lock_Time(lockTime);
+        this.Connection.setAutoCommit(false);
+    }
+
+    private synchronized void setInnoDB_Lock_Time(int time) throws SQLException {
+        Statement s = this.Connection.createStatement();
+        s.execute("SET SESSION innodb_lock_wait_timeout = " + (time - 1));
+    }
+
+    /**
      * @param rs
      * @throws SQLException
      */
-    public static void AfficheResultSet(ResultSet rs) throws SQLException {
+    public static void afficheResultSet(ResultSet rs) throws SQLException {
         ResultSetMetaData rsmf = rs.getMetaData();
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= rsmf.getColumnCount(); i++) {
@@ -99,24 +102,6 @@ public class Bd {
             sb.deleteCharAt(sb.length() - 1);
             System.out.println(sb);
         }
-    }
-
-    /**
-     * Fonction qui va prendre toutes les valeurs d'un noeud d'un résultset, et les mettre dans une liste
-     *
-     * @param rs Resultset à analyser
-     * @return null si le RésultSet est fermé<br/>
-     * List des valeurs du noeud sur lequel pointe le résultset
-     * @throws SQLException Toute exceptions pouvant être lancée
-     */
-    public static List ToList(ResultSet rs) throws SQLException {
-        List l = new LinkedList();
-        if (rs.isClosed()) return null;
-        else if (rs.isBeforeFirst()) rs.next();
-        else if (rs.isAfterLast()) return null;
-        ResultSetMetaData rsmd = rs.getMetaData();
-        for (int i = 1; i <= rsmd.getColumnCount(); i++) l.add(rs.getObject(i));
-        return l;
     }
 
     public static void main(String[] argv) {
@@ -136,8 +121,8 @@ public class Bd {
                         String id = ((Integer) (j + 1)).toString();
                         //                        String id = "1";
                         System.out.println(Thread.currentThread().getName() + "> Id: " + id);
-                        ResultSet rs = anA.SelectBagageVol(id);
-                        System.out.println(Thread.currentThread().getName() + "> Select passé");
+                        ResultSet rs = anA.selectBagageVol(id);
+                        System.out.println(Thread.currentThread().getName() + "> select passé");
                         Table t = toTable(rs);
                         System.out.println(t);
                         System.out.println(Thread.currentThread().getName() + "> Fin requête");
@@ -158,10 +143,6 @@ public class Bd {
         }
     }
 
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="SELECT">
-
     public void setTransactionIsolationLevel(int level) throws SQLException {
         Connection.setTransactionIsolation(level);
     }
@@ -171,8 +152,8 @@ public class Bd {
      * @return Un objet ResultSet contenant les résultats de la requête
      * @throws SQLException Exceptions qui sont générées par la BD
      */
-    public synchronized ResultSet SelectBagageVol(String numVol) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vols WHERE Vols.NumeroVol = ? FOR UPDATE", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+    public synchronized ResultSet selectBagageVol(String numVol) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("SELECT Bagages.* FROM Bagages NATURAL JOIN Billets NATURAL JOIN Vol WHERE NumeroVol = ? FOR UPDATE", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
         s.setString(1, numVol);
         return s.executeQuery();
     }
@@ -197,12 +178,16 @@ public class Bd {
                 try {
                     //Sous MySql, n'importe quel type de données peut être directement converti en String
                     //Le passage via le type ne fonctionne pas
-                    if (rsmd.getColumnTypeName(i) == "TINYINT") {
-                        temp.add(String.valueOf(rs.getBoolean(i)));
-                    } else if (rsmd.getColumnTypeName(i) == "FLOAT") {
-                        temp.add(String.valueOf(rs.getFloat(i)));
-                    } else {
-                        temp.add(rs.getString(i));
+                    switch (rsmd.getColumnTypeName(i)) {
+                        case "TINYINT":
+                            temp.add(String.valueOf(rs.getBoolean(i)));
+                            break;
+                        case "FLOAT":
+                            temp.add(String.valueOf(rs.getFloat(i)));
+                            break;
+                        default:
+                            temp.add(rs.getString(i));
+                            break;
                     }
                 } catch (SQLException e) {
                     System.out.println(Thread.currentThread().getName() + "> Exception: " + e.getMessage());
@@ -213,101 +198,51 @@ public class Bd {
         return new Table(title, champs);
     }
 
-    public synchronized ResultSet Select(String table) throws SQLException {
-        //La table doit être hard codée
-        return Connection.createStatement().executeQuery("select * from " + table);
+    /**
+     * Fonction qui va prendre toutes les valeurs d'un noeud d'un résultset, et les mettre dans une liste
+     *
+     * @param rs Resultset à analyser
+     * @return null si le RésultSet est fermé<br/>
+     * List des valeurs du noeud sur lequel pointe le résultset
+     * @throws SQLException Toute exceptions pouvant être lancée
+     */
+    public static List toList(ResultSet rs) throws SQLException {
+        List l = new LinkedList();
+        if (rs.isClosed()) return null;
+        else if (rs.isBeforeFirst()) rs.next();
+        else if (rs.isAfterLast()) return null;
+        ResultSetMetaData rsmd = rs.getMetaData();
+        for (int i = 1; i <= rsmd.getColumnCount(); i++) l.add(rs.getObject(i));
+        return l;
     }
 
-    public synchronized ResultSet SelectUserPassword(String user) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT password,Prenom FROM Login NATURAL JOIN Agents WHERE Username LIKE ?");
-        ps.setString(1, user);
-        return ps.executeQuery();
-    }
-
-    public synchronized ResultSet SelectUserBillet(String billet) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT Prenom FROM WebUsers NATURAL JOIN Facture NATURAL JOIN Billets WHERE NumeroBillet LIKE ?");
-        ps.setString(1, billet);
-        return ps.executeQuery();
-    }
-
-    public synchronized String SelectLogUser(String User) throws SQLException {
-        PreparedStatement s = Connection.prepareStatement("SELECT Nom,Prenom FROM Agents NATURAL JOIN Login WHERE Username = ? AND Poste = 'Bagagiste'");
-        s.setString(1, User);
-        if (s.execute()) {
-            Vector<Vector<String>> v = toTable(s.getResultSet()).getChamps();
-            if (!v.isEmpty()) {
-                final Vector<String> strings = v.elementAt(0);
-                return strings.elementAt(0) + " " + strings.elementAt(1);
-            }
-            return "";
-        } else {
-            return "";
-        }
-    }
-
-    public synchronized ResultSet SelectTodayVols() throws SQLException {
-        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN CURRENT_DATE AND CURRENT_DATE + 1");
-    }
-
-    public synchronized ResultSet SelectWeekVols() throws SQLException {
-        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 7");
-    }
-
-    public synchronized ResultSet SelectVolReservable(String numVol) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ?");
-        ps.setString(1, numVol);
-        return ps.executeQuery();
-    }
-
-    public synchronized ResultSet SelectVolReservableNbPlaces(String numVol, int nbPlaces) throws SQLException {
-        //Il est directement incrémenté
-        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ? AND PlacesDisponible >= ?");
-        ps.setString(1, numVol);
-        ps.setInt(2, nbPlaces);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            SuppPlacesReservables(numVol, nbPlaces);
-            rs.beforeFirst();
-            return rs;
-        }
-        return null;
-    }
-
-    public synchronized int SuppPlacesReservables(String numVol, int nbPlaces) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible - ? WHERE NumeroVol LIKE ?");
+    public synchronized int ajoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible + ? WHERE NumeroVol LIKE ?");
         ps.setInt(1, nbPlaces);
         ps.setString(2, numVol);
         return ps.executeUpdate();
     }
 
-    public synchronized ResultSet SelectPlacesVols(String numVol) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT PlacesDisponible FROM Vol WHERE NumeroVol LIKE ? ");
-        ps.setString(1, numVol);
-        return ps.executeQuery();
+    public synchronized void close() throws SQLException {
+        close(false);
     }
 
-    public synchronized ResultSet SelectBillets(String numVol) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroBillet FROM bd_airport.Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet");
-        ps.setString(1, numVol);
-        return ps.executeQuery();
+    public synchronized void close(boolean commit) throws SQLException {
+        if (commit) {
+            Connection.commit();
+        }
+        Connection.close();
     }
 
-    public synchronized ResultSet SelectLieu(String numVol) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT Lieu FROM Vol WHERE NumeroVol LIKE ?");
-        ps.setString(1, numVol);
-        return ps.executeQuery();
+    public synchronized void commit() throws SQLException {
+        Connection.commit();
     }
 
-    private synchronized void setInnoDB_Lock_Time(int time) throws SQLException {
-        Statement s = this.Connection.createStatement();
-        s.execute("SET SESSION innodb_lock_wait_timeout = " + (time - 1));
+    public Connection getConnection() {
+        return Connection;
     }
 
-
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="INSERT">
-    public synchronized int InsertAchat(String username, String vol, String places, double prix) throws SQLException {
+    public synchronized int insertAchat(String username, String vol, String places, double prix) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO Facture(Username, NumeroVol, nbPlaces,prix) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, username);
         ps.setString(2, vol);
@@ -322,7 +257,7 @@ public class Bd {
         }
     }
 
-    public synchronized String InsertBillet(String numVol, int idFacture) throws SQLException {
+    public synchronized String insertBillet(String numVol, int idFacture) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("SELECT NumeroBillet FROM Billets WHERE NumeroVol LIKE ?");
         ps.setString(1, numVol);
         ResultSet r = ps.executeQuery();
@@ -342,7 +277,7 @@ public class Bd {
                 : null;
     }
 
-    public synchronized boolean InsertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
+    public synchronized boolean insertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO Reservation(Username, NumeroVol, nbPlaces, timeReservation) VALUES (?,?,?,?)");
         Timestamp ts = Timestamp.valueOf(time);
 
@@ -353,21 +288,130 @@ public class Bd {
         return ps.executeUpdate() != 0;
     }
 
-    public synchronized boolean InsertUser(String username, String password, String mail) throws SQLException {
+    public synchronized boolean insertUser(String username, String password, String mail) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Password, Mail) VALUES (?,?,?)");
         ps.setString(1, username);
         ps.setString(2, password);
         ps.setString(3, mail);
         return ps.executeUpdate() != 0;
     }
-    //</editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="UPDATE">
-    public synchronized int AjoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("UPDATE VolReservable SET PlacesDisponible = PlacesDisponible + ? WHERE NumeroVol LIKE ?");
+    public synchronized int payement(String numeroCarte, double value) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Carte SET solde = solde - ? WHERE numeroCarte = ?");
+        ps.setDouble(1, value);
+        ps.setString(2, numeroCarte);
+        return ps.executeUpdate();
+    }
+
+    public synchronized void rollback() throws SQLException {
+        Connection.rollback();
+    }
+
+    public synchronized void rollback(Savepoint s) throws SQLException {
+        Connection.rollback(s);
+    }
+
+    public synchronized ResultSet select(String table) throws SQLException {
+        //La table doit être hard codée
+        return Connection.createStatement().executeQuery("select * from " + table);
+    }
+
+    public synchronized ResultSet selectAlimCarte(String numeroCarte) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT solde FROM Carte WHERE numeroCarte = ?");
+        ps.setString(1, numeroCarte);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectBillets(String numVol) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroBillet FROM bd_airport.Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet");
+        ps.setString(1, numVol);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectLastTransaction() throws SQLException {
+        return Connection.prepareStatement("SELECT * FROM Transactions ORDER BY instant DESC LIMIT 1").executeQuery();
+    }
+
+    public synchronized ResultSet selectLieu(String numVol) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT Lieu FROM Vol WHERE NumeroVol LIKE ?");
+        ps.setString(1, numVol);
+        return ps.executeQuery();
+    }
+
+    public synchronized String selectLogUser(String User) throws SQLException {
+        PreparedStatement s = Connection.prepareStatement("SELECT Nom,Prenom FROM Agents NATURAL JOIN Login WHERE Username = ? AND Poste = 'Bagagiste'");
+        s.setString(1, User);
+        if (s.execute()) {
+            Vector<Vector<String>> v = toTable(s.getResultSet()).getChamps();
+            if (!v.isEmpty()) {
+                final Vector<String> strings = v.elementAt(0);
+                return strings.elementAt(0) + " " + strings.elementAt(1);
+            }
+            return "";
+        } else {
+            return "";
+        }
+    }
+
+    public synchronized ResultSet selectPlacesVols(String numVol) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT PlacesDisponible FROM Vol WHERE NumeroVol LIKE ? ");
+        ps.setString(1, numVol);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectTodayVols() throws SQLException {
+        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN CURRENT_DATE AND CURRENT_DATE + 1");
+    }
+
+    public synchronized ResultSet selectUserBillet(String billet) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT Prenom FROM WebUsers NATURAL JOIN Facture NATURAL JOIN Billets WHERE NumeroBillet LIKE ?");
+        ps.setString(1, billet);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectUserPassword(String user) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT password,Prenom FROM Login NATURAL JOIN Agents WHERE Username LIKE ?");
+        ps.setString(1, user);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectVolReservable(String numVol) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ?");
+        ps.setString(1, numVol);
+        return ps.executeQuery();
+    }
+
+    public synchronized ResultSet selectVolReservableNbPlaces(String numVol, int nbPlaces) throws SQLException {
+        //Il est directement incrémenté
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ? AND PlacesDisponible >= ?");
+        ps.setString(1, numVol);
+        ps.setInt(2, nbPlaces);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            suppPlacesReservables(numVol, nbPlaces);
+            rs.beforeFirst();
+            return rs;
+        }
+        return null;
+    }
+
+    public synchronized int suppPlacesReservables(String numVol, int nbPlaces) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible - ? WHERE NumeroVol LIKE ?");
         ps.setInt(1, nbPlaces);
         ps.setString(2, numVol);
         return ps.executeUpdate();
+    }
+
+    public synchronized ResultSet selectWeekVols() throws SQLException {
+        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 7");
+    }
+
+    public synchronized void setAutoComit(boolean b) throws SQLException {
+        Connection.setAutoCommit(b);
+    }
+
+    public synchronized Savepoint setSavepoint() throws SQLException {
+        return Connection.setSavepoint();
     }
 
     /**
@@ -377,7 +421,7 @@ public class Bd {
      * @return
      * @throws SQLException
      */
-    public synchronized int UpdateBagage(VolField champ, Object value, String numBagage) throws SQLException {
+    public synchronized int updateBagage(VolField champ, Object value, String numBagage) throws SQLException {
         //Quand on passe via ?, ça ajoute des "" -> Obligé de le passer en dur
         PreparedStatement ps = Connection.prepareStatement("UPDATE Bagages SET " + champ.toString() + " = ? WHERE NumeroBagage = ?");
         switch (champ) {
@@ -395,55 +439,4 @@ public class Bd {
         ps.setString(2, numBagage);
         return ps.executeUpdate();
     }
-
-    public synchronized int Payement(String numeroCarte, double value) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("UPDATE Carte SET solde = solde - ? WHERE numeroCarte = ?");
-        ps.setDouble(1, value);
-        ps.setString(2, numeroCarte);
-        return ps.executeUpdate();
-    }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="DB Operations">
-    public synchronized void Close() throws SQLException {
-        Close(false);
-    }
-
-    public synchronized ResultSet SelectAlimCarte(String numeroCarte) throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT solde FROM Carte WHERE numeroCarte = ?");
-        ps.setString(1, numeroCarte);
-        return ps.executeQuery();
-    }
-
-    public synchronized void Close(boolean commit) throws SQLException {
-        if (commit) {
-            Connection.commit();
-        }
-        Connection.close();
-    }
-
-    public synchronized void commit() throws SQLException {
-        Connection.commit();
-    }
-
-    public Connection getConnection() {
-        return Connection;
-    }
-
-    public synchronized void rollback() throws SQLException {
-        Connection.rollback();
-    }
-
-    public synchronized void rollback(Savepoint s) throws SQLException {
-        Connection.rollback(s);
-    }
-
-    public synchronized void setAutoComit(boolean b) throws SQLException {
-        Connection.setAutoCommit(b);
-    }
-
-    public synchronized Savepoint setSavepoint() throws SQLException {
-        return Connection.setSavepoint();
-    }
-    // </editor-fold>
 }

@@ -42,7 +42,7 @@ import Protocole.TICKMAP.TypeReponseTICKMAP;
 import Protocole.TICKMAP.TypeRequeteTICKMAP;
 import Tools.AsyncTask;
 import Tools.Crypto.Digest.DigestCalculator;
-import Tools.Crypto.Keystore.LoadedKeyStore;
+import Tools.Crypto.FonctionsCrypto;
 import Tools.Procedural;
 import Tools.PropertiesReader;
 import javafx.event.ActionEvent;
@@ -102,6 +102,7 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         connected = false;
         Chargement.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        Username.requestFocus();
     }
 
     @FXML
@@ -130,7 +131,7 @@ public class LoginController implements Initializable {
         private static final int OK = 0;
         private String error = "";
 
-        private static final String keystore = "Application_Billets.jks";
+        private static final String keystore = "Application_Billets.pkcs12";
         private static final String password = "azerty";
         private static final String keyname = "appbillets";
 
@@ -142,26 +143,6 @@ public class LoginController implements Initializable {
             LoginPanel.setVisible(false);
         }
 
-        /**
-         * @return
-         * @throws KeyStoreException
-         * @throws IOException
-         * @throws NoSuchPaddingException
-         * @throws NoSuchAlgorithmException
-         * @throws NoSuchProviderException
-         * @throws InvalidKeyException
-         * @throws CertificateException
-         */
-        private Cipher genPublicKey() throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
-            System.out.println("Récupération de la clef publique du serveur");
-            KeyStore ks = new LoadedKeyStore(keystore, password.toCharArray()).getKs();
-            X509Certificate certificate = (X509Certificate) ks.getCertificate(keyname);
-            PublicKey pk = certificate.getPublicKey();
-            Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
-            cipher.init(Cipher.PUBLIC_KEY, pk);
-            return cipher;
-        }
-
         @Override
         protected Integer doInBackground(Void... voids) {
             System.out.println("doInBackground()");
@@ -169,7 +150,7 @@ public class LoginController implements Initializable {
             try {
                 if (s == null) {
                     s = new Socket();
-                    s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port"))), 5000);
+                    s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("BILLETS_NAME")), Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS"))), 5000);
                     ObjectOutputStream tempoos = new ObjectOutputStream(s.getOutputStream());
                     tempoos.writeObject(new TickmapThreadRequest());
                 }
@@ -183,7 +164,7 @@ public class LoginController implements Initializable {
                         oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Login, new Login(Username.getText(), DigestCalculator.hashPassword(Password.getText(), challenge))));
                         rep = (ReponseTICKMAP) ois.readObject();
                         if (rep.getCode() == TypeReponseTICKMAP.OK)
-                            switch ((TypeReponseTICKMAP) rep.getCode()) {
+                            switch (rep.getCode()) {
                                 case UNKNOWN_LOGIN:
                                     return BAD_LOGIN;
                                 case BAD_PASSWORD:
@@ -225,6 +206,26 @@ public class LoginController implements Initializable {
                 error = e.getLocalizedMessage();
             }
             return OTHER;
+        }
+
+        /**
+         * @return
+         * @throws KeyStoreException
+         * @throws IOException
+         * @throws NoSuchPaddingException
+         * @throws NoSuchAlgorithmException
+         * @throws NoSuchProviderException
+         * @throws InvalidKeyException
+         * @throws CertificateException
+         */
+        private Cipher genPublicKey() throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, CertificateException {
+            System.out.println("Récupération de la clef publique du serveur");
+            KeyStore ks = FonctionsCrypto.loadKeyStore(keystore, password.toCharArray());
+            X509Certificate certificate = (X509Certificate) ks.getCertificate(keyname);
+            PublicKey pk = certificate.getPublicKey();
+            Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
+            cipher.init(Cipher.PUBLIC_KEY, pk);
+            return cipher;
         }
 
         /**

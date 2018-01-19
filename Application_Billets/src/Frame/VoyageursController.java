@@ -28,6 +28,13 @@ public class VoyageursController implements Initializable {
     private ListView<Voyageur> listVoyageurs;
     private int nbMax = Integer.MAX_VALUE;
 
+    @FXML
+    private void deleteClicked(ActionEvent actionEvent) {
+        listVoyageurs.getItems().removeAll(listVoyageurs.getSelectionModel().getSelectedItems());
+        nbMax++;
+        if (nbMax > 0 && MenuVoyageur.isDisable()) MenuVoyageur.setDisable(false);
+    }
+
     public ObservableList<Voyageur> getListVoyageurs() {
         return listVoyageurs.getItems();
     }
@@ -35,26 +42,6 @@ public class VoyageursController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         listVoyageurs.setEditable(false);
-    }
-
-    @FXML
-    private void validerClicked(ActionEvent actionEvent) {
-        voyageurGrid.setVisible(false);
-        listVoyageurs.getItems().add(new Voyageur(nom.getText(), prenom.getText(), naissance.getValue()));
-        resetFields();
-    }
-
-    private void resetFields() {
-        nom.setText("");
-        prenom.setText("");
-        naissance.setValue(null);
-    }
-
-    @FXML
-    private void deleteClicked(ActionEvent actionEvent) {
-        listVoyageurs.getItems().removeAll(listVoyageurs.getSelectionModel().getSelectedItems());
-        nbMax++;
-        if (nbMax > 0 && MenuVoyageur.isDisable()) MenuVoyageur.setDisable(false);
     }
 
     @FXML
@@ -68,5 +55,18 @@ public class VoyageursController implements Initializable {
     public void setNbMax(int nbMax) {
         this.nbMax = nbMax;
         System.out.println("NbMax: " + this.nbMax);
+    }
+
+    @FXML
+    private void validerClicked(ActionEvent actionEvent) {
+        voyageurGrid.setVisible(false);
+        listVoyageurs.getItems().add(new Voyageur(nom.getText(), prenom.getText(), naissance.getValue()));
+        resetFields();
+    }
+
+    private void resetFields() {
+        nom.setText("");
+        prenom.setText("");
+        naissance.setValue(null);
     }
 }

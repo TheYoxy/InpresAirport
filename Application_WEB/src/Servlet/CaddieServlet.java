@@ -42,7 +42,7 @@ public class CaddieServlet extends HttpServlet {
     public void destroy() {
         super.destroy();
         try {
-            Sgbd.Close(true);
+            Sgbd.close(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -95,9 +95,9 @@ public class CaddieServlet extends HttpServlet {
 
                     if (!found)
                         try {
-                            ResultSet rs = Sgbd.SelectVolReservableNbPlaces(numVol, nbPlaces);
+                            ResultSet rs = Sgbd.selectVolReservableNbPlaces(numVol, nbPlaces);
                             if (rs != null)
-                                LReservation.add(new ReservationB(numVol, nbPlaces, Bd.ToList(rs)));
+                                LReservation.add(new ReservationB(numVol, nbPlaces, Bd.toList(rs)));
                             else {
                                 //TODO Info que le nombre de vol sélectionné est supérieur au nombre restant de tickets
                                 request.setAttribute("From", "CaddieServlet.doPost 2");
@@ -114,7 +114,7 @@ public class CaddieServlet extends HttpServlet {
                     session.setAttribute("reservation", LReservation);
 
                     /*try {
-                        if (Sgbd.InsertReservation(username, numVol, qt, time)) {
+                        if (Sgbd.insertReservation(username, numVol, qt, time)) {
                             connectionB.setResult(ConnectionResult.SUCCES);
                             User = username;
                         } else
@@ -131,7 +131,7 @@ public class CaddieServlet extends HttpServlet {
                         for (int i = 0; i < LReservation.size(); i++)
                             if (LReservation.get(i).getNumVol().equals(numVol)) {
                                 try {
-                                    Sgbd.AjoutPlacesLibres((String) LReservation.get(i).getInfosVol().get(0), LReservation.get(i).getNbrPlaces());
+                                    Sgbd.ajoutPlacesLibres((String) LReservation.get(i).getInfosVol().get(0), LReservation.get(i).getNbrPlaces());
                                 } catch (SQLException e) {
                                     request.setAttribute("From", "CaddieServlet.doPost");
                                     request.setAttribute("Exception", e);
@@ -151,11 +151,11 @@ public class CaddieServlet extends HttpServlet {
                             Map<Integer, List<String>> map = new HashMap<>();
                             LReservation = (List<ReservationB>) session.getAttribute("reservation");
                             for (ReservationB aLReservation : LReservation) {
-                                int id = Sgbd.InsertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()), Double.parseDouble(request.getParameter("prix")));
+                                int id = Sgbd.insertAchat((String) session.getAttribute("user"), aLReservation.getNumVol(), Integer.toString(aLReservation.getNbrPlaces()), Double.parseDouble(request.getParameter("prix")));
                                 /* **GENERATION DES BILLETS ****/
                                 List<String> l = new LinkedList<>();
                                 for (int i = 0; i < aLReservation.getNbrPlaces(); i++)
-                                    l.add(Sgbd.InsertBillet(aLReservation.getNumVol(),id));
+                                    l.add(Sgbd.insertBillet(aLReservation.getNumVol(), id));
                                 map.put(id, l);
                             }
                             LReservation = null;
@@ -180,7 +180,7 @@ public class CaddieServlet extends HttpServlet {
 
     public void getVols(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
-            request.setAttribute("Vols", Sgbd.Select("VolReservable"));
+            request.setAttribute("Vols", Sgbd.select("VolReservable"));
         } catch (SQLException e) {
             request.setAttribute("Exception", e);
             request.getRequestDispatcher("/error.jsp").forward(request, response);

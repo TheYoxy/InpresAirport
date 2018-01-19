@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,19 +21,29 @@ import java.util.ResourceBundle;
 import java.util.Vector;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 
+import NetworkObject.Bean.Carte;
+import NetworkObject.Bean.Payement;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Table;
 import NetworkObject.Bean.Voyageur;
 import NetworkObject.CryptedPackage;
+import Protocole.PAYP.PAYPThreadRequest;
+import Protocole.PAYP.ReponsePAYP;
+import Protocole.PAYP.RequetePAYP;
+import Protocole.PAYP.TypeReponsePAYP;
+import Protocole.PAYP.TypeRequetePAYP;
 import Protocole.TICKMAP.ReponseTICKMAP;
 import Protocole.TICKMAP.RequeteTICKMAP;
 import Protocole.TICKMAP.TypeReponseTICKMAP;
 import Protocole.TICKMAP.TypeRequeteTICKMAP;
 import Tools.AESCryptedSocket;
+import Tools.Crypto.FonctionsCrypto;
+import Tools.PropertiesReader;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -39,9 +53,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -54,8 +70,14 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Pair;
 
 public class MainController implements Initializable {
+    private static final String KEYSTORE = "Application_Billets.pkcs12";
+    private static final String KEY_APPBILLETS = "appbillets";
+    private static final String KEY_PAYEMENT = "serveurpayement";
+    private static final String STOREPASS = "azerty";
+
     @FXML
     private TableView<Vector<String>> table;
     private Socket s;
@@ -125,7 +147,7 @@ public class MainController implements Initializable {
         if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 2) {
             int max = 0;
             Vector<String> selected = table.getSelectionModel().getSelectedItem();
-            System.out.println("selected = " + selected);
+            System.out.println("Selected = " + selected);
             int i;
             if (selected == null) return;
             for (i = 0; i < vols.getColumnCount(); i++)
@@ -147,6 +169,7 @@ public class MainController implements Initializable {
             }
 
             try {
+                table.getScene().getWindow().hide();
                 Stage s = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 Parent root = fxmlLoader.load(getClass().getResource("Voyageurs.fxml").openStream());
@@ -168,11 +191,53 @@ public class MainController implements Initializable {
                 ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
                     Places p = (Places) cryptedSocket.readObject();
-                    Optional val = showConfirm(p);
-                    val.ifPresent((Object o) -> {
-                        System.out.println(o.getClass().getName());
-                    });
+                    Optional o1 = showConfirm(p);
+                    if (o1.isPresent()) {
+                        Optional<Pair<String, String>> opt = showCardAndName();
+                        if (opt.isPresent()) {
+                            Pair<String, String> pair = opt.get();
+                            String nom = pair.getKey();
+                            String card = pair.getValue();
+                            try {
+                                Socket payement = new Socket(InetAddress.getByName(PropertiesReader.getProperties("PAYEMENT_NAME")), Integer.parseInt(PropertiesReader.getProperties("PORT_PAYEMENT")));
+                                ObjectOutputStream oosPayement = new ObjectOutputStream(payement.getOutputStream());
+                                oosPayement.writeObject(new PAYPThreadRequest());
+                                oosPayement = new ObjectOutputStream(payement.getOutputStream());
+                                Cipher asym = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
 
+                                oosPayement.writeObject(new RequetePAYP(TypeRequetePAYP.PAYEMENT, (Serializable) FonctionsCrypto.encrypt(new Payement(new Carte(nom, card), p.getPrix()), asym)));
+                                ObjectInputStream oisPayement = new ObjectInputStream(payement.getInputStream());
+                                ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
+                                if (reponse.getCode() == TypeReponsePAYP.OK) {
+                                    new Alert(Alert.AlertType.INFORMATION, "Réservation completée.\nId de la transaction: " + reponse.getParam()).showAndWait();
+                                } else {
+                                    new Alert(Alert.AlertType.INFORMATION, "La réservation n'a pas pu être effectuée. \nCause: " + reponse.getParam()).showAndWait();
+                                }
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (BadPaddingException e) {
+                                e.printStackTrace();
+                            } catch (IllegalBlockSizeException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchAlgorithmException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchProviderException e) {
+                                e.printStackTrace();
+                            } catch (NoSuchPaddingException e) {
+                                e.printStackTrace();
+                            } catch (InvalidKeyException e) {
+                                e.printStackTrace();
+                            } catch (CertificateException e) {
+                                e.printStackTrace();
+                            } catch (KeyStoreException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 } else if (rep.getCode() == TypeReponseTICKMAP.FULL) {
                     int c = (int) rep.getParam();
                     Alert a = new Alert(Alert.AlertType.ERROR);
@@ -195,8 +260,8 @@ public class MainController implements Initializable {
 
     private static Optional showConfirm(Places p) {
         Dialog dialog = new Alert(Alert.AlertType.CONFIRMATION);
-        dialog.setTitle("");
-        dialog.setHeaderText("Confirmation de la réservation");
+        dialog.setTitle("Confirmation de la réservation");
+        dialog.setHeaderText(null);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -217,6 +282,52 @@ public class MainController implements Initializable {
         grid.add(ids, 1, 1);
 
         dialog.getDialogPane().setContent(grid);
+        return dialog.showAndWait();
+    }
+
+    public static Optional<Pair<String, String>> showCardAndName() {
+        // Create the custom dialog.
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Données de payement");
+        dialog.setHeaderText(null);
+
+        // Set the button types.
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Create the username and password labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField proprio = new TextField();
+        TextField card = new TextField();
+
+        grid.add(new Label("Nom du propriétaire: "), 0, 0);
+        grid.add(proprio, 1, 0);
+        grid.add(new Label("Numéro de carte:"), 0, 1);
+        grid.add(card, 1, 1);
+
+        // Enable/Disable login button depending on whether a username was entered.
+        Node loginButton = dialog.getDialogPane().lookupButton(ButtonType.OK);
+        loginButton.setDisable(true);
+
+        // Validation
+        proprio.textProperty().addListener((observable, oldValue, newValue) -> {
+            loginButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        dialog.getDialogPane().setContent(grid);
+
+        Platform.runLater(proprio::requestFocus);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return new Pair<>(proprio.getText(), card.getText());
+            }
+            return null;
+        });
+
         return dialog.showAndWait();
     }
 }

@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
     public void destroy() {
         super.destroy();
         try {
-            Sgbd.Close(true);
+            Sgbd.close(true);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,7 +58,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("connected", "no");
         }
         try {
-            request.setAttribute("Vols", Sgbd.Select("VolReservable"));
+            request.setAttribute("Vols", Sgbd.select("VolReservable"));
         } catch (SQLException e) {
             request.setAttribute("Exception", e);
             request.getRequestDispatcher("/error.jsp").forward(request, response);
@@ -101,7 +101,7 @@ public class LoginServlet extends HttpServlet {
                     }
                     break;
                     case "signup":
-                        if (Sgbd.InsertUser(username, pass, email)) {
+                        if (Sgbd.insertUser(username, pass, email)) {
                             connectionB.setResult(ConnectionResult.SUCCES);
                             User = username;
                         } else
@@ -129,7 +129,7 @@ public class LoginServlet extends HttpServlet {
         String userbd;
         String passbd;
         String mailbd;
-        ResultSet rs = Sgbd.Select("Users");
+        ResultSet rs = Sgbd.select("Users");
         ResultSetMetaData rsmf = rs.getMetaData();
         while (rs.next()) {
             userbd = rs.getString(1);

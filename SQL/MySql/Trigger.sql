@@ -7,8 +7,19 @@ CREATE TRIGGER UpdateCarte
   BEGIN
     IF (OLD.solde != NEW.solde)
     THEN
-      INSERT INTO Transactions VALUES (current_timestamp, OLD.solde - NEW.solde, OLD.numeroCarte);
+      INSERT INTO Transactions (instant, somme, numeroCarte)
+      VALUES (current_timestamp, NEW.solde - OLD.solde, OLD.numeroCarte);
     END IF;
+  END;
+//
+
+DROP TRIGGER IF EXISTS GenIdTransaction;
+CREATE TRIGGER GenIdTransaction
+  BEFORE INSERT
+  ON Transactions
+  FOR EACH ROW
+  BEGIN
+    SET new.id = sha1(new.instant + new.numeroCarte + new.somme);
   END;
 //
 DELIMITER ;

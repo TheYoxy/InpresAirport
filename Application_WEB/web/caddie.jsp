@@ -98,7 +98,7 @@
 
     <%
         if (session.getAttribute("connected").equals("no")) {
-            out.println("<button class=\"checkout\" onclick = \"alert('Veuillez vous identifier'); \">Payement</button>");
+            out.println("<button class=\"checkout\" onclick = \"alert('Veuillez vous identifier'); \">payement</button>");
         } else {
             out.println("<form method=\"post\" action=\"Caddie\">");
             out.println("<input type='hidden' value=\"payment\" name='type'/>");

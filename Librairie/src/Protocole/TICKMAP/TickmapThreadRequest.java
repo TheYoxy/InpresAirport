@@ -9,14 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -26,30 +19,28 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 
 import NetworkObject.Bean.Login;
 import NetworkObject.Bean.MACMessage;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Voyageur;
 import NetworkObject.CryptedPackage;
-import ServeurClientLog.Interfaces.Reponse;
-import ServeurClientLog.Interfaces.ServeurRequete;
+import ServeurClientLog.Objects.ServeurRequete;
 import Tools.AESCryptedSocket;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Crypto.Digest.DigestCalculator;
-import Tools.Crypto.PrivateKey.CustomPrivateKeyCipher;
+import Tools.Crypto.FonctionsCrypto;
 import Tools.Ids;
 import Tools.Procedural;
 
-public class TickmapThreadRequest implements ServeurRequete {
-    private final String keystore = "Serveur_Billets.jks";
-    private final String password = "azerty";
-    private final String keyname = "appbillets";
+public class TickmapThreadRequest extends ServeurRequete {
+    private static final String keyname = "appbillets";
+    private static final String keystore = "Serveur_Billets.pkcs12";
+    private static final String password = "azerty";
+    private static final Cipher cipher = FonctionsCrypto.loadPrivateKeyNoError(keystore, password, keyname);
 
     @Override
     public Runnable createRunnable(Socket client) {
@@ -77,7 +68,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                 try {
                     RequeteTICKMAP req = (RequeteTICKMAP) ois.readObject();
                     ReponseTICKMAP rep;
-                    HeaderRunnable(req.getType().toString(), Procedural.StringIp(client));
+                    HeaderRunnable(req, Procedural.StringIp(client));
                     switch (req.getType()) {
                         case TryConnect:
                             challenge = new Random().nextInt();
@@ -88,7 +79,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                         case Login:
                             try {
                                 bd = new Bd(BdType.MySql, 5);
-                                ResultSet rs = bd.Select("Login");
+                                ResultSet rs = bd.select("Login");
                                 ResultSetMetaData rsmd = rs.getMetaData();
                                 int user = -1, password = -1;
                                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -117,7 +108,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                                         System.out.println("-------------------------------------------------------------------");
 
                                         if (MessageDigest.isEqual(pass, ((Login) req.getParam()).getPassword())) {
-                                            rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, bd.SelectLogUser(rs.getString(user)));
+                                            rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, bd.selectLogUser(rs.getString(user)));
                                             System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                             break;
                                         } else {
@@ -149,18 +140,21 @@ public class TickmapThreadRequest implements ServeurRequete {
                                 System.out.println(Thread.currentThread().getName() + "> Récupération des clefs");
                                 //Transformation de mon objet
 
-                                CustomPrivateKeyCipher cpkc = new CustomPrivateKeyCipher(keystore, password, keyname);
-                                ByteArrayInputStream bais = new ByteArrayInputStream(cpkc.getCipher().doFinal(baos.toByteArray()));
+                                Cipher cipher = FonctionsCrypto.loadPrivateKey(keystore, password, keyname);
+                                ByteArrayInputStream bais = new ByteArrayInputStream(cipher.doFinal(baos.toByteArray()));
                                 ObjectInputStream tempois = new ObjectInputStream(bais);
                                 System.out.println(Thread.currentThread().getName() + "> Décryptage des clefs");
+
                                 CryptedPackage cryptedPackage = (CryptedPackage) tempois.readObject();
                                 System.out.println(Thread.currentThread().getName() + "> Clefs reçues");
                                 System.out.print(Thread.currentThread().getName() + "> Génération du HMAC: ");
+
                                 cryptedSocket = new AESCryptedSocket(client, cryptedPackage.getParams());
+
                                 hmac = Mac.getInstance("HMAC-SHA1", "BC");
                                 hmac.init(cryptedPackage.getKey());
                                 System.out.println("réussie");
-                                rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, Bd.toTable(bd.SelectWeekVols()));
+                                rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, Bd.toTable(bd.selectWeekVols()));
                                 Reponse(oos, rep);
                                 log = true;
 
@@ -172,7 +166,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                                 try {
                                     List list = (List) cryptedSocket.readObject();
                                     String vol = list.get(0).toString();
-                                    ResultSet rs = bd.SelectVolReservable(vol);
+                                    ResultSet rs = bd.selectVolReservable(vol);
                                     Voyageur[] listVoyageurs = (Voyageur[]) list.get(1);
                                     int count = listVoyageurs.length;
                                     if (rs.next()) {
@@ -181,11 +175,17 @@ public class TickmapThreadRequest implements ServeurRequete {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.FULL, count);
                                         else {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK);
-                                            bd.SuppPlacesReservables(vol, count);
-                                            ResultSet rss = bd.SelectLieu(vol);
+                                            bd.suppPlacesReservables(vol, count);
+                                            ResultSet rss = bd.selectLieu(vol);
                                             rss.next();
                                             String lieu = rss.getString(1);
-                                            p = new Places(Ids.genIdBillets(bd.SelectBillets(vol), lieu, vol, count), nb * rs.getDouble("Prix"));
+
+                                            double unit = rs.getDouble("Prix");
+                                            System.out.println(Thread.currentThread().getName() + "> Prix unitaire: " + unit);
+                                            System.out.println(Thread.currentThread().getName() + "> Nombre de places: " + count);
+                                            double prix = count * unit;
+                                            System.out.println(Thread.currentThread().getName() + "> Prix calculé: " + prix);
+                                            p = new Places(Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count), prix);
                                         }
                                     }
                                 } catch (Exception e) {
@@ -216,7 +216,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                                 log = false;
                                 try {
                                     if (bd != null) {
-                                        bd.Close(true);
+                                        bd.close(true);
                                         bd = null;
                                     }
                                     rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK);
@@ -232,7 +232,7 @@ public class TickmapThreadRequest implements ServeurRequete {
                             System.out.println(Thread.currentThread().getName() + "> Déconnexion de " + Procedural.StringIp(client));
                             break;
                     }
-                } catch (IOException | ClassNotFoundException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchProviderException | SQLException e) {
+                } catch (Exception e) {
                     Logger.getGlobal().log(Level.WARNING, e.getClass().getName(), e);
                     if (e.getClass() != EOFException.class)
                         try {
@@ -242,24 +242,8 @@ public class TickmapThreadRequest implements ServeurRequete {
                         }
                     else
                         return;
-                } catch (CertificateException e) {
-                    e.printStackTrace();
-                } catch (UnrecoverableKeyException e) {
-                    e.printStackTrace();
-                } catch (KeyStoreException e) {
-                    e.printStackTrace();
                 }
             }
         };
-    }
-
-    private void HeaderRunnable(String type, String from) {
-        System.out.println();
-        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + type + " de " + from);
-    }
-
-    private void Reponse(final ObjectOutputStream outputStream, Reponse rep) throws IOException {
-        System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
-        outputStream.writeObject(rep);
     }
 }

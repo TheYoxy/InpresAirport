@@ -26,8 +26,8 @@ public class AESParams implements Serializable {
     @Override
     public String toString() {
         return "AESParams{" +
-                "key=" + key +
-                ", init=" + Arrays.toString(init) +
+                "\tkey=" + key + ",\n" +
+                "\tinit=" + Arrays.toString(init) + "\n" +
                 '}';
     }
 }

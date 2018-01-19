@@ -22,7 +22,7 @@ public class RequeteLUGAP extends Requete {
     public String toString() {
         return "RequeteLUGAP{" +
                 "type=" + type + ',' +
-                "params=" + Arrays.toString(param) +
+                "params=" + Arrays.toString(params) +
                 '}';
     }
 }

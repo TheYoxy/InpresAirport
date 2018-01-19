@@ -9,26 +9,22 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import ServeurClientLog.Interfaces.Reponse;
-import ServeurClientLog.Interfaces.ServeurRequete;
-import ServeurClientLog.Objects.Requete;
+import NetworkObject.Bean.Carte;
+import ServeurClientLog.Objects.ServeurRequete;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Procedural;
 
-public class STThreadRequest implements ServeurRequete {
-    private static final long serialVersionUID = 1235434345L;
-
+public class STThreadRequest extends ServeurRequete {
     @Override
     public Runnable createRunnable(Socket client) {
         return () -> {
-
             ObjectInputStream ois;
             ObjectOutputStream oos;
             Bd bd;
             boolean boucle = true;
             boolean verif = false;
-            String carte = null;
+            Carte carte = null;
             double prix = 0;
 
             try {
@@ -51,14 +47,18 @@ public class STThreadRequest implements ServeurRequete {
                     switch (req.getType()) {
                         case VERIF: {
                             Serializable[] params = req.getParams();
-                            carte = (String) params[0];
-                            System.out.println(Thread.currentThread().getName() + "> Carte: " + carte);
-                            ResultSet rs = bd.SelectAlimCarte(carte);
+                            carte = (Carte) params[0];
+                            System.out.println(Thread.currentThread().getName() + "> Vérification de la carte: " + carte);
+                            ResultSet rs = bd.selectAlimCarte(carte.getNumeroCarte());
                             if (rs.next()) {
+                                System.out.println(Thread.currentThread().getName() + "> Carte trouvée");
                                 double restant = rs.getDouble(1);
                                 prix = (double) params[1];
+                                System.out.println(Thread.currentThread().getName() + "> Solde restant: " + restant);
+                                System.out.println(Thread.currentThread().getName() + "> Prix du payement: " + prix);
                                 if (prix < restant) {
                                     rep = new ReponseST(TypeReponseST.OK);
+                                    System.out.println(Thread.currentThread().getName() + "> Attente d'une confirmation du payement");
                                     verif = true;
                                 } else
                                     boucle = false;
@@ -68,20 +68,14 @@ public class STThreadRequest implements ServeurRequete {
                         break;
                         case PAYEMENT:
                             if (verif) {
-                                ResultSet rs = bd.SelectAlimCarte(carte);
-                                rs.next();
-                                double avant = rs.getDouble("solde");
-
-                                int nb = bd.Payement(carte, prix);
-
-                                rs = bd.SelectAlimCarte(carte);
-                                rs.next();
-                                double apres = rs.getDouble("solde");
+                                int nb = bd.payement(carte.getNumeroCarte(), prix);
                                 bd.commit();
-
-                                System.out.println(Thread.currentThread().getName() + "> " + avant + " -> " + apres);
-                                System.out.println(Thread.currentThread().getName() + "> Nombre d'update: " + nb);
-                                rep = new ReponseST(TypeReponseST.OK);
+                                System.out.println(Thread.currentThread().getName() + "> Payement validé pour la carte: " + carte);
+                                ResultSet rs = bd.selectLastTransaction();
+                                if (!rs.next()) System.exit(-42);
+                                String id = rs.getString(1);
+                                System.out.println(Thread.currentThread().getName() + "> Id de la transaction: " + id);
+                                rep = new ReponseST(TypeReponseST.OK, id);
                             }
                             boucle = false;
                             break;
@@ -103,22 +97,10 @@ public class STThreadRequest implements ServeurRequete {
             }
 
             try {
-                bd.Close(true);
+                bd.close(true);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         };
-    }
-
-    private void HeaderRunnable(Requete req, String from) {
-        System.out.println("====================");
-        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + req.getType().toString() + " de " + from);
-        System.out.println(Thread.currentThread().getName() + "> Message reçu: " + req);
-    }
-
-    private void Reponse(final ObjectOutputStream outputStream, Reponse rep) throws IOException {
-        System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
-        outputStream.writeObject(rep);
-        System.out.println("====================\n");
     }
 }

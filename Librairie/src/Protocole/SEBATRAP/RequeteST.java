@@ -22,7 +22,7 @@ public class RequeteST extends Requete {
     public String toString() {
         return "RequeteST{" +
                 "type=" + type + ',' +
-                "params=" + Arrays.toString(param) +
+                "params=" + Arrays.toString(params) +
                 '}';
     }
 }

@@ -3,7 +3,6 @@ package Protocole.LUGAP;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.sql.Connection;
@@ -17,13 +16,13 @@ import java.util.Random;
 
 import NetworkObject.Bean.Login;
 import NetworkObject.Bean.Table;
-import ServeurClientLog.Interfaces.ServeurRequete;
+import ServeurClientLog.Objects.ServeurRequete;
 import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Procedural;
 
-public class LUGAPThreadRequest implements ServeurRequete {
+public class LUGAPThreadRequest extends ServeurRequete {
     private static final long serialVersionUID = 129L;
 
     @Override
@@ -40,7 +39,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                 while (boucle) {
                     RequeteLUGAP req = (RequeteLUGAP) ois.readObject();
                     ReponseLUGAP rep;
-                    HeaderRunnable(req.getType().toString(), Procedural.IpPort(client));
+                    HeaderRunnable(req, Procedural.IpPort(client));
                     switch (req.getType()) {
                         case TryConnect:
                             challenge = new Random().nextInt();
@@ -51,7 +50,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                         case Login:
                             try {
                                 bd = new Bd(BdType.MySql, 5);
-                                ResultSet rs = bd.Select("Login");
+                                ResultSet rs = bd.select("Login");
                                 ResultSetMetaData rsmd = rs.getMetaData();
                                 int user = -1, password = -1;
                                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -80,7 +79,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                                         System.out.println("-------------------------------------------------------------------");
 
                                         if (MessageDigest.isEqual(pass, ((Login) req.getParam()).getPassword())) {
-                                            rep = new ReponseLUGAP(TypeReponseLUGAP.LOG, bd.SelectLogUser(rs.getString(user)));
+                                            rep = new ReponseLUGAP(TypeReponseLUGAP.LOG, bd.selectLogUser(rs.getString(user)));
                                             System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                             log = true;
                                             break;
@@ -108,7 +107,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                                 log = false;
                                 try {
                                     if (bd != null) {
-                                        bd.Close(true);
+                                        bd.close(true);
                                         bd = null;
                                     }
                                     rep = new ReponseLUGAP(TypeReponseLUGAP.OK);
@@ -125,7 +124,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                         case Request_Vols:
                             if (log) {
                                 try {
-                                    Table t = Bd.toTable(bd.SelectTodayVols());
+                                    Table t = Bd.toTable(bd.selectTodayVols());
                                     rep = new ReponseLUGAP(TypeReponseLUGAP.OK, t);
                                 } catch (SQLException e) {
                                     System.out.println(Thread.currentThread().getName() + "> SQLException: " + e.getMessage());
@@ -140,7 +139,7 @@ public class LUGAPThreadRequest implements ServeurRequete {
                                     bd.setTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE);
                                     final String vol = (String) req.getParam();
                                     System.out.println(Thread.currentThread().getName() + "> Id du vol demandé: " + vol);
-                                    resultSet = bd.SelectBagageVol(vol);
+                                    resultSet = bd.selectBagageVol(vol);
                                     rep = new ReponseLUGAP(TypeReponseLUGAP.OK, Bd.toTable(resultSet));
                                 } catch (SQLException e) {
                                     if (e.getErrorCode() == 1205)
@@ -222,20 +221,6 @@ public class LUGAPThreadRequest implements ServeurRequete {
                 e.printStackTrace();
             }
         };
-    }
-
-    private void HeaderRunnable(String type, String from) {
-        System.out.println();
-        System.out.println(Thread.currentThread().getName() + "> Traitement d'une requête de " + type + " de " + from);
-    }
-
-    private void Reponse(final OutputStream outputStream, ReponseLUGAP rep) {
-        System.out.println(Thread.currentThread().getName() + "> Réponse: " + rep);
-        try {
-            ((ObjectOutputStream) outputStream).writeObject(rep);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void Update(ResultSet rs, LinkedList<Object> list) throws UpdateException, SQLException {

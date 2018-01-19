@@ -20,3 +20,4 @@ manifest.mf
 *.jar
 Librairie/src/CryptoTest/
 SSLCert/*
+Crypto/Keystores/*

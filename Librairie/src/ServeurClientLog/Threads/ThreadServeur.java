@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ServeurClientLog.Interfaces.ServeurRequete;
 import ServeurClientLog.Objects.Containeur;
+import ServeurClientLog.Objects.ServeurRequete;
 import Tools.Procedural;
 
 /**
@@ -37,7 +37,7 @@ public class ThreadServeur extends Thread {
     public void run() {
         try {
             SSocket = new ServerSocket(port);
-            System.out.println(Thread.currentThread().getName() + "> Serveur en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
+            System.out.println(Thread.currentThread().getName() + "> ServeurPayement en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
         } catch (IOException e) {
             System.out.println(Thread.currentThread().getName() + "> Erreur de port d'écoute ! ? [" + e + "]\n");
             return;
@@ -53,6 +53,7 @@ public class ThreadServeur extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 ServeurRequete req = (ServeurRequete) ois.readObject();
                 int i, typeLength;
+
                 for (i = 0, typeLength = types.length; i < typeLength; i++) {
                     Class c = types[i];
                     if (c.isAssignableFrom(req.getClass())) {
@@ -60,6 +61,7 @@ public class ThreadServeur extends Thread {
                         break;
                     }
                 }
+
                 if (i == typeLength) {
                     System.out.println("L'objet envoyé par le client n'est pas accepté par le serveur.");
                     System.out.println("Type: " + req.getClass());

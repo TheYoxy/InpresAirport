@@ -126,6 +126,7 @@ CREATE TABLE Facture (
 DROP TABLE IF EXISTS Transactions;
 CREATE TABLE Transactions
 (
+  id          CHAR(40),
   instant     TIMESTAMP,
   somme       DOUBLE,
   numeroCarte CHAR(17),
@@ -133,5 +134,8 @@ CREATE TABLE Transactions
   FOREIGN KEY (numeroCarte) REFERENCES Carte (numeroCarte)
 )
   ENGINE = INNODB;
-
+DROP TABLE IF EXISTS LOGS;
+CREATE TABLE LOGS (
+  message VARCHAR(10000)
+);
 SET FOREIGN_KEY_CHECKS = 1;
