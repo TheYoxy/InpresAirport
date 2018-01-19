@@ -8,10 +8,10 @@ import javax.crypto.Mac;
 import Tools.Crypto.HMAC.MacCalculator;
 
 public class MACMessage implements Serializable {
-    private Serializable param;
+    private Serializable[] param;
     private byte[] mac;
 
-    public MACMessage(Mac hmac, Serializable param) throws IOException {
+    public MACMessage(Mac hmac, Serializable... param) throws IOException {
         this.param = param;
         mac = MacCalculator.calcObject(hmac, param);
     }
@@ -24,7 +24,7 @@ public class MACMessage implements Serializable {
         return MacCalculator.compMacObject(hmac, mac, param);
     }
 
-    public Serializable getParam() {
+    public Serializable[] getParam() {
         return param;
     }
 }

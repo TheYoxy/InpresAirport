@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +20,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import NetworkObject.Bean.Table;
+import NetworkObject.Bean.Voyageur;
 import Tools.VolField;
 
 public class Bd {
@@ -216,10 +218,28 @@ public class Bd {
         return l;
     }
 
+    public synchronized int ajoutBillets(String vol, String billet, int place, String facture, int voyageur) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO Billets VALUES(?,?,?,?,?)");
+        ps.setString(1, billet);
+        ps.setString(2, vol);
+        ps.setInt(3, place);
+        ps.setString(4, facture);
+        ps.setInt(5, voyageur);
+        return ps.executeUpdate();
+    }
+
     public synchronized int ajoutPlacesLibres(String numVol, int nbPlaces) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible + ? WHERE NumeroVol LIKE ?");
         ps.setInt(1, nbPlaces);
         ps.setString(2, numVol);
+        return ps.executeUpdate();
+    }
+
+    public synchronized int ajoutVoyageur(Voyageur v) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO Voyageur(nom, prenom, naissance) VALUE (?,?,?)");
+        ps.setString(1, v.getNom());
+        ps.setString(2, v.getPrenom());
+        ps.setDate(3, Date.valueOf(v.getNaissance()));
         return ps.executeUpdate();
     }
 
@@ -275,6 +295,15 @@ public class Bd {
         return ps.executeUpdate() != 0
                 ? numbillet
                 : null;
+    }
+
+    public synchronized int insertFacture(String idFacture, Timestamp instant, String NumeroVol, int nbPlaces) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO bd_airport.Facture(idFacture, instant, NumeroVol, nbPlaces) VALUES (?,?,?,?)");
+        ps.setString(1, idFacture);
+        ps.setTimestamp(2, instant);
+        ps.setString(3, NumeroVol);
+        ps.setInt(4, nbPlaces);
+        return ps.executeUpdate();
     }
 
     public synchronized boolean insertReservation(String username, String vol, String nbrPlaces, String time) throws SQLException {
@@ -363,6 +392,13 @@ public class Bd {
         return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN CURRENT_DATE AND CURRENT_DATE + 1");
     }
 
+    public synchronized ResultSet selectTransaction(String id) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Transactions WHERE idFacture like ?");
+        ps.setString(1, id);
+        ps.execute();
+        return ps.getResultSet();
+    }
+
     public synchronized ResultSet selectUserBillet(String billet) throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("SELECT Prenom FROM WebUsers NATURAL JOIN Facture NATURAL JOIN Billets WHERE NumeroBillet LIKE ?");
         ps.setString(1, billet);
@@ -400,6 +436,14 @@ public class Bd {
         ps.setInt(1, nbPlaces);
         ps.setString(2, numVol);
         return ps.executeUpdate();
+    }
+
+    public synchronized ResultSet selectVoyageurId(Voyageur v) throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT idVoyageur FROM Voyageur WHERE nom = ? AND prenom = ? AND naissance = ?");
+        ps.setString(1, v.getNom());
+        ps.setString(2, v.getPrenom());
+        ps.setDate(3, Date.valueOf(v.getNaissance()));
+        return ps.executeQuery();
     }
 
     public synchronized ResultSet selectWeekVols() throws SQLException {

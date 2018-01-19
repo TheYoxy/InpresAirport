@@ -26,7 +26,7 @@ CREATE TABLE Billets (
   NumeroBillet VARCHAR(40) PRIMARY KEY,
   NumeroVol    VARCHAR(15) NOT NULL,
   NumeroPlace  INTEGER     NOT NULL,
-  idFacture    INTEGER     NOT NULL,
+  idFacture    CHAR(40)    NOT NULL,
   idVoyageur   INTEGER     NOT NULL,
   FOREIGN KEY (NumeroVol) REFERENCES Vol (NumeroVol),
   FOREIGN KEY (idFacture) REFERENCES Facture (idFacture),
@@ -75,8 +75,6 @@ CREATE TABLE Agents (
 )
   ENGINE = INNODB;
 
-/* WEB */
-
 DROP TABLE IF EXISTS WebUsers;
 CREATE TABLE WebUsers (
   Username VARCHAR(25) PRIMARY KEY,
@@ -108,25 +106,10 @@ CREATE TABLE Carte (
 )
   ENGINE = INNODB;
 
-DROP TABLE IF EXISTS Facture;
-CREATE TABLE Facture (
-  idFacture   INTEGER PRIMARY KEY AUTO_INCREMENT,
-  instant     TIMESTAMP           DEFAULT current_timestamp(),
-  Username    VARCHAR(20) NOT NULL,
-  NumeroVol   VARCHAR(15) NOT NULL,
-  nbPlaces    INTEGER     NOT NULL,
-  prix        DOUBLE      NOT NULL,
-  numeroCarte CHAR(17)    NOT NULL,
-  FOREIGN KEY (Username) REFERENCES Login (Username),
-  FOREIGN KEY (NumeroVol) REFERENCES Vol (NumeroVol),
-  FOREIGN KEY (numeroCarte) REFERENCES Carte (numeroCarte)
-)
-  ENGINE = INNODB;
-
 DROP TABLE IF EXISTS Transactions;
 CREATE TABLE Transactions
 (
-  id          CHAR(40),
+  idFacture   CHAR(40) UNIQUE,
   instant     TIMESTAMP,
   somme       DOUBLE,
   numeroCarte CHAR(17),
@@ -134,6 +117,20 @@ CREATE TABLE Transactions
   FOREIGN KEY (numeroCarte) REFERENCES Carte (numeroCarte)
 )
   ENGINE = INNODB;
+
+DROP TABLE IF EXISTS Facture;
+CREATE TABLE Facture (
+  idFacture CHAR(40) PRIMARY KEY,
+  instant   TIMESTAMP DEFAULT current_timestamp(),
+  Username  VARCHAR(20),
+  NumeroVol VARCHAR(15) NOT NULL,
+  nbPlaces  INTEGER     NOT NULL,
+  FOREIGN KEY (idFacture) REFERENCES Transactions (idFacture),
+  FOREIGN KEY (Username) REFERENCES Login (Username),
+  FOREIGN KEY (NumeroVol) REFERENCES Vol (NumeroVol)
+)
+  ENGINE = INNODB;
+
 DROP TABLE IF EXISTS LOGS;
 CREATE TABLE LOGS (
   message VARCHAR(10000)

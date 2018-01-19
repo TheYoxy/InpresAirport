@@ -19,7 +19,7 @@ CREATE TRIGGER GenIdTransaction
   ON Transactions
   FOR EACH ROW
   BEGIN
-    SET new.id = sha1(new.instant + new.numeroCarte + new.somme);
+    SET new.idFacture = sha1(new.instant + new.numeroCarte + new.somme);
   END;
 //
 DELIMITER ;

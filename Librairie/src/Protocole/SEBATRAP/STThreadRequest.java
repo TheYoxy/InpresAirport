@@ -72,7 +72,7 @@ public class STThreadRequest extends ServeurRequete {
                                 bd.commit();
                                 System.out.println(Thread.currentThread().getName() + "> Payement validé pour la carte: " + carte);
                                 ResultSet rs = bd.selectLastTransaction();
-                                if (!rs.next()) System.exit(-42);
+                                if (!rs.next()) System.exit(42);
                                 String id = rs.getString(1);
                                 System.out.println(Thread.currentThread().getName() + "> Id de la transaction: " + id);
                                 rep = new ReponseST(TypeReponseST.OK, id);

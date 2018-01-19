@@ -10,9 +10,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -35,6 +37,7 @@ import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Crypto.FonctionsCrypto;
 import Tools.Ids;
 import Tools.Procedural;
+import javafx.util.Pair;
 
 public class TickmapThreadRequest extends ServeurRequete {
     private static final String keyname = "appbillets";
@@ -49,7 +52,6 @@ public class TickmapThreadRequest extends ServeurRequete {
             // Machines a etat
             boolean log = false;
             // Fin machine à état
-            Places p = null;
 
             Bd bd = null;
             boolean boucle = true;
@@ -57,6 +59,11 @@ public class TickmapThreadRequest extends ServeurRequete {
             Mac hmac = null;
             ObjectInputStream ois;
             ObjectOutputStream oos;
+
+            String vol = null;
+            String[] billets = null;
+            Voyageur[] listVoyageurs = null;
+            Integer[] places = null;
             try {
                 ois = new ObjectInputStream(client.getInputStream());
                 oos = new ObjectOutputStream(client.getOutputStream());
@@ -130,7 +137,7 @@ public class TickmapThreadRequest extends ServeurRequete {
                                 System.out.println(Thread.currentThread().getName() + "> Utilisateur introuvable");
                             }
                             Reponse(oos, rep);
-                            if (rep.getCode() != TypeReponseTICKMAP.NOT_OK) {
+                            if (rep.getCode() == TypeReponseTICKMAP.OK) {
                                 DataInputStream dis = new DataInputStream(new BufferedInputStream(client.getInputStream()));
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 //Lecture de mon objet crypté
@@ -163,11 +170,12 @@ public class TickmapThreadRequest extends ServeurRequete {
                         case Ajout_Voyageurs: {
                             if (log) {
                                 rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
+                                Places p = null;
                                 try {
                                     List list = (List) cryptedSocket.readObject();
-                                    String vol = list.get(0).toString();
+                                    vol = list.get(0).toString();
                                     ResultSet rs = bd.selectVolReservable(vol);
-                                    Voyageur[] listVoyageurs = (Voyageur[]) list.get(1);
+                                    listVoyageurs = (Voyageur[]) list.get(1);
                                     int count = listVoyageurs.length;
                                     if (rs.next()) {
                                         int nb = rs.getInt("PlacesDisponible");
@@ -185,7 +193,13 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             System.out.println(Thread.currentThread().getName() + "> Nombre de places: " + count);
                                             double prix = count * unit;
                                             System.out.println(Thread.currentThread().getName() + "> Prix calculé: " + prix);
-                                            p = new Places(Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count), prix);
+                                            Pair<List<String>, List<Integer>> pair = Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count);
+                                            List<String> listBillets = pair.getKey();
+                                            List<Integer> listPlaces = pair.getValue();
+                                            billets = listBillets.toArray(new String[listBillets.size()]);
+                                            places = listPlaces.toArray(new Integer[listPlaces.size()]);
+                                            p = new Places(listBillets, prix);
+                                            bd.commit();
                                         }
                                     }
                                 } catch (Exception e) {
@@ -195,20 +209,54 @@ public class TickmapThreadRequest extends ServeurRequete {
 
                                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
                                     cryptedSocket.writeObject(p);
-                                    MACMessage m = (MACMessage) ois.readObject();
-                                    rep = (ReponseTICKMAP) m.getParam();
-                                    if (rep.getCode() == TypeReponseTICKMAP.OK)
-                                        if (!m.authenticate(hmac)) p = null;
                                 }
                             }
                         }
                         break;
                         case Confirm_Payement:
-                            if (log && p != null) {
+                            if (log) {
                                 MACMessage m = (MACMessage) req.getParam();
+                                System.out.println(Thread.currentThread().getName() + "> MAC param: " + Arrays.toString(m.getParam()));
+                                String facture = (String) m.getParam()[0];
+                                System.out.println(Thread.currentThread().getName() + "> Numéro de facture: " + facture);
                                 if (m.authenticate(hmac)) {
-                                    // Enregistrement des infos de payement & co
-                                }
+                                    System.out.println(Thread.currentThread().getName() + "> Message authentifié");
+                                    if (billets != null && listVoyageurs != null && vol != null) {
+                                        if (billets.length == listVoyageurs.length && listVoyageurs.length == places.length) {
+                                            //TODO Ajouter la transaction dans les factures
+                                            // USERNAME = Celui qui possède la carte
+                                            bd.setTransactionIsolationLevel(Connection.TRANSACTION_READ_COMMITTED);
+                                            ResultSet rs = bd.selectTransaction(facture);
+                                            if (!rs.next())
+                                                Reponse(oos, new ReponseTICKMAP(TypeReponseTICKMAP.BAD_TRANSACTION));
+                                            else {
+                                                Timestamp instant = rs.getTimestamp(2);
+                                                bd.insertFacture(facture, instant, vol, listVoyageurs.length);
+                                                for (int i = 0; i < billets.length; i++) {
+                                                    int idVoy = -1;
+                                                    do {
+                                                        rs = bd.selectVoyageurId(listVoyageurs[i]);
+                                                        if (rs.next())
+                                                            idVoy = rs.getInt(1);
+                                                        else
+                                                            bd.ajoutVoyageur(listVoyageurs[i]);
+                                                    } while (idVoy == -1);
+
+                                                    System.out.println(Thread.currentThread().getName() + "> Billet ajouté: " +
+                                                            "\n\t Vol:      " + vol +
+                                                            "\n\t Billet:   " + billets[i] +
+                                                            "\n\t Place:    " + places[i] +
+                                                            "\n\t Facture:  " + facture +
+                                                            "\n\t Voyageur: " + idVoy);
+                                                    bd.ajoutBillets(vol, billets[i], places[i], facture, idVoy);
+                                                }
+                                                bd.commit();
+                                                Reponse(oos, new ReponseTICKMAP(TypeReponseTICKMAP.OK));
+                                            }
+                                        }
+                                    }
+                                } else
+                                    System.out.println(Thread.currentThread().getName() + "> Authentification du message échouée");
                             }
                             break;
                         case Logout:

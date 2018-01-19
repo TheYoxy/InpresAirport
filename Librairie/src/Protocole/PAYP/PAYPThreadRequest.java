@@ -116,19 +116,20 @@ public class PAYPThreadRequest extends ServeurRequete {
 
                                 SSLoos = new ObjectOutputStream(socket.getOutputStream());
                                 SSLoos.writeObject(new RequeteST(TypeRequeteST.VERIF, p.getCarte(), p.getSomme()));
-                                System.out.println(Thread.currentThread().getName() + "> Demande de vérification pour " + p);
+                                System.out.println(Thread.currentThread().getName() + ">\t Demande de vérification pour " + p);
 
                                 ObjectInputStream SSLois = new ObjectInputStream(socket.getInputStream());
                                 ReponseST repST = (ReponseST) SSLois.readObject();
-                                System.out.println(Thread.currentThread().getName() + "> Réponse: " + repST);
+                                System.out.println(Thread.currentThread().getName() + ">\t Réponse: " + repST);
 
                                 if (repST.getCode() == TypeReponseST.OK) {
                                     SSLoos.writeObject(new RequeteST(TypeRequeteST.PAYEMENT));
-                                    System.out.println(Thread.currentThread().getName() + "> Confirmation du payement");
+                                    System.out.println(Thread.currentThread().getName() + ">\t Confirmation du payement");
                                     repST = (ReponseST) SSLois.readObject();
-                                    System.out.println(Thread.currentThread().getName() + "> Réponse: " + repST);
+                                    System.out.println(Thread.currentThread().getName() + ">\t Réponse: " + repST);
+                                    System.out.println(Thread.currentThread().getName() + ">\t Params: " + repST.getParam());
                                     if (repST.getCode() == TypeReponseST.OK)
-                                        rep = new ReponsePAYP(TypeReponsePAYP.OK, repST.getParam());
+                                        rep = new ReponsePAYP(TypeReponsePAYP.OK, repST.getParams());
                                     else
                                         rep = new ReponsePAYP(TypeReponsePAYP.NOT_OK, repST.getCode().toString());
                                 } else
@@ -156,7 +157,7 @@ public class PAYPThreadRequest extends ServeurRequete {
                     e.printStackTrace(System.out);
                 } finally {
                     try {
-                        oos.writeObject(rep);
+                        Reponse(oos, rep);
                     } catch (IOException e) {
                         e.printStackTrace();
                         boucle = false;

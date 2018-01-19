@@ -27,6 +27,7 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 
 import NetworkObject.Bean.Carte;
+import NetworkObject.Bean.MACMessage;
 import NetworkObject.Bean.Payement;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Table;
@@ -77,15 +78,14 @@ public class MainController implements Initializable {
     private static final String KEY_APPBILLETS = "appbillets";
     private static final String KEY_PAYEMENT = "serveurpayement";
     private static final String STOREPASS = "azerty";
-
-    @FXML
-    private TableView<Vector<String>> table;
-    private Socket s;
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
-    private Table vols;
     private AESCryptedSocket cryptedSocket;
     private Mac hmac;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
+    private Socket s;
+    @FXML
+    private TableView<Vector<String>> table;
+    private Table vols;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -204,14 +204,25 @@ public class MainController implements Initializable {
                                 oosPayement.writeObject(new PAYPThreadRequest());
                                 oosPayement = new ObjectOutputStream(payement.getOutputStream());
                                 Cipher asym = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
-
+                                //TODO AJOUT SIGNATURE
                                 oosPayement.writeObject(new RequetePAYP(TypeRequetePAYP.PAYEMENT, (Serializable) FonctionsCrypto.encrypt(new Payement(new Carte(nom, card), p.getPrix()), asym)));
                                 ObjectInputStream oisPayement = new ObjectInputStream(payement.getInputStream());
                                 ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
+                                RequeteTICKMAP requeteTICKMAP = null;
                                 if (reponse.getCode() == TypeReponsePAYP.OK) {
+                                    System.out.println("Réponse: " + reponse.getParam());
+                                    System.out.println("Réponse (classname): " + reponse.getParam().getClass().getName());
                                     new Alert(Alert.AlertType.INFORMATION, "Réservation completée.\nId de la transaction: " + reponse.getParam()).showAndWait();
+                                    requeteTICKMAP = new RequeteTICKMAP(TypeRequeteTICKMAP.Confirm_Payement, new MACMessage(hmac, reponse.getParam()));
                                 } else {
                                     new Alert(Alert.AlertType.INFORMATION, "La réservation n'a pas pu être effectuée. \nCause: " + reponse.getParam()).showAndWait();
+                                    //AJOUT DU MAC
+                                    requeteTICKMAP = new RequeteTICKMAP(TypeRequeteTICKMAP.Payement_Abort);
+                                }
+                                oos.writeObject(requeteTICKMAP);
+                                rep = (ReponseTICKMAP) ois.readObject();
+                                if (rep.getCode() == TypeReponseTICKMAP.OK) {
+                                    new Alert(Alert.AlertType.INFORMATION, "Transaction validée").showAndWait();
                                 }
                             } catch (UnknownHostException e) {
                                 e.printStackTrace();
