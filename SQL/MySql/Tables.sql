@@ -101,8 +101,8 @@ DROP TABLE IF EXISTS Carte;
 CREATE TABLE Carte (
   numeroCarte CHAR(17) PRIMARY KEY,
   solde       DECIMAL(15, 2) NOT NULL,
-  username    VARCHAR(20),
-  FOREIGN KEY (username) REFERENCES Login (Username)
+  idVoyageur  INTEGER,
+  FOREIGN KEY (idVoyageur) REFERENCES Voyageur (idVoyageur)
 )
   ENGINE = INNODB;
 

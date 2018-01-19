@@ -10,7 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,10 +39,10 @@ import Tools.Procedural;
 import javafx.util.Pair;
 
 public class TickmapThreadRequest extends ServeurRequete {
-    private static final String keyname = "appbillets";
+    private static final String keyname  = "appbillets";
     private static final String keystore = "Serveur_Billets.pkcs12";
     private static final String password = "azerty";
-    private static final Cipher cipher = FonctionsCrypto.loadPrivateKeyNoError(keystore, password, keyname);
+    private static final Cipher cipher   = FonctionsCrypto.loadPrivateKeyNoError(keystore, password, keyname);
 
     @Override
     public Runnable createRunnable(Socket client) {
@@ -53,17 +52,17 @@ public class TickmapThreadRequest extends ServeurRequete {
             boolean log = false;
             // Fin machine à état
 
-            Bd bd = null;
-            boolean boucle = true;
-            AESCryptedSocket cryptedSocket = null;
-            Mac hmac = null;
-            ObjectInputStream ois;
+            Bd                 bd            = null;
+            boolean            boucle        = true;
+            AESCryptedSocket   cryptedSocket = null;
+            Mac                hmac          = null;
+            ObjectInputStream  ois;
             ObjectOutputStream oos;
 
-            String vol = null;
-            String[] billets = null;
+            String     vol           = null;
+            String[]   billets       = null;
             Voyageur[] listVoyageurs = null;
-            Integer[] places = null;
+            Integer[]  places        = null;
             try {
                 ois = new ObjectInputStream(client.getInputStream());
                 oos = new ObjectOutputStream(client.getOutputStream());
@@ -86,13 +85,14 @@ public class TickmapThreadRequest extends ServeurRequete {
                         case Login:
                             try {
                                 bd = new Bd(BdType.MySql, 5);
-                                ResultSet rs = bd.select("Login");
+                                ResultSet         rs   = bd.select("Login");
                                 ResultSetMetaData rsmd = rs.getMetaData();
-                                int user = -1, password = -1;
+                                int               user = -1, password = -1;
                                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                                     if (rsmd.getColumnName(i).equals("Username")) {
                                         user = i;
-                                    } else if (rsmd.getColumnName(i).equals("Password")) {
+                                    }
+                                    else if (rsmd.getColumnName(i).equals("Password")) {
                                         password = i;
                                     }
                                 }
@@ -101,7 +101,7 @@ public class TickmapThreadRequest extends ServeurRequete {
                                 while (rs.next()) {
                                     if (rs.getString(user).equals(((Login) req.getParam()).getUser())) {
                                         byte envoye[] = ((Login) req.getParam()).getPassword();
-                                        byte pass[] = DigestCalculator.hashPassword(rs.getString(password), challenge);
+                                        byte pass[]   = DigestCalculator.hashPassword(rs.getString(password), challenge);
 
                                         System.out.println(Thread.currentThread().getName() + "> Utilisateur trouvé");
                                         System.out.println("-------------------------------------------------------------------");
@@ -118,7 +118,8 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, bd.selectLogUser(rs.getString(user)));
                                             System.out.println(Thread.currentThread().getName() + "> Mot de passe correct");
                                             break;
-                                        } else {
+                                        }
+                                        else {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.BAD_PASSWORD);
                                             System.out.println(Thread.currentThread().getName() + "> Mot de passe incorrect");
                                             break;
@@ -138,7 +139,7 @@ public class TickmapThreadRequest extends ServeurRequete {
                             }
                             Reponse(oos, rep);
                             if (rep.getCode() == TypeReponseTICKMAP.OK) {
-                                DataInputStream dis = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+                                DataInputStream       dis  = new DataInputStream(new BufferedInputStream(client.getInputStream()));
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 //Lecture de mon objet crypté
                                 do {
@@ -147,9 +148,9 @@ public class TickmapThreadRequest extends ServeurRequete {
                                 System.out.println(Thread.currentThread().getName() + "> Récupération des clefs");
                                 //Transformation de mon objet
 
-                                Cipher cipher = FonctionsCrypto.loadPrivateKey(keystore, password, keyname);
-                                ByteArrayInputStream bais = new ByteArrayInputStream(cipher.doFinal(baos.toByteArray()));
-                                ObjectInputStream tempois = new ObjectInputStream(bais);
+                                Cipher               cipher  = FonctionsCrypto.loadPrivateKey(keystore, password, keyname);
+                                ByteArrayInputStream bais    = new ByteArrayInputStream(cipher.doFinal(baos.toByteArray()));
+                                ObjectInputStream    tempois = new ObjectInputStream(bais);
                                 System.out.println(Thread.currentThread().getName() + "> Décryptage des clefs");
 
                                 CryptedPackage cryptedPackage = (CryptedPackage) tempois.readObject();
@@ -183,6 +184,12 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.FULL, count);
                                         else {
                                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK);
+
+                                            //Ajout des voyageurs dans la base
+                                            for (Voyageur v : listVoyageurs) {
+                                                bd.ajoutVoyageur(v);
+                                            }
+
                                             bd.suppPlacesReservables(vol, count);
                                             ResultSet rss = bd.selectLieu(vol);
                                             rss.next();
@@ -193,9 +200,9 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             System.out.println(Thread.currentThread().getName() + "> Nombre de places: " + count);
                                             double prix = count * unit;
                                             System.out.println(Thread.currentThread().getName() + "> Prix calculé: " + prix);
-                                            Pair<List<String>, List<Integer>> pair = Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count);
-                                            List<String> listBillets = pair.getKey();
-                                            List<Integer> listPlaces = pair.getValue();
+                                            Pair<List<String>, List<Integer>> pair        = Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count);
+                                            List<String>                      listBillets = pair.getKey();
+                                            List<Integer>                     listPlaces  = pair.getValue();
                                             billets = listBillets.toArray(new String[listBillets.size()]);
                                             places = listPlaces.toArray(new Integer[listPlaces.size()]);
                                             p = new Places(listBillets, prix);
@@ -209,6 +216,13 @@ public class TickmapThreadRequest extends ServeurRequete {
 
                                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
                                     cryptedSocket.writeObject(p);
+                                    MACMessage m = (MACMessage) ois.readObject();
+                                    rep = (ReponseTICKMAP) m.getParam()[0];
+                                    if (rep.getCode() == TypeReponseTICKMAP.OK) {
+                                        if (!m.authenticate(hmac)) p = null;
+                                        else
+                                            System.out.println(Thread.currentThread().getName() + "> Validation authentifiée");
+                                    }
                                 }
                             }
                         }
@@ -219,13 +233,13 @@ public class TickmapThreadRequest extends ServeurRequete {
                                 System.out.println(Thread.currentThread().getName() + "> MAC param: " + Arrays.toString(m.getParam()));
                                 String facture = (String) m.getParam()[0];
                                 System.out.println(Thread.currentThread().getName() + "> Numéro de facture: " + facture);
+                                // TODO Envoi de messages d'échecs
                                 if (m.authenticate(hmac)) {
                                     System.out.println(Thread.currentThread().getName() + "> Message authentifié");
                                     if (billets != null && listVoyageurs != null && vol != null) {
                                         if (billets.length == listVoyageurs.length && listVoyageurs.length == places.length) {
-                                            //TODO Ajouter la transaction dans les factures
+                                            // TODO Ajouter la transaction dans les factures
                                             // USERNAME = Celui qui possède la carte
-                                            bd.setTransactionIsolationLevel(Connection.TRANSACTION_READ_COMMITTED);
                                             ResultSet rs = bd.selectTransaction(facture);
                                             if (!rs.next())
                                                 Reponse(oos, new ReponseTICKMAP(TypeReponseTICKMAP.BAD_TRANSACTION));
@@ -241,7 +255,6 @@ public class TickmapThreadRequest extends ServeurRequete {
                                                         else
                                                             bd.ajoutVoyageur(listVoyageurs[i]);
                                                     } while (idVoy == -1);
-
                                                     System.out.println(Thread.currentThread().getName() + "> Billet ajouté: " +
                                                             "\n\t Vol:      " + vol +
                                                             "\n\t Billet:   " + billets[i] +
@@ -255,7 +268,8 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             }
                                         }
                                     }
-                                } else
+                                }
+                                else
                                     System.out.println(Thread.currentThread().getName() + "> Authentification du message échouée");
                             }
                             break;
@@ -272,7 +286,8 @@ public class TickmapThreadRequest extends ServeurRequete {
                                     e.printStackTrace(System.out);
                                     rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOT_OK);
                                 }
-                            } else rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOTLOGGED);
+                            }
+                            else rep = new ReponseTICKMAP(TypeReponseTICKMAP.NOTLOGGED);
                             Reponse(oos, rep);
                             break;
                         case Disconnect:

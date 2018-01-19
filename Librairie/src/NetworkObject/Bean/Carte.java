@@ -3,27 +3,35 @@ package NetworkObject.Bean;
 import java.io.Serializable;
 
 public class Carte implements Serializable {
-    private String nom;
-    private String numeroCarte;
+    private String   numeroCarte;
+    private Voyageur voyageur;
 
     public Carte(String nom, String numeroCarte) {
+        this.voyageur = new Voyageur(nom, null, null);
+        this.numeroCarte = numeroCarte;
+    }
 
-        this.nom = nom;
+    public Carte(Voyageur v, String numeroCarte) {
+        this.voyageur = v;
         this.numeroCarte = numeroCarte;
     }
 
     public String getNom() {
-        return nom;
+        return this.voyageur.getNom();
     }
 
     public String getNumeroCarte() {
         return numeroCarte;
     }
 
+    public Voyageur getVoyageur() {
+        return voyageur;
+    }
+
     @Override
     public String toString() {
         return "Carte{" +
-                "nom='" + nom + '\'' +
+                "voyageur='" + voyageur + '\'' +
                 ", numeroCarte='" + numeroCarte + '\'' +
                 '}';
     }

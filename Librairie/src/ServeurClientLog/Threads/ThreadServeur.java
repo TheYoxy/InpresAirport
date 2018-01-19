@@ -27,6 +27,7 @@ public class ThreadServeur extends Thread {
         this.types = types;
         for (int i = 0; i < listChild.length; i++)
             listChild[i] = new ThreadClient(fileSocket, "Thread du pool n°" + String.valueOf(i));
+        setName("Thread maitre du pool");
     }
 
     public ThreadClient[] getListChild() {
@@ -37,7 +38,7 @@ public class ThreadServeur extends Thread {
     public void run() {
         try {
             SSocket = new ServerSocket(port);
-            System.out.println(Thread.currentThread().getName() + "> ServeurPayement en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
+            System.out.println(Thread.currentThread().getName() + "> Thread en écoute sur " + Procedural.StringIp(SSocket) + ":" + SSocket.getLocalPort() + "\n");
         } catch (IOException e) {
             System.out.println(Thread.currentThread().getName() + "> Erreur de port d'écoute ! ? [" + e + "]\n");
             return;

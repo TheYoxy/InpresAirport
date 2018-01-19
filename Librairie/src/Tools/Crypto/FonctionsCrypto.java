@@ -24,7 +24,6 @@ import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -63,13 +62,13 @@ public class FonctionsCrypto {
         oos.writeObject(o);
         byte[] b = baos.toByteArray();
 
-        System.err.println(cipher.getAlgorithm() + "> " + Arrays.toString(b));
-        System.err.println(cipher.getAlgorithm() + "> " + b.length);
+        //        System.err.println(cipher.getAlgorithm() + "> " + Arrays.toString(b));
+        //        System.err.println(cipher.getAlgorithm() + "> " + b.length);
         byte[] c = cipher.doFinal(b);
 
-        System.err.println(cipher.getAlgorithm() + "> " + "Après");
-        System.err.println(cipher.getAlgorithm() + "> " + Arrays.toString(c));
-        System.err.println(cipher.getAlgorithm() + "> " + c.length);
+        //        System.err.println(cipher.getAlgorithm() + "> " + "Après");
+        //        System.err.println(cipher.getAlgorithm() + "> " + Arrays.toString(c));
+        //        System.err.println(cipher.getAlgorithm() + "> " + c.length);
         return c;
     }
 
