@@ -12,17 +12,15 @@ public class Ids {
         // NumVol-Lieu-Num
         List<String> strings = new LinkedList<>();
         List<Integer> integers = new LinkedList<>();
-        int val;
-        if (!ids.last())
-            val = 1;
-        else {
-            String id = ids.getString(1);
-            val = Integer.parseInt(id.substring(id.lastIndexOf('-') + 1));
-        }
+        int val = !ids.next()
+                  ? 1
+                  : ids.getInt(1);
+
+        System.out.println(Thread.currentThread().getName() + "> Dernier numéro dans la base: " + val);
 
         for (int i = 0; i < nb; i++) {
-            integers.add(val);
-            strings.add(String.format("%s-%s-%d", numVol, lieu, val++));
+            integers.add(++val);
+            strings.add(String.format("%s-%s-%d", numVol, lieu, val));
         }
 
         strings.forEach(s -> System.out.println(Thread.currentThread().getName() + "> Id généré: " + s));

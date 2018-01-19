@@ -264,6 +264,8 @@ public class MainController implements Initializable {
                                     if (rep.getCode() == TypeReponseTICKMAP.OK) {
                                         new Alert(Alert.AlertType.INFORMATION, "Transaction validée").showAndWait();
                                     }
+                                    else
+                                        new Alert(Alert.AlertType.INFORMATION, "Transaction annulée").showAndWait();
                                 }
                             }
                         }

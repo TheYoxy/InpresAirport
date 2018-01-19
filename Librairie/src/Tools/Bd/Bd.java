@@ -386,9 +386,9 @@ public class Bd {
         return ps.executeQuery();
     }
 
-    public synchronized ResultSet selectBillets(String numVol)
+    public synchronized ResultSet selectLastPlaceNum(String numVol)
     throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroBillet FROM bd_airport.Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet");
+        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroPlace FROM bd_airport.Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet DESC LIMIT 1");
         ps.setString(1, numVol);
         return ps.executeQuery();
     }

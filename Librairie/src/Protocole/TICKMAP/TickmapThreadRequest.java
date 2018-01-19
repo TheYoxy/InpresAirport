@@ -200,7 +200,7 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             System.out.println(Thread.currentThread().getName() + "> Nombre de places: " + count);
                                             double prix = count * unit;
                                             System.out.println(Thread.currentThread().getName() + "> Prix calculé: " + prix);
-                                            Pair<List<String>, List<Integer>> pair        = Ids.genIdBillets(bd.selectBillets(vol), lieu, vol, count);
+                                            Pair<List<String>, List<Integer>> pair        = Ids.genIdBillets(bd.selectLastPlaceNum(vol), lieu, vol, count);
                                             List<String>                      listBillets = pair.getKey();
                                             List<Integer>                     listPlaces  = pair.getValue();
                                             billets = listBillets.toArray(new String[listBillets.size()]);
@@ -216,9 +216,10 @@ public class TickmapThreadRequest extends ServeurRequete {
 
                                 if (rep.getCode() == TypeReponseTICKMAP.OK) {
                                     cryptedSocket.writeObject(p);
-                                    MACMessage m = (MACMessage) ois.readObject();
-                                    rep = (ReponseTICKMAP) m.getParam()[0];
+                                    System.out.println(Thread.currentThread().getName() + "> Attente d'une confirmation");
+                                    rep = (ReponseTICKMAP) ois.readObject();
                                     if (rep.getCode() == TypeReponseTICKMAP.OK) {
+                                        MACMessage m = (MACMessage) rep.getParam();
                                         if (!m.authenticate(hmac)) p = null;
                                         else
                                             System.out.println(Thread.currentThread().getName() + "> Validation authentifiée");
