@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     cout << "Ip de l'host: " << ip << endl;
     try {
         SoCl = new SocketClient(ipv4().Any);
-        SoCl->Connect(ipv4(ip.c_str()), Parametres.PortRange[0]);
+        SoCl->CheckIn(ipv4(ip.c_str()), Parametres.PortRange[0]);
         cout << "Client connecté" << endl;
         /************************************ FIN LIAISON ******************************************/
         bool boucle;

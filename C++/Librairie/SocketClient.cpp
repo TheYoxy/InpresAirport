@@ -15,6 +15,10 @@ void SocketClient::Connect(const ipv4 &addr, unsigned short port) {
     struct sockaddr_in *ip = CreationSockStruct(addr, port);
     if (connect(descripteur, (struct sockaddr *) ip, sizeof(struct sockaddr_in)) == -1)
         throw Exception(EXCEPTION() + "Erreur de connect: " + strerror(errno));
+}
+
+void SocketClient::CheckIn(const ipv4 &addr, unsigned short port) {
+    Connect(addr, port);
     Type flag = ACK;
     if (recv(descripteur, &flag, 1, 0) == -1)
         throw Exception(EXCEPTION() + "Impossible de recevoir le message " + strerror(errno));

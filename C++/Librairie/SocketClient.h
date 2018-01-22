@@ -11,10 +11,11 @@ public:
 
     void Connect(const ipv4 &addr, unsigned short port);
 
+    void CheckIn(const ipv4 &addr, unsigned short port);
+
     void Disconnect();
 
 protected:
-
 };
 
 

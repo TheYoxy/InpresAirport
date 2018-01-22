@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(Applcation_CheckIn)
 project(Serveur_CheckIn)
-project(Serveur_Chat)
+project(Client_mail)
 set(LIB Librairie/Socket.cpp
         Librairie/Socket.h
         Librairie/Exception.cpp
@@ -17,7 +17,13 @@ set(LIB Librairie/Socket.cpp
         Librairie/SocketServeur.h
         Librairie/Type.h
         Librairie/ConnexionException.cpp
-        Librairie/ConnexionException.h Librairie/UdpSocket.cpp Librairie/UdpSocket.h Librairie/Macro.h Librairie/UdpMessage.cpp Librairie/UdpMessage.h)
+        Librairie/ConnexionException.h
+        #        Librairie/UdpSocket.cpp
+        #        Librairie/UdpSocket.h
+        #        Librairie/Macro.h
+        #        Librairie/UdpMessage.cpp
+        #        Librairie/UdpMessage.h
+        )
 
 
 set(CMAKE_CXX_STANDARD 11)
@@ -30,7 +36,7 @@ set(SOURCE_FILES_SERVER
         Serveur_CheckIn/FonctionServeur.cpp)
 set(SOURCE_FILES_CLIENT
         Application_CheckIn/main.cpp)
-set(SOURCE_FILE_CHAT)
+set(SOURCE_MAIL Mail/main.cpp)
 
 set(LIBRARY_OUTPUT_PATH Build/Lib)
 find_package(Threads REQUIRED)
@@ -43,4 +49,7 @@ add_executable(Serveur_CheckIn ${LIB} ${SOURCE_FILES_SERVER})
 target_link_libraries(Serveur_CheckIn ${CMAKE_THREAD_LIBS_INIT})
 target_compile_definitions(Serveur_CheckIn PUBLIC ${CMAKE_BUILD_TYPE})
 
-add_executable(Serveur_Chat ${LIB} ${SOURCE_FILES_CHAT} Serveur_Chat/main.cpp Serveur_Chat/FonctionChat.cpp Serveur_Chat/FonctionChat.h)
+add_executable(Client_Mail ${LIB} ${SOURCE_MAIL})
+target_link_libraries(Client_Mail ${CMAKE_THREAD_LIBS_INIT})
+target_compile_definitions(Client_Mail PUBLIC ${CMAKE_BUILD_TYPE})
+
