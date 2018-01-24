@@ -27,7 +27,7 @@ public class ServeurControlleur implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.setOut(new PrintStream(new FTextAreaOutputStream(Console)));
 
-        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS")),
+        ts = new ThreadServeur(Integer.valueOf(PropertiesReader.getProperties("PORT_FlightManagement")),
                 Integer.valueOf(PropertiesReader.getProperties("NB_THREADS")), XmlapThreadRequest.class);
 
         Procedural.ajoutBoutonListener(ts.getListChild(), VBoxStatus);

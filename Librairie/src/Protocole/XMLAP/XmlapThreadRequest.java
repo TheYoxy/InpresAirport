@@ -6,6 +6,8 @@ import ServeurClientLog.Objects.ServeurRequete;
 import Tools.AESCryptedSocket;
 import Tools.Bd.Bd;
 import Tools.Procedural;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Mac;
 import javax.swing.text.Document;
@@ -47,11 +49,18 @@ public class XmlapThreadRequest extends ServeurRequete {
             while (boucle) {
                 try {
                     RequeteXMLAP req = (RequeteXMLAP) ois.readObject();
+                    System.out.println("RequeteXMLAP recue : "+req.getType().toString());
                     ReponseXMLAP rep;
                     HeaderRunnable(req, Procedural.StringIp(client));//Pour log Affichage
                     switch (req.getType()) {
                         case AjoutVols:
-                            ParserCompanyDOM parser = new ParserCompanyDOM((File)req.getParam());
+                            //Copie du contenu de l'input stream dans un objet File
+                            File file = new File("/Application_FlightManagement/vols.xml");
+                            OutputStream outputStream = new FileOutputStream(file);
+                            IOUtils.copy(ois, outputStream);
+                            outputStream.close();
+                            System.out.println("Taille du fichier : " + file.getTotalSpace());
+                            //ParserCompanyDOM parser =
                             rep = new ReponseXMLAP(TypeReponseXMLAP.OK);
                             System.out.println(Thread.currentThread().getName() + "> Fichier xml traité.");
                             Reponse(oos, rep);
