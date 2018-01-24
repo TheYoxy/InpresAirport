@@ -1,0 +1,77 @@
+package Protocole.XMLAP;
+
+import NetworkObject.Bean.Voyageur;
+import NetworkObject.Company.ICompany;
+import ServeurClientLog.Objects.ServeurRequete;
+import Tools.AESCryptedSocket;
+import Tools.Bd.Bd;
+import Tools.Procedural;
+
+import javax.crypto.Mac;
+import javax.swing.text.Document;
+import java.io.*;
+import java.net.Socket;
+import java.sql.*;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class XmlapThreadRequest extends ServeurRequete {
+
+
+    @Override
+    public Runnable createRunnable(Socket client) {
+        return () -> {
+            // Machines a etat
+            boolean log = false;
+            // Fin machine à état
+
+            Bd                 bd            = null;
+            boolean            boucle        = true;
+            AESCryptedSocket   cryptedSocket = null;
+            Mac                hmac          = null;
+            ObjectInputStream  ois;
+            ObjectOutputStream oos;
+
+            String     vol           = null;
+            String[]   billets       = null;
+            Voyageur[] listVoyageurs = null;
+            Integer[]  places        = null;
+            try {
+                ois = new ObjectInputStream(client.getInputStream());
+                oos = new ObjectOutputStream(client.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            while (boucle) {
+                try {
+                    RequeteXMLAP req = (RequeteXMLAP) ois.readObject();
+                    ReponseXMLAP rep;
+                    HeaderRunnable(req, Procedural.StringIp(client));//Pour log Affichage
+                    switch (req.getType()) {
+                        case AjoutVols:
+                            ParserCompanyDOM parser = new ParserCompanyDOM((File)req.getParam());
+                            rep = new ReponseXMLAP(TypeReponseXMLAP.OK);
+                            System.out.println(Thread.currentThread().getName() + "> Fichier xml traité.");
+                            Reponse(oos, rep);
+                        break;
+                        case Connect: break;
+
+                        case Disconnect:
+                            boucle = false;
+                            System.out.println(Thread.currentThread().getName() + "> Déconnexion de " + Procedural.StringIp(client));
+                            break;
+                    }
+                } catch (Exception e) {
+                    Logger.getGlobal().log(Level.WARNING, e.getClass().getName(), e);
+                    if (e.getClass() != EOFException.class)
+                        System.out.println(e.getMessage());
+                    else
+                        return;
+                }
+            }
+        };
+    }
+
+}
