@@ -50,10 +50,12 @@ public class XmlapThreadRequest extends ServeurRequete {
                     switch (req.getType()) {
                         case AjoutVols:
                             //Copie du contenu de l'input stream dans un objet File
-                            File file = new File("/Application_FlightManagement/vols.xml");
+                            //BufferedReader bfr = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            File file = new File("vols.xml");
                             OutputStream outputStream = new FileOutputStream(file);
-                            IOUtils.copy(ois, outputStream);
+                            IOUtils.copy(client.getInputStream(), outputStream);
                             outputStream.close();
+                            //FileUtils.copyInputStreamToFile(client.getInputStream(), file);
                             System.out.println("Taille du fichier : " + file.getTotalSpace());
                             //ParserCompanyDOM parser =
                             rep = new ReponseXMLAP(TypeReponseXMLAP.OK);

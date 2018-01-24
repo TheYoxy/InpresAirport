@@ -1,6 +1,7 @@
 
 import Protocole.XMLAP.RequeteXMLAP;
 import Protocole.XMLAP.TypeRequeteXMLAP;
+import Protocole.XMLAP.XmlapThreadRequest;
 import Tools.PropertiesReader;
 import org.apache.commons.io.IOUtils;
 
@@ -29,16 +30,24 @@ public class MainFrame extends javax.swing.JFrame {
     
     public MainFrame() {
         initComponents();
+
+        //this.setVisible(true);
         try {
             Serveur = new Socket(InetAddress.getByName(PropertiesReader.getProperties("ServerName")), Integer.valueOf(PropertiesReader.getProperties("Port")));
-            Oos = new ObjectOutputStream(Serveur.getOutputStream());
-            Ois = new ObjectInputStream(Serveur.getInputStream());
+
+            if (Oos == null) {
+                Oos = new ObjectOutputStream(Serveur.getOutputStream());
+                Oos.writeObject(new XmlapThreadRequest());
+                Oos = new ObjectOutputStream(Serveur.getOutputStream());
+            }
+            if (Ois == null)
+                Ois = new ObjectInputStream(Serveur.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
+            //System.exit(-1);
         }
-
+        this.setVisible(true);
         fileNameLabel.setVisible(false);
     }
 
@@ -123,8 +132,8 @@ public class MainFrame extends javax.swing.JFrame {
     private void addFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addFileButtonActionPerformed
         attachDialog attach = new attachDialog(this, true);
         attach.setVisible(true);
-        
-        File xmlFile = attach.GetFile();
+
+        xmlFile = attach.GetFile();
         fileNameLabel.setText(attach.GetFile().getName());
         fileNameLabel.setVisible(true);
     }//GEN-LAST:event_addFileButtonActionPerformed
@@ -134,7 +143,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             InputStream fileStream = new FileInputStream(xmlFile);
             Oos.writeObject(new RequeteXMLAP(TypeRequeteXMLAP.AjoutVols));
-            IOUtils.copy(fileStream, Oos);
+            IOUtils.copy(fileStream, Serveur.getOutputStream());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
