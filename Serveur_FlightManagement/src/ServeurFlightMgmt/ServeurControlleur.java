@@ -1,6 +1,5 @@
 package ServeurFlightMgmt;
 
-//import Protocole.TICKMAP.TickmapThreadRequest;
 import Protocole.XMLAP.XmlapThreadRequest;
 import ServeurClientLog.Threads.ThreadServeur;
 import Tools.Affichage.FTextAreaOutputStream;

@@ -30,15 +30,10 @@ public class XmlapThreadRequest extends ServeurRequete {
 
             Bd                 bd            = null;
             boolean            boucle        = true;
-            AESCryptedSocket   cryptedSocket = null;
-            Mac                hmac          = null;
+
             ObjectInputStream  ois;
             ObjectOutputStream oos;
 
-            String     vol           = null;
-            String[]   billets       = null;
-            Voyageur[] listVoyageurs = null;
-            Integer[]  places        = null;
             try {
                 ois = new ObjectInputStream(client.getInputStream());
                 oos = new ObjectOutputStream(client.getOutputStream());
