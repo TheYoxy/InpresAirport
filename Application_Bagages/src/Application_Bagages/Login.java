@@ -201,7 +201,7 @@ public class Login extends javax.swing.JDialog {
         if (rep == null) return;
         if (rep.getCode() == TypeReponseLUGAP.OK) {
             if (rep.getParam() == null) {
-                System.err.println("getParam() = null lors de la réception du challenge");
+                System.err.println("getParams() = null lors de la réception du challenge");
                 this.setVisible(false);
                 return;
             }

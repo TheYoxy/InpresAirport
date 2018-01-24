@@ -231,8 +231,8 @@ public class TickmapThreadRequest extends ServeurRequete {
                         case Confirm_Payement:
                             if (log) {
                                 MACMessage m = (MACMessage) req.getParam();
-                                System.out.println(Thread.currentThread().getName() + "> MAC param: " + Arrays.toString(m.getParam()));
-                                String facture = (String) m.getParam()[0];
+                                System.out.println(Thread.currentThread().getName() + "> MAC param: " + Arrays.toString(m.getParams()));
+                                String facture = (String) m.getParams()[0];
                                 System.out.println(Thread.currentThread().getName() + "> Numéro de facture: " + facture);
                                 // TODO Envoi de messages d'échecs
                                 if (m.authenticate(hmac)) {

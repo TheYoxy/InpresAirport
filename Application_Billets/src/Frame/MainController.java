@@ -3,7 +3,6 @@ package Frame;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
@@ -13,8 +12,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -27,23 +24,21 @@ import javax.crypto.NoSuchPaddingException;
 
 import NetworkObject.Bean.Carte;
 import NetworkObject.Bean.MACMessage;
-import NetworkObject.Bean.Payement;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Table;
 import NetworkObject.Bean.Voyageur;
 import NetworkObject.CryptedPackage;
-import Protocole.PAYP.PAYPThreadRequest;
 import Protocole.PAYP.ReponsePAYP;
 import Protocole.PAYP.RequetePAYP;
-import Protocole.PAYP.TypeReponsePAYP;
 import Protocole.PAYP.TypeRequetePAYP;
-import Protocole.SEBATRAP.TypeReponseST;
 import Protocole.TICKMAP.ReponseTICKMAP;
 import Protocole.TICKMAP.RequeteTICKMAP;
 import Protocole.TICKMAP.TypeReponseTICKMAP;
 import Protocole.TICKMAP.TypeRequeteTICKMAP;
 import Tools.AESCryptedSocket;
 import Tools.Crypto.FonctionsCrypto;
+import Tools.Exceptions.PayementException;
+import Tools.FonctionsPayement;
 import Tools.PropertiesReader;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -58,6 +53,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -190,94 +186,49 @@ public class MainController implements Initializable {
                         s.showAndWait();
 
                         ObservableList<Voyageur> list = voyageursController.getListVoyageurs();
-                        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Ajout_Voyageurs));
-                        List l = new LinkedList<>();
-                        l.add(selected.get(0));
-                        l.add(list.toArray(new Voyageur[list.size()]));
-                        cryptedSocket.writeObject((Serializable) l);
 
-                        ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
-                        if (rep.getCode() == TypeReponseTICKMAP.OK) {
-                            Places   p  = (Places) cryptedSocket.readObject();
-                            Optional o1 = showConfirm(p);
-                            if (o1.isPresent()) {
-                                rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, new MACMessage(hmac, new ReponseTICKMAP(TypeReponseTICKMAP.OK)));
-                                oos.writeObject(rep);
-                                Optional<Pair<Voyageur, String>> opt = showCardAndName(list);
-                                if (opt.isPresent()) {
-                                    Pair<Voyageur, String> pair = opt.get();
-                                    Voyageur               v    = pair.getKey();
-                                    String                 nom  = v.getNom();
-                                    String                 card = pair.getValue();
+                        Places   p  = FonctionsPayement.sendVoyageur(oos, cryptedSocket, ois, selected.get(0), list);
+                        Optional o1 = showConfirm(p);
+                        if (o1.isPresent()) {
+                            FonctionsPayement.confirmTICKMAP(hmac, oos);
+                            Optional<Pair<Voyageur, String>> opt = showCardAndName(list);
 
-                                    Socket             payement    = new Socket(InetAddress.getByName(PropertiesReader.getProperties("PAYEMENT_NAME")), Integer.parseInt(PropertiesReader.getProperties("PORT_PAYEMENT")));
-                                    ObjectOutputStream oosPayement = new ObjectOutputStream(payement.getOutputStream());
-                                    oosPayement.writeObject(new PAYPThreadRequest());
-                                    oosPayement = new ObjectOutputStream(payement.getOutputStream());
-                                    Cipher asym = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
-                                    //TODO AJOUT SIGNATURE
-                                    Carte             c              = new Carte(nom, card);
-                                    ObjectInputStream oisPayement    = new ObjectInputStream(payement.getInputStream());
-                                    boolean           pay            = true;
-                                    RequeteTICKMAP    requeteTICKMAP = null;
-                                    while (pay) {
-                                        oosPayement.writeObject(new RequetePAYP(TypeRequetePAYP.PAYEMENT, (Serializable) FonctionsCrypto.encrypt(new Payement(c, p.getPrix()), asym)));
-                                        ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
-                                        System.out.println("Reponse: " + reponse);
-                                        System.out.println("Param:   " + reponse.getParam());
-                                        System.out.println("Param: (classname) " + reponse.getParam().getClass().getName());
-                                        if (reponse.getCode() == TypeReponsePAYP.OK) {
-                                            System.out.println("Réponse: " + reponse.getParam());
-                                            System.out.println("Réponse (classname): " + reponse.getParam().getClass().getName());
-                                            new Alert(Alert.AlertType.INFORMATION, "Réservation completée.\nId de la transaction: " + reponse.getParam()).showAndWait();
-                                            requeteTICKMAP = new RequeteTICKMAP(TypeRequeteTICKMAP.Confirm_Payement, new MACMessage(hmac, reponse.getParam()));
-                                            pay = false;
-                                        }
-                                        else if (reponse.getParam() == TypeReponseST.CARD_NOT_FOUND) {
-                                            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "La carte n'existe pas.\n Création d'une nouvelle carte ?", ButtonType.YES, ButtonType.NO);
-                                            a.showAndWait();
-                                            if (a.getResult() == ButtonType.YES) {
-                                                Optional<Pair<Carte, Double>> optional = showNewCard(c, list);
-                                                if (optional.isPresent()) {
-                                                    Pair<Carte, Double> pair1       = optional.get();
-                                                    RequetePAYP         requetePAYP = new RequetePAYP(TypeRequetePAYP.NEW_CARD, FonctionsCrypto.encrypt(pair1.getKey(), asym), FonctionsCrypto.encrypt(pair1.getValue(), asym));
-                                                    oosPayement.writeObject(requetePAYP);
-                                                    reponse = (ReponsePAYP) oisPayement.readObject();
-                                                    //TODO Traitement réponse
-                                                }
-                                            }
-                                            else {
-                                                requeteTICKMAP = new RequeteTICKMAP(TypeRequeteTICKMAP.Payement_Abort);
-                                                pay = false;
-                                            }
-                                        }
-                                        else {
-                                            new Alert(Alert.AlertType.INFORMATION, "La réservation n'a pas pu être effectuée. \nCause: " + reponse.getParam()).showAndWait();
-                                            //AJOUT DU MAC
-                                            requeteTICKMAP = new RequeteTICKMAP(TypeRequeteTICKMAP.Payement_Abort);
-                                            pay = false;
+                            if (opt.isPresent()) {
+                                Pair<Voyageur, String> pair = opt.get();
+                                Voyageur               v    = pair.getKey();
+                                String                 card = pair.getValue();
+
+                                Cipher asym     = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
+                                Carte  c        = new Carte(v, card);
+                                Socket payement = new Socket(InetAddress.getByName(PropertiesReader.getProperties("PAYEMENT_NAME")), Integer.parseInt(PropertiesReader.getProperties("PORT_PAYEMENT")));
+
+                                RequeteTICKMAP requeteTICKMAP = FonctionsPayement.sendPayement(c, asym, payement, p.getPrix(), hmac, (oosPayement, oisPayement) -> {
+                                    Alert a = new Alert(Alert.AlertType.CONFIRMATION, "La carte n'existe pas.\n Création d'une nouvelle carte ?", ButtonType.YES, ButtonType.NO);
+                                    a.showAndWait();
+                                    if (a.getResult() == ButtonType.YES) {
+                                        Optional<Pair<Carte, Double>> optional = showNewCard(c, list);
+                                        if (optional.isPresent()) {
+                                            Pair<Carte, Double> pair1       = optional.get();
+                                            RequetePAYP         requetePAYP = new RequetePAYP(TypeRequetePAYP.NEW_CARD, FonctionsCrypto.encrypt(pair1.getKey(), asym), FonctionsCrypto.encrypt(pair1.getValue(), asym));
+
+                                            oosPayement.writeObject(requetePAYP);
+                                            ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
+                                            //TODO Traitement réponse
+                                            return true;
                                         }
                                     }
-                                    oos.writeObject(requeteTICKMAP);
-
-                                    rep = (ReponseTICKMAP) ois.readObject();
-                                    if (rep.getCode() == TypeReponseTICKMAP.OK) {
-                                        new Alert(Alert.AlertType.INFORMATION, "Transaction validée").showAndWait();
-                                    }
-                                    else
-                                        new Alert(Alert.AlertType.INFORMATION, "Transaction annulée").showAndWait();
-                                }
+                                    return false;
+                                });
+                                new Alert(Alert.AlertType.INFORMATION, requeteTICKMAP.getType() == TypeRequeteTICKMAP.Confirm_Payement
+                                                                       ? "Réservation completée.\nId de la transaction: " + ((MACMessage) requeteTICKMAP.getParam()).getParam()
+                                                                       : "La réservation n'a pas pu être effectuée.\nCause: " + requeteTICKMAP.getParam()).showAndWait();
+                                oos.writeObject(requeteTICKMAP);
+                                ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
+                                if (requeteTICKMAP.getType() == TypeRequeteTICKMAP.Confirm_Payement)
+                                    new Alert(Alert.AlertType.INFORMATION, rep.getCode() == TypeReponseTICKMAP.OK
+                                                                           ? "Transaction validée"
+                                                                           : "Transaction annulée").showAndWait();
                             }
-                        }
-                        else if (rep.getCode() == TypeReponseTICKMAP.FULL) {
-                            int   c = (int) rep.getParam();
-                            Alert a = new Alert(Alert.AlertType.ERROR);
-                            a.setHeaderText(null);
-                            a.setContentText("Impossible de réserver les places.\n" +
-                                    "Il ne reste que " + c + (c < 1
-                                                              ? " place "
-                                                              : " places ") + "disponible.");
-                            a.showAndWait();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -299,6 +250,17 @@ public class MainController implements Initializable {
                         e.printStackTrace();
                     } catch (KeyStoreException e) {
                         e.printStackTrace();
+                    } catch (PayementException e) {
+                        e.printStackTrace();
+                        ReponseTICKMAP rep = (ReponseTICKMAP) e.getRep();
+                        int            c   = (int) rep.getParam();
+                        Alert          a   = new Alert(Alert.AlertType.ERROR);
+                        a.setHeaderText(null);
+                        a.setContentText("Impossible de réserver les places.\n" +
+                                "Il ne reste que " + c + (c < 1
+                                                          ? " place "
+                                                          : " places ") + "disponible.");
+                        a.showAndWait();
                     }
                 }
                 break;
@@ -411,6 +373,11 @@ public class MainController implements Initializable {
         grid.add(numCarte, 1, 1);
         grid.add(new Label("Solde disponible: "), 0, 2);
         grid.add(solde, 1, 2);
+
+        final Button ok = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        ok.setDisable(true);
+
+        proprio.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> ok.setDisable(newValue == null));
 
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(dialogButton -> {
