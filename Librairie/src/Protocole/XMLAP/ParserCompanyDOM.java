@@ -20,7 +20,8 @@ public class ParserCompanyDOM {
             domFactory.setValidating(true);
             domFactory.setNamespaceAware(true);
             DocumentBuilder parserDOM = domFactory.newDocumentBuilder();
-            Document doc = parserDOM.parse(xmlFile);
+            Document doc = parserDOM.parse(new File("vols.xml"));
+            ParcourArbre(doc, 0);
 
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

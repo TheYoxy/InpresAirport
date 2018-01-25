@@ -51,16 +51,24 @@ public class XmlapThreadRequest extends ServeurRequete {
                         case AjoutVols:
                             //Copie du contenu de l'input stream dans un objet File
                             //BufferedReader bfr = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                            File file = new File("vols.xml");
-                            OutputStream outputStream = new FileOutputStream(file);
-                            IOUtils.copy(client.getInputStream(), outputStream);
-                            outputStream.close();
-                            //FileUtils.copyInputStreamToFile(client.getInputStream(), file);
-                            System.out.println("Taille du fichier : " + file.getTotalSpace());
-                            //ParserCompanyDOM parser =
-                            rep = new ReponseXMLAP(TypeReponseXMLAP.OK);
-                            System.out.println(Thread.currentThread().getName() + "> Fichier xml traité.");
-                            Reponse(oos, rep);
+                            try {
+                                File file = new File("vols.xml");
+                                //OutputStream outputStream = new FileOutputStream(file);
+
+                                //long taille = IOUtils.copy(client.getInputStream(), outputStream, client.getInputStream().available());
+
+                                //FileUtils.copyInputStreamToFile(client.getInputStream(), file);
+                                //outputStream.flush();
+                                //outputStream.close();
+                                System.out.println("Taille du fichier : " + file.getTotalSpace());
+                                ParserCompanyDOM parser = new ParserCompanyDOM(file);
+                                rep = new ReponseXMLAP(TypeReponseXMLAP.OK);
+                                System.out.println(Thread.currentThread().getName() + "> Fichier xml traité.");
+                                Reponse(oos, rep);
+                            }
+                            catch(Exception e){
+                                System.out.println("Ajout vols > "+ e);
+                            }
                         break;
                         case Connect: break;
 
