@@ -360,6 +360,21 @@ public class Bd {
         return ps.executeUpdate();
     }
 
+    //public boolean createFlights(String numeroVol, String lieu, Time Hdep, Time Harr, float prix, String Desc, int PlacesDisp, int idAv)
+    public synchronized boolean insertVol(String numeroVol, String lieu, Timestamp dep, Timestamp arr, float prix, String desc, int places, int idAv)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO Vol VALUES(?,?,?,?,?,?,?,?)");
+        ps.setString(1, numeroVol);
+        ps.setString(2, lieu);
+        ps.setTimestamp(3, dep);
+        ps.setTimestamp(4, arr);
+        ps.setDouble(5, prix);
+        ps.setString(6, desc);
+        ps.setInt(7, places);
+        ps.setInt(8, idAv);
+        return ps.executeUpdate() != 0;
+    }
+
     public synchronized boolean insertWebUser(String username, String mail)
     throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Mail) VALUES (?,?)");
