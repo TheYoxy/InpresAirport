@@ -1,0 +1,45 @@
+<listeVols>
+	<compagnie lowcost="Y">
+		<nom>Poubelle-air</nom>
+		<pays>Boursoulavie</pays>
+	</compagnie>
+	<createDestination>
+		<ville zoneFranche="T"> Saint-Hélier</ville>
+		<pays>Jersey</pays>
+	</createDestination>
+	<createFlights>
+		<vol>
+			<date>27/12/2017</date>
+			<time>8:30</time>
+			<prix>225.30</prix>
+		</vol>
+		<vol>
+			<date>27/12/2017</date>
+			<time>14:30</time>
+			<prix>185.75</prix>
+		</vol>
+		<vol>
+			<date>30/12/2017</date>
+			<time>8:30</time>
+			<prix>225.30</prix>
+		</vol>
+	</createFlights>
+	<createDestination>
+		<ville zoneFranche="F">Aurillac</ville>
+		<pays>France</pays>
+	</createDestination>
+	<createFlights>
+		<vol>
+			<date>27/12/2017</date>
+			<time>10:30</time>
+			<prix>98.00</prix>
+		</vol>
+	</createFlights>
+	<createFlights destination="Honolulu" country="Hawaï">
+		<vol>
+			<date>28/12/2017</date>
+			<time>5:15</time>
+			<prix>652.35</prix>
+		</vol>
+	</createFlights>
+</listeVols>
