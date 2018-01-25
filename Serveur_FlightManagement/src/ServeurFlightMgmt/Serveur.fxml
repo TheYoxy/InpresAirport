@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="679.0" prefWidth="1030.0"
+            stylesheets="@fxml.css" xmlns="http://javafx.com/javafx/8.0.121"
+            fx:controller="ServeurFlightMgmt.ServeurControlleur">
+    <center>
+        <TextArea fx:id="Console" editable="false" prefHeight="1076.0" prefWidth="1465.0" styleClass="console" BorderPane.alignment="CENTER" />
+    </center>
+    <left>
+        <VBox fx:id="VBoxStatus" prefHeight="360.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="16.0" prefWidth="204.0" styleClass="title" text="Socket connectées" underline="true" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" />
+         </padding>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin></VBox>
+    </left>
+</BorderPane>
