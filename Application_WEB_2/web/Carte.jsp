@@ -24,7 +24,7 @@
     <div class="row">
         <h2>Carte pour le payement: </h2>
     </div>
-    <div class="row">
+    <div class="invisible row">
         <form action="Main" method="post">
             <input type="hidden" name="Type"
                    value="<%=MainServlet.WebType.CARTE.toString()%>">
@@ -42,9 +42,27 @@
                 <label for="card">Numéro de carte: </label>
                 <input type="number" class="form-control" name="card" id="card">
             </div>
-            <input type="submit" class="btn btn-default" value="Confirmer">
+            <div class="checkbox">
+                <label><input id="newcard" type="checkbox" value="" name="new">Nouvelle
+                    carte</label>
+            </div>
+            <div id="solde" class="form-group invisible">
+                <label for="isolde"></label>
+                <input id="isolde" type="number" value="1000" name="solde">
+            </div>
+            <input id="submit" type="submit" class="btn btn-default disabled" value="Confirmer">
         </form>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        $("#card").change(function (e) {
+            console.log(e);
+        });
+        $("#newcard").change(function () {
+
+        });
+    });
+</script>
 </body>
 </html>

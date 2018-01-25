@@ -27,10 +27,12 @@ import NetworkObject.Bean.Login;
 import NetworkObject.Bean.MACMessage;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Voyageur;
+import NetworkObject.Bean.WebUser;
 import NetworkObject.CryptedPackage;
 import ServeurClientLog.Objects.ServeurRequete;
 import Tools.AESCryptedSocket;
 import Tools.Bd.Bd;
+import Tools.Bd.BdMethods;
 import Tools.Bd.BdType;
 import Tools.Crypto.Digest.DigestCalculator;
 import Tools.Crypto.FonctionsCrypto;
@@ -76,6 +78,22 @@ public class TickmapThreadRequest extends ServeurRequete {
                     ReponseTICKMAP rep;
                     HeaderRunnable(req, Procedural.StringIp(client));
                     switch (req.getType()) {
+                        case New_Users: {
+                            DataInputStream       dis  = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            //Lecture de mon objet crypté
+                            do {
+                                baos.write(dis.readByte());
+                            } while (dis.available() > 0);
+                            Cipher  cipher = FonctionsCrypto.loadPrivateKey(keystore, password, keyname);
+                            WebUser wu     = (WebUser) FonctionsCrypto.decrypt(baos.toByteArray(), cipher);
+                            bd = new Bd(BdType.MySql, 5);
+                            BdMethods.addWebUser(bd, wu);
+                            bd.close(true);
+                            rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK);
+                            Reponse(oos, rep);
+                        }
+                        break;
                         case TryConnect:
                             challenge = new Random().nextInt();
                             rep = new ReponseTICKMAP(TypeReponseTICKMAP.OK, challenge);

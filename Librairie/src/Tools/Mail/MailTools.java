@@ -1,14 +1,21 @@
 package Tools.Mail;
 
-import Tools.PropertiesReader;
+import java.util.Properties;
 
-import javax.mail.*;
+import javax.mail.Authenticator;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.swing.*;
-import java.util.Properties;
+
+import Tools.PropertiesReader;
 
 
 public class MailTools {
@@ -16,14 +23,12 @@ public class MailTools {
     private Properties prop = System.getProperties();
     private Session sess;
 
-    public MailTools() throws Exception{
-
+    public MailTools() {
         CreateSession();
     }
 
 
-
-    private void CreateSession() throws Exception{
+    private void CreateSession() {
         prop.put("mail.smtp.host", PropertiesReader.getProperties("SERVERENVOIE"));
         prop.put("mail.smtp.port", PropertiesReader.getProperties("PORTENVOIE"));
         prop.put("mail.from", PropertiesReader.getProperties("MAIL"));
@@ -36,17 +41,19 @@ public class MailTools {
 
         sess = Session.getInstance(prop, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(PropertiesReader.getProperties("MAIL"), PropertiesReader.getProperties("PWD"));}
+                return new PasswordAuthentication(PropertiesReader.getProperties("MAIL"), PropertiesReader.getProperties("PWD"));
+            }
         });
     }
 
-    public void SendMail(String mailTO, String mailObject, String text) throws MessagingException{
+    public void SendMail(String mailTO, String mailObject, String text)
+    throws MessagingException {
 
-        Multipart multipart = new MimeMultipart();
-        MimeMessage msg = new MimeMessage (sess);
+        Multipart   multipart = new MimeMultipart();
+        MimeMessage msg       = new MimeMessage(sess);
 
-        msg.setFrom (new InternetAddress(PropertiesReader.getProperties("MAIL")));
-        msg.setRecipient (Message.RecipientType.TO, new InternetAddress (mailTO));
+        msg.setFrom(new InternetAddress(PropertiesReader.getProperties("MAIL")));
+        msg.setRecipient(Message.RecipientType.TO, new InternetAddress(mailTO));
         msg.setSubject(mailObject);
         //msg.setText (messageTextArea.getText());
 

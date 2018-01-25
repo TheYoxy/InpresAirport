@@ -168,6 +168,7 @@ public class Bd {
         return s.executeQuery();
     }
 
+
     /**
      * @param rs
      * @return
@@ -364,6 +365,16 @@ public class Bd {
         PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Mail) VALUES (?,?)");
         ps.setString(1, username);
         ps.setString(2, mail);
+        return ps.executeUpdate() != 0;
+    }
+
+    public synchronized boolean insertWebUser(String username, String mail, String nom, String prenom)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Mail,Nom,Prenom) VALUES (?,?,?,?)");
+        ps.setString(1, username);
+        ps.setString(2, mail);
+        ps.setString(3, nom);
+        ps.setString(4, prenom);
         return ps.executeUpdate() != 0;
     }
 

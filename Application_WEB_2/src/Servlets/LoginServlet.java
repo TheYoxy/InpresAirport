@@ -37,6 +37,7 @@ import javax.servlet.http.HttpSession;
 import NetworkObject.AESParams;
 import NetworkObject.Bean.Login;
 import NetworkObject.Bean.Table;
+import NetworkObject.Bean.WebUser;
 import NetworkObject.CryptedPackage;
 import Protocole.TICKMAP.ReponseTICKMAP;
 import Protocole.TICKMAP.RequeteTICKMAP;
@@ -62,59 +63,118 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         request.getSession(false).invalidate();
+        String type = request.getParameter("Type");
+        try {
+            if (type.equals("Log")) {
+                String ou = "/error.jsp";
+                switch (Log(request, response)) {
+                    case 0:
+                        ou = "/Vols.jsp";
+                        break;
+                    case 1:
+                    case 2:
+                        ou = "/Login.jsp";
+                        break;
+                    case -1:
+                        ou = "/error.jsp";
+                        break;
+                }
+                request.getRequestDispatcher(ou).forward(request, response);
+            }
+            else if (type.equals("New")) request.getRequestDispatcher(NewUser(request, response)
+                                                                      ? "/NewLog.jsp"
+                                                                      : "/NLogin.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("From", "Login.doPost 3");
+            request.setAttribute("Exception", e);
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        }
+    }
+
+    private int Log(HttpServletRequest request, HttpServletResponse response)
+    throws Exception {
         String      username = request.getParameter("username");
         String      password = request.getParameter("password");
         HttpSession session  = request.getSession(true);
         int         challenge;
-        try {
-            Socket s = (Socket) session.getAttribute("s");
-            if (s == null) {
-                s = new Socket();
-                s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("BILLETS_NAME")), Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS"))), 5000);
-                session.setAttribute("s", s);
+        Socket      s        = (Socket) session.getAttribute("s");
+        if (s == null) {
+            s = new Socket();
+            s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("BILLETS_NAME")), Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS"))), 5000);
+            session.setAttribute("s", s);
 
-                ObjectOutputStream tempoos = new ObjectOutputStream(s.getOutputStream());
-                tempoos.writeObject(new TickmapThreadRequest());
-            }
-            ObjectOutputStream oos = (ObjectOutputStream) session.getAttribute("oos");
-            if (oos == null) oos = new ObjectOutputStream(s.getOutputStream());
-            session.setAttribute("oos", oos);
+            ObjectOutputStream tempoos = new ObjectOutputStream(s.getOutputStream());
+            tempoos.writeObject(new TickmapThreadRequest());
+        }
+        ObjectOutputStream oos = (ObjectOutputStream) session.getAttribute("oos");
+        if (oos == null) oos = new ObjectOutputStream(s.getOutputStream());
+        session.setAttribute("oos", oos);
 
-            oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.TryConnect, Procedural.IpPort(s)));
+        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.TryConnect, Procedural.IpPort(s)));
 
-            ObjectInputStream ois = (ObjectInputStream) session.getAttribute("ois");
-            if (ois == null) ois = new ObjectInputStream(s.getInputStream());
-            session.setAttribute("ois", ois);
+        ObjectInputStream ois = (ObjectInputStream) session.getAttribute("ois");
+        if (ois == null) ois = new ObjectInputStream(s.getInputStream());
+        session.setAttribute("ois", ois);
 
-            ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
-            if (rep.getCode() == TypeReponseTICKMAP.OK) {
-                if (rep.getParam() != null) {
-                    challenge = (int) rep.getParam();
-                    oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Login, new Login(username, DigestCalculator.hashPassword(password, challenge))));
-                    rep = (ReponseTICKMAP) ois.readObject();
-                    if (rep.getCode() == TypeReponseTICKMAP.OK)
-                        switch (rep.getCode()) {
-                            case UNKNOWN_LOGIN:
-                                request.setAttribute("From", "Login.doPost 1");
-                                request.setAttribute("Exception", "L'utilisateur n'existe pas");
-                                request.getRequestDispatcher("/error.jsp").forward(request, response);
-                                break;
-                            case BAD_PASSWORD:
-                                request.setAttribute("From", "Login.doPost 2");
-                                request.setAttribute("Exception", "Le mot de passe n'existe pas");
-                                request.getRequestDispatcher("/error.jsp").forward(request, response);
-                            case OK:
-                                KeyExchange(request);
-                                request.getRequestDispatcher("/Vols.jsp").forward(request, response);
-                                break;
-                        }
+        ReponseTICKMAP rep = (ReponseTICKMAP) ois.readObject();
+        if (rep.getCode() == TypeReponseTICKMAP.OK) {
+            if (rep.getParam() != null) {
+                challenge = (int) rep.getParam();
+                oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Login, new Login(username, DigestCalculator.hashPassword(password, challenge))));
+                rep = (ReponseTICKMAP) ois.readObject();
+                System.out.print("Log: ");
+                switch (rep.getCode()) {
+                    case UNKNOWN_LOGIN:
+                        request.setAttribute("Bad", "Login");
+                        System.out.println("UNKNOWN_LOGIN");
+                        return 1;
+                    case BAD_PASSWORD:
+                        request.setAttribute("Bad", "Password");
+                        System.out.println("BAD_PASSWORD");
+                        return 2;
+                    case OK:
+                        KeyExchange(request);
+                        session.setAttribute("log", true);
+                        System.out.println("OK");
+                        return 0;
                 }
             }
-        } catch (Exception e) {
-            request.setAttribute("From", "Login.doPost 3");
-            request.setAttribute("Exception", e);
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
         }
+        return -1;
+    }
+
+    private boolean NewUser(HttpServletRequest request, HttpServletResponse response)
+    throws Exception {
+        String username = request.getParameter("username");
+        String mail     = request.getParameter("mail");
+        String password = request.getParameter("password");
+        String prenom   = request.getParameter("fname");
+        String nom      = request.getParameter("lname");
+        Socket s        = new Socket();
+
+        s.connect(new InetSocketAddress(InetAddress.getByName(PropertiesReader.getProperties("BILLETS_NAME")), Integer.valueOf(PropertiesReader.getProperties("PORT_BILLETS"))), 5000);
+        ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+        oos.writeObject(new TickmapThreadRequest());
+
+        oos = new ObjectOutputStream(s.getOutputStream());
+        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.New_Users));
+
+        Cipher           cipher = genPublicKey();
+        WebUser          wu     = new WebUser(nom, prenom, mail, username, password);
+        byte[]           enc    = FonctionsCrypto.encrypt(wu, cipher);
+        DataOutputStream dos    = new DataOutputStream(s.getOutputStream());
+        dos.write(enc);
+        dos.flush();
+
+        ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+        ReponseTICKMAP    rep = (ReponseTICKMAP) ois.readObject();
+
+        oos.writeObject(new RequeteTICKMAP(TypeRequeteTICKMAP.Disconnect));
+
+        request.setAttribute("username", rep.getCode() == TypeReponseTICKMAP.OK
+                                         ? username
+                                         : true);
+        return rep.getCode() == TypeReponseTICKMAP.OK;
     }
 
     /**
@@ -142,8 +202,8 @@ public class LoginServlet extends HttpServlet {
         Socket            s       = (Socket) session.getAttribute("s");
         ObjectInputStream ois     = (ObjectInputStream) session.getAttribute("ois");
         do {
-            CryptedPackage cp     = new CryptedPackage(genSecretAES(), genAESParams());
             Cipher         cipher = genPublicKey();
+            CryptedPackage cp     = new CryptedPackage(genSecretAES(), genAESParams());
             System.out.println("Création du flux");
             DataOutputStream      dos     = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             ByteArrayOutputStream baos    = new ByteArrayOutputStream();
@@ -164,6 +224,30 @@ public class LoginServlet extends HttpServlet {
         } while (rep.getCode() != TypeReponseTICKMAP.OK);
         Table vols = (Table) rep.getParam();
         session.setAttribute("vols", vols);
+    }
+
+    /**
+     * @return
+     * @throws KeyStoreException
+     * @throws IOException
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws InvalidKeyException
+     * @throws CertificateException
+     */
+    private Cipher genPublicKey()
+    throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException,
+           NoSuchProviderException, InvalidKeyException, CertificateException {
+        System.out.println("Récupération de la clef publique du serveur");
+        KeyStore        ks          = FonctionsCrypto.loadKeyStore(keystore, password.toCharArray());
+        X509Certificate certificate = (X509Certificate) ks.getCertificate(keyname);
+        PublicKey       pk          = certificate.getPublicKey();
+        System.out.println("GETINSTANCE");
+        Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
+        System.out.println("GETINSTANCE");
+        cipher.init(Cipher.PUBLIC_KEY, pk);
+        return cipher;
     }
 
     /**
@@ -196,30 +280,6 @@ public class LoginServlet extends HttpServlet {
         new SecureRandom().nextBytes(init);
         System.out.println(".");
         return new AESParams(secretKey, init);
-    }
-
-    /**
-     * @return
-     * @throws KeyStoreException
-     * @throws IOException
-     * @throws NoSuchPaddingException
-     * @throws NoSuchAlgorithmException
-     * @throws NoSuchProviderException
-     * @throws InvalidKeyException
-     * @throws CertificateException
-     */
-    private Cipher genPublicKey()
-    throws KeyStoreException, IOException, NoSuchPaddingException, NoSuchAlgorithmException,
-           NoSuchProviderException, InvalidKeyException, CertificateException {
-        System.out.println("Récupération de la clef publique du serveur");
-        KeyStore        ks          = FonctionsCrypto.loadKeyStore(keystore, password.toCharArray());
-        X509Certificate certificate = (X509Certificate) ks.getCertificate(keyname);
-        PublicKey       pk          = certificate.getPublicKey();
-        System.out.println("GETINSTANCE");
-        Cipher cipher = Cipher.getInstance(pk.getAlgorithm(), "BC");
-        System.out.println("GETINSTANCE");
-        cipher.init(Cipher.PUBLIC_KEY, pk);
-        return cipher;
     }
 
 }
