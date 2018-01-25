@@ -1,15 +1,19 @@
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.Socket;
+
+import javax.swing.JOptionPane;
 
 import Protocole.XMLAP.RequeteXMLAP;
 import Protocole.XMLAP.TypeRequeteXMLAP;
 import Protocole.XMLAP.XmlapThreadRequest;
 import Tools.PropertiesReader;
-import org.apache.commons.io.IOUtils;
-
-
-import javax.swing.*;
-import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -18,16 +22,21 @@ import java.net.Socket;
  */
 
 /**
- *
  * @author Nicolas
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private Socket Serveur = null;
-    private ObjectInputStream Ois = null;
-    private ObjectOutputStream Oos = null;
-    private File xmlFile;
-    
+    private ObjectInputStream  Ois     = null;
+    private ObjectOutputStream Oos     = null;
+    private Socket             Serveur = null;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addFileButton;
+    private javax.swing.JLabel  fileNameLabel;
+    private javax.swing.JLabel  jLabel1;
+    private javax.swing.JLabel  jLabel2;
+    private javax.swing.JButton sendButton;
+    private File                xmlFile;
+
     public MainFrame() {
         initComponents();
 
@@ -45,7 +54,7 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
-            //System.exit(-1);
+            System.exit(-1);
         }
         this.setVisible(true);
         fileNameLabel.setVisible(false);
@@ -92,38 +101,38 @@ public class MainFrame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(104, 104, 104)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(fileNameLabel)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(sendButton)
-                                    .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(addFileButton)))))
-                .addContainerGap(25, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(104, 104, 104)
+                                                .addComponent(jLabel1))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(51, 51, 51)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(fileNameLabel)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addComponent(sendButton)
+                                                                        .addComponent(jLabel2))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(addFileButton)))))
+                                .addContainerGap(25, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addFileButton)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fileNameLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
-                .addComponent(sendButton)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(addFileButton)
+                                        .addComponent(jLabel2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fileNameLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
+                                .addComponent(sendButton)
+                                .addContainerGap())
         );
 
         pack();
@@ -141,15 +150,28 @@ public class MainFrame extends javax.swing.JFrame {
     private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendButtonActionPerformed
         fileNameLabel.setVisible(false);
         try {
-            InputStream fileStream = new FileInputStream(xmlFile);
+            FileInputStream fileStream = new FileInputStream(xmlFile);
             Oos.writeObject(new RequeteXMLAP(TypeRequeteXMLAP.AjoutVols));
-            IOUtils.copy(fileStream, Serveur.getOutputStream());
+            sendFile(fileStream);
+            fileStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_sendButtonActionPerformed
+
+    private void sendFile(FileInputStream fis)
+    throws IOException {
+        DataOutputStream dos = new DataOutputStream(Serveur.getOutputStream());
+        byte[]           buf = new byte[fis.available()];
+        while (fis.read(buf) > 0) {
+            System.out.println(new String(buf));
+            dos.write(buf);
+        }
+        dos.flush();
+        dos.close();
+    }
 
     /**
      * @param args the command line arguments
@@ -158,7 +180,7 @@ public class MainFrame extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -185,12 +207,5 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addFileButton;
-    private javax.swing.JLabel fileNameLabel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JButton sendButton;
     // End of variables declaration//GEN-END:variables
 }
