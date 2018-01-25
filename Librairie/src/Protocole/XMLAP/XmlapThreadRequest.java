@@ -46,7 +46,7 @@ public class XmlapThreadRequest extends ServeurRequete {
                     HeaderRunnable(req, Procedural.StringIp(client));//Pour log Affichage
                     switch (req.getType()) {
                         case AjoutVols:
-                            File file = new File("xml" + System.getProperty("file.separator") + "temp.xml");
+                            File file = new File("newvols.xml");
                             file.deleteOnExit();
                             System.out.println(Thread.currentThread().getName() + "> Ouverture du fichier xml" + System.getProperty("file.separator") + "temp.xml");
 

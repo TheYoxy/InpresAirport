@@ -1,11 +1,9 @@
 package NetworkObject.Company;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public interface ICompany {
-    boolean createDestination(String v, String p);
-    boolean createFlights(String v, String p, Date d, Time t, double pr);
-    boolean cancelDestination(String v);
-    boolean cancelFlights(String v, String p, Date d, Time t);
+    boolean createFlights(String numeroVol, String lieu, Timestamp Hdep, Timestamp Harr, float prix , String Desc, int PlacesDisp, int idAv);
 }
