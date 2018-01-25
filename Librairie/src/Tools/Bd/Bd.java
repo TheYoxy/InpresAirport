@@ -274,6 +274,14 @@ public class Bd {
         Connection.commit();
     }
 
+    public synchronized int deleteReservation(String username, String vol)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("DELETE FROM bd_airport.Reservation WHERE bd_airport.Reservation.Username = ? AND bd_airport.Reservation.NumeroVol = ?");
+        ps.setString(1, username);
+        ps.setString(2, vol);
+        return ps.executeUpdate();
+    }
+
     public Connection getConnection() {
         return Connection;
     }
@@ -334,24 +342,28 @@ public class Bd {
         return ps.executeUpdate();
     }
 
-    public synchronized boolean insertReservation(String username, String vol, String nbrPlaces, String time)
+    public synchronized boolean insertLogin(String username, String password)
     throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("INSERT INTO Reservation(Username, NumeroVol, nbPlaces, timeReservation) VALUES (?,?,?,?)");
-        Timestamp         ts = Timestamp.valueOf(time);
-
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO bd_airport.Login(Username, Password) VALUES (?,?)");
         ps.setString(1, username);
-        ps.setString(2, vol);
-        ps.setString(3, nbrPlaces);//a mettre en int !
-        ps.setString(4, time); //A mettre en time
+        ps.setString(2, password);
         return ps.executeUpdate() != 0;
     }
 
-    public synchronized boolean insertUser(String username, String password, String mail)
+    public synchronized int insertReservation(String username, String vol, int nbrPlaces)
     throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Password, Mail) VALUES (?,?,?)");
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO Reservation(Username, NumeroVol, nbPlaces) VALUES (?,?,?)");
         ps.setString(1, username);
-        ps.setString(2, password);
-        ps.setString(3, mail);
+        ps.setString(2, vol);
+        ps.setInt(3, nbrPlaces);
+        return ps.executeUpdate();
+    }
+
+    public synchronized boolean insertWebUser(String username, String mail)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("INSERT INTO WebUsers(Username, Mail) VALUES (?,?)");
+        ps.setString(1, username);
+        ps.setString(2, mail);
         return ps.executeUpdate() != 0;
     }
 
@@ -429,6 +441,14 @@ public class Bd {
         return ps.executeQuery();
     }
 
+    public synchronized ResultSet selectReservation(String username, String numVol)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Reservation WHERE Username = ? AND NumeroVol = ?");
+        ps.setString(1, username);
+        ps.setString(2, numVol);
+        return ps.executeQuery();
+    }
+
     public synchronized ResultSet selectTodayVols()
     throws SQLException {
         return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN CURRENT_DATE AND CURRENT_DATE + 1");
@@ -456,6 +476,13 @@ public class Bd {
         return ps.executeQuery();
     }
 
+    public synchronized ResultSet selectUserWeb(String mail)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("SELECT Username,Password FROM WebUsers NATURAL JOIN Login WHERE Mail = ?");
+        ps.setString(1, mail);
+        return ps.executeQuery();
+    }
+
     public synchronized ResultSet selectVolReservable(String numVol)
     throws SQLException {
         PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ?");
@@ -469,21 +496,7 @@ public class Bd {
         PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Vol WHERE NumeroVol LIKE ? AND PlacesDisponible >= ?");
         ps.setString(1, numVol);
         ps.setInt(2, nbPlaces);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            suppPlacesReservables(numVol, nbPlaces);
-            rs.beforeFirst();
-            return rs;
-        }
-        return null;
-    }
-
-    public synchronized int suppPlacesReservables(String numVol, int nbPlaces)
-    throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible - ? WHERE NumeroVol LIKE ?");
-        ps.setInt(1, nbPlaces);
-        ps.setString(2, numVol);
-        return ps.executeUpdate();
+        return ps.executeQuery();
     }
 
     public synchronized ResultSet selectVoyageurId(Voyageur v)
@@ -497,7 +510,7 @@ public class Bd {
 
     public synchronized ResultSet selectWeekVols()
     throws SQLException {
-        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 7");
+        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 6");
     }
 
     public synchronized void setAutoComit(boolean b)
@@ -508,6 +521,14 @@ public class Bd {
     public synchronized Savepoint setSavepoint()
     throws SQLException {
         return Connection.setSavepoint();
+    }
+
+    public synchronized int suppPlacesLibre(String numVol, int nbPlaces)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Vol SET PlacesDisponible = PlacesDisponible - ? WHERE NumeroVol LIKE ?");
+        ps.setInt(1, nbPlaces);
+        ps.setString(2, numVol);
+        return ps.executeUpdate();
     }
 
     /**
@@ -534,6 +555,15 @@ public class Bd {
                 break;
         }
         ps.setString(2, numBagage);
+        return ps.executeUpdate();
+    }
+
+    public synchronized int updateReservation(String username, String vol, int nbPlaces)
+    throws SQLException {
+        PreparedStatement ps = Connection.prepareStatement("UPDATE Reservation SET nbPlaces = nbPlaces + ? WHERE Username = ? AND NumeroVol = ?");
+        ps.setInt(1, nbPlaces);
+        ps.setString(2, username);
+        ps.setString(3, vol);
         return ps.executeUpdate();
     }
 }

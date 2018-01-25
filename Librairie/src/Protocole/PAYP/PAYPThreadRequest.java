@@ -35,13 +35,12 @@ import Tools.Bd.Bd;
 import Tools.Bd.BdType;
 import Tools.Crypto.FonctionsCrypto;
 import Tools.Procedural;
-import Tools.PropertiesReader;
 
 public class PAYPThreadRequest extends ServeurRequete {
     private static final String keyname        = "payement";
     //todo Properties avec le nom du keystore, password
     private static final String keystore       = "Serveur_Payement.pkcs12";
-    private static final String mastercardName = PropertiesReader.getProperties("SERVER_MASTERCARD");
+    private static final String mastercardName = "floryan-msi-portable";// PropertiesReader.getProperties("SERVER_MASTERCARD");
     private static final String password       = "azerty";
     private static final Cipher cipher         = FonctionsCrypto.loadPrivateKeyNoError(keystore, password, keyname);
     private static final int    port           = 26019 /*Integer.parseInt(PropertiesReader.getProperties("PORT_MASTERCARD"))*/;

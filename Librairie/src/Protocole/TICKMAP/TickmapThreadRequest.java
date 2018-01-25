@@ -189,8 +189,8 @@ public class TickmapThreadRequest extends ServeurRequete {
                                             for (Voyageur v : listVoyageurs) {
                                                 bd.ajoutVoyageur(v);
                                             }
-
-                                            bd.suppPlacesReservables(vol, count);
+                                            //Todo méhtode qui enregistre dans la bd tous les vols réservés non payé
+                                            bd.suppPlacesLibre(vol, count);
                                             ResultSet rss = bd.selectLieu(vol);
                                             rss.next();
                                             String lieu = rss.getString(1);
