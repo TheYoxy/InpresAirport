@@ -22,28 +22,35 @@
           href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
 </head>
 <body>
-<table data-toggle="table" id="table" class="table table-bordered table-hover">
-    <thead>
-    <tr>
-        <% for (String s : vols.getTete()) {%>
-        <th>
-            <%=s %>
-        </th>
-        <% } %>
-    </tr>
-    </thead>
-    <tbody>
-    <% for (Vector<String> vs : vols.getChamps()) { %>
-    <tr class="clickable-row">
-        <% for (String s : vs) { %>
-        <td>
-            <%=s %>
-        </td>
-        <% } %>
-    </tr>
-    <% } %>
-    </tbody>
-</table>
+<div class="container">
+    <div class="row">
+        <h2 class="text-center">Liste des vols: </h2>
+    </div>
+    <div class="row">
+        <table data-toggle="table" id="table" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <% for (String s : vols.getTete()) {%>
+                <th>
+                    <%=s %>
+                </th>
+                <% } %>
+            </tr>
+            </thead>
+            <tbody>
+            <% for (Vector<String> vs : vols.getChamps()) { %>
+            <tr class="clickable-row">
+                <% for (String s : vs) { %>
+                <td>
+                    <%=s %>
+                </td>
+                <% } %>
+            </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
 <script>
     $(function () {
         $('#table').on('dbl-click-row.bs.table', function (row, $element, field) {

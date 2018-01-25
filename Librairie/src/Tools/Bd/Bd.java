@@ -400,14 +400,17 @@ public class Bd {
 
     public synchronized ResultSet selectLastPlaceNum(String numVol)
     throws SQLException {
-        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroPlace FROM bd_airport.Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet DESC LIMIT 1");
+        PreparedStatement ps = Connection.prepareStatement("SELECT NumeroPlace FROM Billets NATURAL JOIN Vol WHERE NumeroVol LIKE ? ORDER BY NumeroBillet DESC LIMIT 1");
         ps.setString(1, numVol);
         return ps.executeQuery();
     }
 
-    public synchronized ResultSet selectLastTransaction()
+    public synchronized ResultSet selectLastTransaction(String carte, double prix)
     throws SQLException {
-        return Connection.prepareStatement("SELECT * FROM Transactions ORDER BY instant DESC LIMIT 1").executeQuery();
+        PreparedStatement ps = Connection.prepareStatement("SELECT * FROM Transactions WHERE somme = -? AND numeroCarte = ? ORDER BY instant DESC LIMIT 1");
+        ps.setDouble(1, prix);
+        ps.setString(2, carte);
+        return ps.executeQuery();
     }
 
     public synchronized ResultSet selectLieu(String numVol)
@@ -510,7 +513,7 @@ public class Bd {
 
     public synchronized ResultSet selectWeekVols()
     throws SQLException {
-        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 6");
+        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 6 AND PlacesDisponible > 0");
     }
 
     public synchronized void setAutoComit(boolean b)

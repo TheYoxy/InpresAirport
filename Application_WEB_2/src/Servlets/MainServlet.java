@@ -22,10 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import NetworkObject.Bean.Carte;
+import NetworkObject.Bean.MACMessage;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Voyageur;
 import Protocole.TICKMAP.ReponseTICKMAP;
 import Protocole.TICKMAP.RequeteTICKMAP;
+import Protocole.TICKMAP.TypeReponseTICKMAP;
 import Temp.PropertiesReader;
 import Tools.AESCryptedSocket;
 import Tools.Crypto.FonctionsCrypto;
@@ -82,22 +84,28 @@ public class MainServlet extends HttpServlet {
                     }
                     break;
                 case CARTE: {
-
                     HttpSession    session = request.getSession();
                     List<Voyageur> list    = (List<Voyageur>) session.getAttribute("list");
                     Voyageur       v       = list.get(Integer.valueOf(request.getParameter("proprio")));
                     String         card    = request.getParameter("card");
 
-
                     Cipher asym     = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
                     Carte  c        = new Carte(v, card);
                     Socket payement = new Socket(InetAddress.getByName(PropertiesReader.getProperties("PAYEMENT_NAME")), Integer.parseInt(PropertiesReader.getProperties("PORT_PAYEMENT")));
                     //TODO Gestion de la création d'une nouvelle carte
+                    request.setAttribute("c", c);
+
                     RequeteTICKMAP     requeteTICKMAP = FonctionsPayement.sendPayement(c, asym, payement, ((Places) session.getAttribute("p")).getPrix(), (Mac) session.getAttribute("hmac"), (oosPayement, oisPayement) -> false);
                     ObjectOutputStream oos            = (ObjectOutputStream) session.getAttribute("oos");
                     oos.writeObject(requeteTICKMAP);
+
                     ObjectInputStream ois = (ObjectInputStream) session.getAttribute("ois");
                     ReponseTICKMAP    rep = (ReponseTICKMAP) ois.readObject();
+                    //TODO TEST VALEUR DE REP
+
+                    request.setAttribute("id", rep.getCode() == TypeReponseTICKMAP.OK
+                                               ? (String) ((MACMessage) requeteTICKMAP.getParam()).getParam()
+                                               : null);
                     request.getRequestDispatcher("valide.jsp").forward(request, response);
                 }
                 break;

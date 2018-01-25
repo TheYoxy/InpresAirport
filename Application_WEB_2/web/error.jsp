@@ -1,9 +1,9 @@
+<%@ page import="java.io.PrintWriter" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <title>InpresAirport</title>
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans"/>
-    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <meta charset="UTF-16BE">
 </head>
 <body>
@@ -19,7 +19,7 @@
         <%
             Exception e = (Exception) request.getAttribute("Exception");
             if (e != null)
-                out.println("Erreur: " + e.getLocalizedMessage());
+                e.printStackTrace(new PrintWriter(out));
         %>
     </p>
 </div>

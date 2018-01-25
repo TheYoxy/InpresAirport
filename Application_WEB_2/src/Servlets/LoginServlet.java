@@ -61,9 +61,10 @@ public class LoginServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
+        request.getSession(false).invalidate();
         String      username = request.getParameter("username");
         String      password = request.getParameter("password");
-        HttpSession session  = request.getSession();
+        HttpSession session  = request.getSession(true);
         int         challenge;
         try {
             Socket s = (Socket) session.getAttribute("s");

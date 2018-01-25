@@ -44,12 +44,10 @@ public abstract class FonctionsPayement {
         RequeteTICKMAP     requeteTICKMAP = null;
         ObjectOutputStream oosPayement    = new ObjectOutputStream(payement.getOutputStream());
         oosPayement.writeObject(new PAYPThreadRequest());
-        System.out.println("THREADREQUEST");
         oosPayement = new ObjectOutputStream(payement.getOutputStream());
         ObjectInputStream oisPayement = new ObjectInputStream(payement.getInputStream());
         //TODO AJOUT SIGNATURE
         while (pay) {
-            System.out.println("PAYEMENT");
             oosPayement.writeObject(new RequetePAYP(TypeRequetePAYP.PAYEMENT, (Serializable) FonctionsCrypto.encrypt(new Payement(c, prix), asym)));
             ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
             System.out.println("Reponse: " + reponse);

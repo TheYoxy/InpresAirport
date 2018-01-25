@@ -19,13 +19,13 @@ public class STThreadRequest extends ServeurRequete {
     @Override
     public Runnable createRunnable(Socket client) {
         return () -> {
-            ObjectInputStream ois;
+            ObjectInputStream  ois;
             ObjectOutputStream oos;
-            Bd bd;
-            boolean boucle = true;
-            boolean verif = false;
-            Carte carte = null;
-            double prix = 0;
+            Bd                 bd;
+            boolean            boucle = true;
+            boolean            verif  = false;
+            Carte              carte  = null;
+            double             prix   = 0;
 
             try {
                 bd = new Bd(BdType.MySql, 5);
@@ -60,9 +60,11 @@ public class STThreadRequest extends ServeurRequete {
                                     rep = new ReponseST(TypeReponseST.OK);
                                     System.out.println(Thread.currentThread().getName() + "> Attente d'une confirmation du payement");
                                     verif = true;
-                                } else
+                                }
+                                else
                                     boucle = false;
-                            } else
+                            }
+                            else
                                 rep = new ReponseST(TypeReponseST.CARD_NOT_FOUND);
                         }
                         break;
@@ -71,11 +73,24 @@ public class STThreadRequest extends ServeurRequete {
                                 int nb = bd.payement(carte.getNumeroCarte(), prix);
                                 bd.commit();
                                 System.out.println(Thread.currentThread().getName() + "> Payement validé pour la carte: " + carte);
-                                ResultSet rs = bd.selectLastTransaction();
-                                if (!rs.next()) System.exit(42);
-                                String id = rs.getString(1);
-                                System.out.println(Thread.currentThread().getName() + "> Id de la transaction: " + id);
-                                rep = new ReponseST(TypeReponseST.OK, id);
+                                ResultSet rs;
+                                int       i = 0;
+                                boolean   b = true;
+                                do {
+                                    i++;
+                                    rs = bd.selectLastTransaction(carte.getNumeroCarte(), prix);
+                                    if (i == 5) b = false;
+                                    Thread.yield();
+                                } while (!rs.next() && b);
+                                if (b) {
+                                    String id = rs.getString(1);
+                                    System.out.println(Thread.currentThread().getName() + "> Id de la transaction: " + id);
+                                    rep = new ReponseST(TypeReponseST.OK, id);
+                                }
+                                else {
+                                    System.out.println(Thread.currentThread().getName() + "> Impossible de trouver l'id de transaction.");
+                                    rep = new ReponseST(TypeReponseST.CANT_FIND);
+                                }
                             }
                             boucle = false;
                             break;

@@ -12,8 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
     <!-- CSS -->
-
-    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css"/>
     <link rel="stylesheet"
           href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet"
@@ -32,12 +30,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 col-lg-offset-3">
-            <h1>Vol ${selected.get(0)}</h1>
+            <h1 class="text-center">Vol ${selected.get(0)}</h1>
             <h3>Destination: ${selected.get(1)}</h3>
             <form class="form-horizontal" action="Main"
                   method="post">
-                <%
-                    int nb = Integer.parseInt(nbPlaces);
+                <% int nb = Integer.parseInt(nbPlaces);
                     for (int i = 0; i < nb; i++)
                         out.println("                <div class=\"well\">\n" +
                                 "                    <h4>Passager n°" + (i + 1) + " :</h4>\n" +
