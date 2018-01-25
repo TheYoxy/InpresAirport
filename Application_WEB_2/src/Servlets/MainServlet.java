@@ -25,6 +25,10 @@ import NetworkObject.Bean.Carte;
 import NetworkObject.Bean.MACMessage;
 import NetworkObject.Bean.Places;
 import NetworkObject.Bean.Voyageur;
+import Protocole.PAYP.ReponsePAYP;
+import Protocole.PAYP.RequetePAYP;
+import Protocole.PAYP.TypeReponsePAYP;
+import Protocole.PAYP.TypeRequetePAYP;
 import Protocole.TICKMAP.ReponseTICKMAP;
 import Protocole.TICKMAP.RequeteTICKMAP;
 import Protocole.TICKMAP.TypeReponseTICKMAP;
@@ -92,11 +96,21 @@ public class MainServlet extends HttpServlet {
                     Cipher asym     = FonctionsCrypto.loadPublicKey(KEYSTORE, STOREPASS, KEY_PAYEMENT);
                     Carte  c        = new Carte(v, card);
                     Socket payement = new Socket(InetAddress.getByName(PropertiesReader.getProperties("PAYEMENT_NAME")), Integer.parseInt(PropertiesReader.getProperties("PORT_PAYEMENT")));
-                    //TODO Gestion de la création d'une nouvelle carte
                     request.setAttribute("c", c);
+                    final double solde = (request.getParameter("new") != null
+                            && !request.getParameter("new").equals("")
+                            && Boolean.parseBoolean(request.getParameter("new")))
+                                         ? Double.parseDouble(request.getParameter("solde"))
+                                         : 0.00;
 
-                    RequeteTICKMAP     requeteTICKMAP = FonctionsPayement.sendPayement(c, asym, payement, ((Places) session.getAttribute("p")).getPrix(), (Mac) session.getAttribute("hmac"), (oosPayement, oisPayement) -> false);
-                    ObjectOutputStream oos            = (ObjectOutputStream) session.getAttribute("oos");
+                    RequeteTICKMAP requeteTICKMAP = FonctionsPayement.sendPayement(c, asym, payement, ((Places) session.getAttribute("p")).getPrix(), (Mac) session.getAttribute("hmac"), (oosPayement, oisPayement) -> {
+                        if (solde == 0.00) return false;
+                        RequetePAYP requetePAYP = new RequetePAYP(TypeRequetePAYP.NEW_CARD, FonctionsCrypto.encrypt(c, asym), FonctionsCrypto.encrypt(solde, asym));
+                        oosPayement.writeObject(requetePAYP);
+                        ReponsePAYP reponse = (ReponsePAYP) oisPayement.readObject();
+                        return reponse.getCode() == TypeReponsePAYP.OK;
+                    });
+                    ObjectOutputStream oos = (ObjectOutputStream) session.getAttribute("oos");
                     oos.writeObject(requeteTICKMAP);
 
                     ObjectInputStream ois = (ObjectInputStream) session.getAttribute("ois");
@@ -106,7 +120,9 @@ public class MainServlet extends HttpServlet {
                     request.setAttribute("id", rep.getCode() == TypeReponseTICKMAP.OK
                                                ? (String) ((MACMessage) requeteTICKMAP.getParam()).getParam()
                                                : null);
-                    request.getRequestDispatcher("valide.jsp").forward(request, response);
+                    request.getRequestDispatcher(rep.getCode() == TypeReponseTICKMAP.OK
+                                                 ? "valide.jsp"
+                                                 : "fail.jsp").forward(request, response);
                 }
                 break;
             }

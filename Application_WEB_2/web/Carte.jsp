@@ -19,48 +19,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+</style>
 <body>
 <div class="container">
     <div class="row">
         <h2>Carte pour le payement: </h2>
     </div>
-    <div class="invisible row">
-        <form action="Main" method="post">
-            <input type="hidden" name="Type"
-                   value="<%=MainServlet.WebType.CARTE.toString()%>">
-            <div class="form-group">
-                <label for="proprio">Propriétaire de la carte: </label>
-                <select class="form-control" id="proprio" name="proprio">
-                    <% for (int i = 0; i < list.size(); i++) {%>
-                    <option value="<%=i%>">
-                        <%=list.get(i)%>
-                    </option>
-                    <%}%>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="card">Numéro de carte: </label>
-                <input type="number" class="form-control" name="card" id="card">
-            </div>
-            <div class="checkbox">
-                <label><input id="newcard" type="checkbox" value="" name="new">Nouvelle
-                    carte</label>
-            </div>
-            <div id="solde" class="form-group invisible">
-                <label for="isolde"></label>
-                <input id="isolde" type="number" value="1000" name="solde">
-            </div>
-            <input id="submit" type="submit" class="btn btn-default disabled" value="Confirmer">
-        </form>
+    <div class="row">
+        <div class="well well-lg">
+            <form action="Main" method="post">
+                <input type="hidden" name="Type"
+                       value="<%=MainServlet.WebType.CARTE.toString()%>">
+                <div class="form-group">
+                    <label for="proprio">Propriétaire de la carte: </label>
+                    <select class="form-control" id="proprio" name="proprio">
+                        <% for (int i = 0; i < list.size(); i++) {%>
+                        <option value="<%=i%>">
+                            <%=list.get(i)%>
+                        </option>
+                        <%}%>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="card">Numéro de carte: </label>
+                    <input type="number" class="form-control" name="card" id="card">
+                </div>
+                <div class="checkbox">
+                    <label><input id="newcard" type="checkbox" value="true" name="new">Nouvelle
+                        carte</label>
+                </div>
+                <div id="solde" class="form-group invisible">
+                    <label for="isolde">Solde sur la nouvelle carte: </label>
+                    <input id="isolde" class="form-control" type="number" value="1000" name="solde">
+                </div>
+                <input id="submit" type="submit" class="btn btn-default disabled" value="Confirmer">
+            </form>
+        </div>
     </div>
 </div>
 <script>
     $(document).ready(function () {
-        $("#card").change(function (e) {
-            console.log(e);
+        $("#card").on('change paste keyup', function () {
+            if ($(this).val().toString().length === 17)
+                $("#submit").removeClass("disabled");
+            else
+                $("#submit").addClass("disabled");
         });
-        $("#newcard").change(function () {
-
+        $("#newcard").on('change', function () {
+            $('#solde').toggleClass('invisible');
         });
     });
 </script>
