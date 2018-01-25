@@ -539,7 +539,7 @@ public class Bd {
 
     public synchronized ResultSet selectWeekVols()
     throws SQLException {
-        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN current_date AND current_date + 6 AND PlacesDisponible > 0");
+        return Connection.createStatement().executeQuery("SELECT NumeroVol,Lieu,HeureDepart,Prix,Description FROM Vol WHERE HeureDepart BETWEEN NOW() AND NOW() + INTERVAL 1 WEEK AND PlacesDisponible > 0");
     }
 
     public synchronized void setAutoComit(boolean b)
