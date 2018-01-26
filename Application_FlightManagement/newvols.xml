@@ -5,8 +5,8 @@
 	</compagnie>
 	<createFlights>
 		<vol>
-			<NumeroVol>1</NumeroVol>
-			<Lieu>Paris</Lieu>
+			<NumeroVol>3</NumeroVol>
+			<Lieu>New-York</Lieu>
 			<HeureDepart>2018-12-02 07:30:00</HeureDepart>
 			<HeureArrivee>2018-12-02 09:45:00</HeureArrivee>
 			<Prix>250.0</Prix>

@@ -145,9 +145,9 @@ public class FonctionsCrypto {
     }
 
     public static KeyStore loadKeyStore(String filename, char[] pass) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
-        if (!filename.startsWith(System.getProperty("file.separator")))
-            filename = System.getProperty("file.separator") + filename;
-
+        //if (!filename.startsWith(System.getProperty("file.separator")))
+          //  filename = System.getProperty("file.separator") + filename;
+        System.out.println(">filename: "+ filename);
         File f = new File(FonctionsCrypto.class.getResource(filename).getFile());
 
         if (!f.exists()) throw new FileNotFoundException(filename + " not found.");
